@@ -1,0 +1,13 @@
+!ifndef BRIDLE_NULL
+    !define BRIDLE_NULL "BridleNSIS_NULL"
+!endif
+
+Var /GLOBAL g
+
+!include "Include2.bnsh"
+
+Var /GLOBAL b
+StrCpy $b $a
+
+Call foo
+DetailPrint "$b$g" 

@@ -1,0 +1,27 @@
+!ifndef BRIDLE_NULL
+    !define BRIDLE_NULL "BridleNSIS_NULL"
+!endif
+
+Var /GLOBAL a
+StrCpy $a "hello"
+
+StrCpy $r0 "!"
+       ; $0..9 are out of the game
+
+Var /GLOBAL b
+StrCpy $b "$a world$r0"
+
+Var /GLOBAL p
+StrCpy $p 1
+
+Var /GLOBAL pre
+StrCpy $pre 2
+
+    DetailPrint $pre 
+	
+	Var /GLOBAL c
+	StrCpy $c "$a$b$r0"
+    
+DetailPrint "$a$r0!" 
+
+; eof

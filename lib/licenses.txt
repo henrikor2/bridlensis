@@ -1,0 +1,11 @@
+Markdown4J
+    The BSD 3-Clause License
+    http://opensource.org/licenses/BSD-3-Clause
+
+JUnit
+    Eclipse Public License - v 1.0
+    http://www.eclipse.org/legal/epl-v10.html
+
+Hamcrest
+    New BSD License
+    http://opensource.org/licenses/BSD-3-Clause

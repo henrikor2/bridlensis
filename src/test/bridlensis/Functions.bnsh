@@ -1,0 +1,54 @@
+!ifndef BRIDLE_NULL
+    !define BRIDLE_NULL "BridleNSIS_NULL"
+!endif
+
+Var /GLOBAL arguments.a
+Var /GLOBAL arguments.b
+Function arguments
+    Pop $arguments.a
+    Pop $arguments.b
+    StrCpy $arguments.b "there"
+    Var /GLOBAL arguments.c
+    StrCpy $arguments.c "y'all"
+    StrCpy $r0 "$arguments.a$arguments.b$arguments.c"
+    DetailPrint $r0 
+FunctionEnd
+
+Var /GLOBAL b
+StrCpy $b "world"
+StrCpy $r0 "."
+Push $b
+Push "hello"
+Call arguments
+DetailPrint $b 
+DetailPrint $r0 
+
+Function return_foo
+    Push "foo"
+    Return
+    DetailPrint "Never gets here"
+FunctionEnd
+
+Call return_foo
+Var /GLOBAL bridlensis_nullvar
+Pop $bridlensis_nullvar
+
+Call return_foo
+Pop $r0
+
+DetailPrint $r0 
+
+;DetailPrint (return_foo())
+
+Var /GLOBAL join.a
+Var /GLOBAL join.b
+Function join
+    Pop $join.a
+    Pop $join.b
+    Push "$join.a$join.b"
+    Return
+FunctionEnd
+
+;Function len(a, b)
+;    Return strlen(join(a, b))
+;FunctionEnd

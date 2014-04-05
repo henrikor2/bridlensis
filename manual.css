@@ -1,0 +1,44 @@
+<style type='text/css'>
+html, body{
+    background-color:#FFFFFF;
+    color:#000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    margin:6px;
+    padding:0px;
+}
+
+h2{
+	border-top: 1px solid #CCCCCC;
+	margin-top: 24px;
+	padding-top: 12px;
+}
+
+li{
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+code{
+	background-color:#EEEEEE;
+	color:#000000;
+	font-family:monospace;
+    margin:0px;
+	padding:3px;
+}
+
+pre{
+	background-color:#EEEEEE;
+    border-style:solid;
+    border-color:#CCCCCC;
+    border-width:1px;
+	color:#000000;
+	font-family:monospace;
+    line-height: 1.5;
+	margin:0px;
+	padding:6px;
+}
+.func{
+	padding-left:24px;
+}
+</style>

@@ -1,0 +1,159 @@
+<project name="BridleNSIS" default="build">
+
+    <loadfile property="bridle.version" srcfile="src/prod/bridlensis/VERSION" />
+    <property file="build.properties" />
+
+    <target name="clean">
+        <delete dir="build" />
+        <delete dir="Example" />
+        <delete>
+            <fileset dir="." includes="*.jar,*.exe,*.html,*.snsi" />
+        </delete>
+    </target>
+
+    <target name="build">
+        <echo message="Build BridleNSIS ${bridle.version}" />
+        <antcall target="compile" />
+        <antcall target="test" />
+        <antcall target="jar" />
+        <antcall target="doc" />
+        <antcall target="installer" />
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${bridle.prod.bin}" />
+        <copy todir="${bridle.prod.bin}" overwrite="true">
+            <fileset dir="${bridle.prod.src}" excludes="**/*.java" />
+        </copy>
+        <javac destdir="${bridle.prod.bin}"
+               source="${bridle.java.version}"
+               target="${bridle.java.version}"
+               debug="on"
+               includeAntRuntime="false">
+            <src path="${bridle.prod.src}" />
+        </javac>
+    </target>
+
+    <target name="test">
+        <antcall target="test::compile" />
+        <antcall target="test::run" />
+    </target>
+
+    <target name="test::compile">
+        <mkdir dir="${bridle.test.bin}" />
+        <javac destdir="${bridle.test.bin}"
+               source="${bridle.java.version}"
+               target="${bridle.java.version}"
+               debug="on"
+               includeAntRuntime="false">
+            <src path="${bridle.test.src}" />
+            <classpath>
+                <pathelement path="${bridle.prod.bin}" />
+                <pathelement location="${bridle.junit.jar}" />
+                <pathelement location="${bridle.hamcrest-core.jar}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test::run">
+        <junit printsummary="true"
+               haltonfailure="false"
+               failureproperty="bridle.test.failure">
+            <formatter type="plain" />
+            <batchtest fork="yes" todir="${bridle.test.bin}">
+                <fileset dir="${bridle.test.src}" includes="**/*Test.java" />
+            </batchtest>
+            <classpath>
+                <pathelement path="${bridle.prod.bin}" />
+                <pathelement path="${bridle.test.bin}" />
+                <pathelement location="${bridle.junit.jar}" />
+                <pathelement location="${bridle.hamcrest-core.jar}" />
+            </classpath>
+        </junit>
+        <fail if="bridle.test.failure" message="Test(s) failed" />
+    </target>
+
+    <target name="jar">
+        <jar destfile="${bridle.jar.file}">
+            <fileset dir="${bridle.prod.bin}" />
+            <manifest>
+                <attribute name="Implementation-Title" value="BridleNSIS" />
+                <attribute name="Implementation-Version"
+                           value="${bridle.version}" />
+                <attribute name="Main-Class"
+                           value="bridlensis.MakeBridleNSIS" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="doc">
+        <antcall target="doc::compile" />
+        <antcall target="doc::generate" />
+    </target>
+
+    <target name="doc::compile">
+        <mkdir dir="${bridle.doc.bin}" />
+        <javac destdir="${bridle.doc.bin}"
+               source="${bridle.java.version}"
+               target="${bridle.java.version}"
+               debug="on"
+               includeAntRuntime="false">
+            <src path="${bridle.doc.src}" />
+            <classpath>
+                <pathelement path="${bridle.prod.bin}" />
+                <pathelement location="${bridle.markdown4j.jar}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="doc::generate">
+        <java classname="bridlensis.doc.HTMLConvert"
+              fork="true"
+              failonerror="true">
+            <classpath>
+                <pathelement path="${bridle.doc.bin}" />
+                <pathelement path="${bridle.prod.bin}" />
+                <pathelement location="${bridle.markdown4j.jar}" />
+            </classpath>
+        </java>
+    </target>
+
+    <target name="installer">
+        <antcall target="installer::copyfiles" />
+        <antcall target="installer::makebridle" />
+    </target>
+
+    <target name="installer::copyfiles">
+        <mkdir dir="Example" />
+        <copy todir="Example" overwrite="true">
+            <fileset dir="${bridle.inst.src}" />
+        </copy>
+        <replace file="Example/MakeInstaller.bat"
+                 token="@BRIDLE_VERSION@"
+                 value="${bridle.version}" />
+    </target>
+
+    <target name="installer::makebridle">
+        <condition property="bridle.nsis.home.switch" value="-n" else="">
+            <and>
+                <isset property="bridle.nsis.home" />
+                <length string="${bridle.nsis.home}"
+                        when="greater"
+                        length="0" />
+            </and>
+        </condition>
+        <java classname="bridlensis.MakeBridleNSIS"
+              fork="true"
+              failonerror="true">
+            <classpath>
+                <pathelement path="${bridle.prod.bin}" />
+            </classpath>
+            <arg line="${bridle.nsis.home.switch}" />
+            <arg value="${bridle.nsis.home}" />
+            <arg value="Example/Installer.nsi" />
+            <arg value="/DBRIDLE_HOME=${basedir}" />
+            <arg value="/DBRIDLE_VERSION=${bridle.version}" />
+        </java>
+    </target>
+
+</project>

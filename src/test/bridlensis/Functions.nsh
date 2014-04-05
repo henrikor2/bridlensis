@@ -1,0 +1,32 @@
+Function arguments(a, b)
+    b = "there"
+    c = "y'all"
+    global.R0 = a + b + c
+    DetailPrint(global.R0)
+FunctionEnd
+
+b = "world"
+R0 = "."
+arguments("hello", b)
+DetailPrint(b)
+DetailPrint(R0)
+
+Function return_foo()
+    Return "foo"
+    DetailPrint "Never gets here"
+FunctionEnd
+
+return_foo()
+
+R0 = return_foo()
+DetailPrint (R0)
+
+;DetailPrint (return_foo())
+
+Function join(a, b)
+    Return a + b
+FunctionEnd
+
+;Function len(a, b)
+;    Return strlen(join(a, b))
+;FunctionEnd

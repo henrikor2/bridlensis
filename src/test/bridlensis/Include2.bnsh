@@ -1,0 +1,8 @@
+Var /GLOBAL a
+StrCpy $a "hello world"
+
+Function foo
+
+    StrCpy $g "!"
+
+FunctionEnd
