@@ -2,6 +2,11 @@
 
 BridleNSIS is a language extension for NSIS (Nullsoft Scriptable Install System) designed to make things easier to express and rein in verbosity of NSIS at places.
 
+[Version 0.1.0](https://github.com/henrikor2/bridlensis/blob/master/dist/BridleNSIS-0.1.0.exe)
+First public version.
+
+## Build From Source Code
+
 In order to build the project you need JDK 1.7 or newer, Apache ANT 1.8 or newer, and NSIS for compiling the installer. If NSIS home directory is not found from the Windows %PATH% define it in property `bridle.nsis.home` at `build.properties` file.
 
 1.   Compile BridleNSIS Java classes: `ant compile`
