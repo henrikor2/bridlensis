@@ -5,17 +5,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import bridlensis.env.Callable;
+import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.FunctionDelete;
+import bridlensis.env.FunctionFile;
 import bridlensis.env.FunctionFileCopy;
-import bridlensis.env.UserFunction;
-import bridlensis.env.ComparisonStatement;
-import bridlensis.env.Instruction;
 import bridlensis.env.FunctionMsgBox;
-import bridlensis.env.Variable;
 import bridlensis.env.FunctionMsgBox.ButtonGroup;
 import bridlensis.env.FunctionMsgBox.ReturnOption;
+import bridlensis.env.Instruction;
+import bridlensis.env.UserFunction;
+import bridlensis.env.Variable;
 
 public class StatementFactory {
 
@@ -124,6 +125,8 @@ public class StatementFactory {
 			return callFileCopy(indent, args, returnVar);
 		} else if (callable instanceof FunctionDelete) {
 			return callDelete(indent, args, returnVar);
+		} else if (callable instanceof FunctionFile) {
+			return callFile(indent, args, returnVar);
 		} else {
 			return callInstruction(indent, (Instruction) callable, args,
 					returnVar);
@@ -281,6 +284,27 @@ public class StatementFactory {
 		}
 		sb.append(argValues.get(FunctionDelete.FILE_INDEX));
 		sb.append(endBuiltinFunctionStatement(indent, returnVar));
+		return sb.toString();
+	}
+
+	private String callFile(String indent, List<String> argValues,
+			Variable returnVar) throws InvalidSyntaxException {
+		StringBuilder sb = begin(indent);
+		if (!argValues.get(FunctionFile.OUTPATH_INDEX).equals(NULL)) {
+			sb.append("SetOutPath ");
+			sb.append(argValues.get(FunctionFile.OUTPATH_INDEX));
+			sb.append(InputReader.NEW_LINE);
+			sb.append(indent);
+		}
+		sb.append("File ");
+		if (!argValues.get(FunctionFile.OPTIONS_INDEX).equals(NULL)) {
+			String options = deString(argValues.get(FunctionFile.OPTIONS_INDEX));
+			if (!options.isEmpty()) {
+				sb.append(options);
+				sb.append(' ');
+			}
+		}
+		sb.append(argValues.get(FunctionFile.FILE_INDEX));
 		return sb.toString();
 	}
 

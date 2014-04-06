@@ -27,6 +27,8 @@ Function join(a, b)
     Return a + b
 FunctionEnd
 
-;Function len(a, b)
-;    Return strlen(join(a, b))
-;FunctionEnd
+; FunctionFile
+File("autoexec.bat")
+File("autoexec.bat", "/oname=autoexec.tmp")
+File("*.*", "/r /nonfatal", instdir + "\doc")
+File("*.html", "", instdir + "\doc")

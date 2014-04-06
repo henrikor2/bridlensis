@@ -49,6 +49,10 @@ Function join
     Return
 FunctionEnd
 
-;Function len(a, b)
-;    Return strlen(join(a, b))
-;FunctionEnd
+; FunctionFile
+File "autoexec.bat"
+File /oname=autoexec.tmp "autoexec.bat"
+SetOutPath "$instdir\doc"
+File /r /nonfatal "*.*"
+SetOutPath "$instdir\doc"
+File "*.html"

@@ -100,7 +100,7 @@ Functions may have 0 to N arguments and a return value.
 
 Existing NSIS functions can be called the same way as BridleNSIS functions. They will not have any arguments or return value.
 
-    Function NsisFunc ...
+    Function NsisFunc
         ...
     FunctionEnd
     
@@ -187,6 +187,19 @@ Function will return name of the button user selected: `OK`, `CANCEL`, `ABORT`, 
 
     If MsgBox("YESNO", "Are you sure?") == "YES"
         ...
+
+
+#### File(file [, options [, outpath]])
+
+Adds file(s) to be extracted. Wildcards are supported. See NSIS File instruction documentation for options. Uses the current output path unless argument `outpath` is given. 
+
+    File("somefile.dat")
+    
+    File("c:\autoexec.bat", \       ; Specific file
+         "/oname=my autoexec.tmp")  ; As "my autoexec.bat"
+    
+    File("*.html", "", \            ; All HTML files
+         instdir + "\doc")          ; To $INSTDIR\doc
 
 
 #### FileCopy(source, target)
