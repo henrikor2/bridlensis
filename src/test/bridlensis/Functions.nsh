@@ -35,4 +35,8 @@ File("*.html", "", instdir + "\doc")
 
 ; FunctionRename
 Rename("autoexec.bak", "autoexec.bat")
-Rename("autoexec.bak", "autoexec.bat" 1) ; REBOOTOK
+Rename("autoexec.bak", "autoexec.bat", 1) ; REBOOTOK
+
+; RMDir
+RMDir(pluginsdir)
+RMDir($%TEMP% + "\BridleNSIS", "/r") ; Recursive option

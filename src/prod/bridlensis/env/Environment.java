@@ -48,6 +48,7 @@ public class Environment {
 		addBuiltinFunction(new FunctionDelete());
 		addBuiltinFunction(new FunctionFile());
 		addBuiltinFunction(new FunctionRename());
+		addBuiltinFunction(new FunctionRMDir());
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {

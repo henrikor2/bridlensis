@@ -14,6 +14,7 @@ import bridlensis.env.FunctionFileCopy;
 import bridlensis.env.FunctionMsgBox;
 import bridlensis.env.FunctionMsgBox.ButtonGroup;
 import bridlensis.env.FunctionMsgBox.ReturnOption;
+import bridlensis.env.FunctionRMDir;
 import bridlensis.env.FunctionRename;
 import bridlensis.env.Instruction;
 import bridlensis.env.UserFunction;
@@ -130,6 +131,8 @@ public class StatementFactory {
 			return callFile(indent, args, returnVar);
 		} else if (callable instanceof FunctionRename) {
 			return callRename(indent, args, returnVar);
+		} else if (callable instanceof FunctionRMDir) {
+			return callRMDir(indent, args, returnVar);
 		} else {
 			return callInstruction(indent, (Instruction) callable, args,
 					returnVar);
@@ -321,6 +324,22 @@ public class StatementFactory {
 		sb.append(argValues.get(FunctionRename.SOURCE_INDEX));
 		sb.append(" ");
 		sb.append(argValues.get(FunctionRename.TARGET_INDEX));
+		sb.append(endBuiltinFunctionStatement(indent, returnVar));
+		return sb.toString();
+	}
+
+	private String callRMDir(String indent, List<String> argValues,
+			Variable returnVar) throws InvalidSyntaxException {
+		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
+		sb.append("RMDir ");
+		if (!argValues.get(FunctionRMDir.OPTIONS_INDEX).equals(NULL)) {
+			String options = deString(argValues.get(FunctionFile.OPTIONS_INDEX));
+			if (!options.isEmpty()) {
+				sb.append(options);
+				sb.append(' ');
+			}
+		}
+		sb.append(argValues.get(FunctionRMDir.DIR_INDEX));
 		sb.append(endBuiltinFunctionStatement(indent, returnVar));
 		return sb.toString();
 	}

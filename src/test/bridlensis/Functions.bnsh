@@ -60,3 +60,7 @@ File "*.html"
 ; FunctionRename
 Rename "autoexec.bak" "autoexec.bat"
 Rename /REBOOTOK "autoexec.bak" "autoexec.bat"
+
+; RMDir
+RMDir $pluginsdir
+RMDir /r "$%TEMP%\BridleNSIS"
