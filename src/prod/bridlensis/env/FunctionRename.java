@@ -4,7 +4,7 @@ public class FunctionRename extends Callable {
 
 	public static final int SOURCE_INDEX = 0;
 	public static final int TARGET_INDEX = 1;
-	public static final int REBOOTOK_INDEX = 2;
+	public static final int OPTIONS_INDEX = 2;
 
 	FunctionRename() {
 		super("rename");

@@ -63,4 +63,4 @@ Rename /REBOOTOK "autoexec.bak" "autoexec.bat"
 
 ; RMDir
 RMDir $pluginsdir
-RMDir /r "$%TEMP%\BridleNSIS"
+RMDir /r /REBOOTOK "$%TEMP%\BridleNSIS"

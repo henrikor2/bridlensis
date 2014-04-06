@@ -285,8 +285,13 @@ public class StatementFactory {
 			Variable returnVar) {
 		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
 		sb.append("Delete ");
-		if (!argValues.get(FunctionDelete.REBOOTOK_INDEX).equals(NULL)) {
-			sb.append("/REBOOTOK ");
+		if (!argValues.get(FunctionDelete.OPTIONS_INDEX).equals(NULL)) {
+			String options = deString(argValues
+					.get(FunctionDelete.OPTIONS_INDEX));
+			if (!options.isEmpty()) {
+				sb.append(options);
+				sb.append(' ');
+			}
 		}
 		sb.append(argValues.get(FunctionDelete.FILE_INDEX));
 		sb.append(endBuiltinFunctionStatement(indent, returnVar));
@@ -318,8 +323,13 @@ public class StatementFactory {
 			Variable returnVar) {
 		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
 		sb.append("Rename ");
-		if (!argValues.get(FunctionRename.REBOOTOK_INDEX).equals(NULL)) {
-			sb.append("/REBOOTOK ");
+		if (!argValues.get(FunctionRename.OPTIONS_INDEX).equals(NULL)) {
+			String options = deString(argValues
+					.get(FunctionRename.OPTIONS_INDEX));
+			if (!options.isEmpty()) {
+				sb.append(options);
+				sb.append(' ');
+			}
 		}
 		sb.append(argValues.get(FunctionRename.SOURCE_INDEX));
 		sb.append(" ");

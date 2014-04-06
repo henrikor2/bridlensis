@@ -122,12 +122,8 @@ public class StatementFactoryTest {
 		assertEquals(
 				"StrCpy $s03 1\r\nClearErrors\r\nDelete /REBOOTOK \"C:\\autoexec.bat\"\r\nIfErrors +2\r\n    StrCpy $s03 0",
 				sf.call("", env.getCallable("Delete"),
-						Arrays.asList("\"C:\\autoexec.bat\"", "1"),
+						Arrays.asList("\"C:\\autoexec.bat\"", "/REBOOTOK"),
 						env.registerVariable("s03", null)));
-		assertEquals(
-				"Delete /REBOOTOK \"C:\\autoexec.bat\"",
-				sf.call("", env.getCallable("Delete"),
-						Arrays.asList("\"C:\\autoexec.bat\"", "xxx"), null));
 	}
 
 }

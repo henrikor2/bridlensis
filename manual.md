@@ -210,17 +210,17 @@ Copies files silently from the source to the target on the installing system. Re
         Abort("File copy failed.")
 
 
-#### Delete(file [, rebootok])
+#### Delete(file [, options])
 
-Delete file (which can be a file or wildcard, but should be specified with a full path) from the target system. If any value is specified at `rebootok`(or unless using `${BRIDLE_NULL}` argument value) and the file cannot be deleted then the file is deleted when the system reboots -- if the file will be deleted on a reboot, the reboot flag will be set. Returns `0` with error flag cleared if files are found and deleted or a file is not found, `1` with error flag set if files are found and cannot be deleted. Error flag is not cleared unless function return value is assigned for a variable or used in operation.
+Delete file (which can be a file or wildcard, but should be specified with a full path) from the target system. See NSIS documentation for supported options (`/REBOOTOK`) and their behavior. Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
     If Delete("C:\autoexec.bat") == 0
         DetailPrint("File delete succeeded.")
 
 
-#### Rename(source, target [, rebootok])
+#### Rename(source, target [, options])
 
-Rename source file to target file. The destination file must not exist or the move will fail (unless you are using any value at `rebootok`). If `rebootok` is specified, and the file cannot be moved, then the file is moved when the system reboots. If the file will be moved on a reboot, the reboot flag will be set. Function returns `0` and error flag is set if the file cannot be renamed or if the source file does not exist, otherwise returns `1` with error flag cleared. Error flag is not cleared unless function return value is assigned for a variable or used in operation.
+Rename source file to target file. See NSIS documentation for supported options (`/REBOOTOK`) and their behavior. Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
     If Rename("C:\autoexec.bat", "C:\autoexec.bak") == 0
         DetailPrint("Rename succeeded.")

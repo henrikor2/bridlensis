@@ -3,7 +3,7 @@ package bridlensis.env;
 public class FunctionDelete extends Callable {
 
 	public static final int FILE_INDEX = 0;
-	public static final int REBOOTOK_INDEX = 1;
+	public static final int OPTIONS_INDEX = 1;
 
 	FunctionDelete() {
 		super("delete");
