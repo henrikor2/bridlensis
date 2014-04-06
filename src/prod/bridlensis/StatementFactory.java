@@ -14,6 +14,7 @@ import bridlensis.env.FunctionFileCopy;
 import bridlensis.env.FunctionMsgBox;
 import bridlensis.env.FunctionMsgBox.ButtonGroup;
 import bridlensis.env.FunctionMsgBox.ReturnOption;
+import bridlensis.env.FunctionRename;
 import bridlensis.env.Instruction;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
@@ -127,6 +128,8 @@ public class StatementFactory {
 			return callDelete(indent, args, returnVar);
 		} else if (callable instanceof FunctionFile) {
 			return callFile(indent, args, returnVar);
+		} else if (callable instanceof FunctionRename) {
+			return callRename(indent, args, returnVar);
 		} else {
 			return callInstruction(indent, (Instruction) callable, args,
 					returnVar);
@@ -305,6 +308,20 @@ public class StatementFactory {
 			}
 		}
 		sb.append(argValues.get(FunctionFile.FILE_INDEX));
+		return sb.toString();
+	}
+
+	private String callRename(String indent, List<String> argValues,
+			Variable returnVar) {
+		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
+		sb.append("Rename ");
+		if (!argValues.get(FunctionRename.REBOOTOK_INDEX).equals(NULL)) {
+			sb.append("/REBOOTOK ");
+		}
+		sb.append(argValues.get(FunctionRename.SOURCE_INDEX));
+		sb.append(" ");
+		sb.append(argValues.get(FunctionRename.TARGET_INDEX));
+		sb.append(endBuiltinFunctionStatement(indent, returnVar));
 		return sb.toString();
 	}
 

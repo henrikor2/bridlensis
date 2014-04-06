@@ -32,3 +32,7 @@ File("autoexec.bat")
 File("autoexec.bat", "/oname=autoexec.tmp")
 File("*.*", "/r /nonfatal", instdir + "\doc")
 File("*.html", "", instdir + "\doc")
+
+; FunctionRename
+Rename("autoexec.bak", "autoexec.bat")
+Rename("autoexec.bak", "autoexec.bat" 1) ; REBOOTOK

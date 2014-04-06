@@ -56,3 +56,7 @@ SetOutPath "$instdir\doc"
 File /r /nonfatal "*.*"
 SetOutPath "$instdir\doc"
 File "*.html"
+
+; FunctionRename
+Rename "autoexec.bak" "autoexec.bat"
+Rename /REBOOTOK "autoexec.bak" "autoexec.bat"
