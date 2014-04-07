@@ -3,9 +3,11 @@ package bridlensis;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,36 +54,51 @@ public class Parser {
 		return fileCount;
 	}
 
-	public void start(String inputFileName, String outputFileName)
+	public void parse(String inputFileName, String outputFileName)
 			throws IOException, ParserException {
-		parseFile(inputFileName, outputFileName, true);
+		File inputFile1 = new File(baseDir, inputFileName);
+		System.out.println("Begin parse file: " + inputFile1.getAbsolutePath());
+		File inputFile = inputFile1;
+		BufferedWriter writer = null;
+		try {
+			writer = getOutputWriter(outputFileName);
+			writer.write(statementFactory.nullDefine());
+			parseFile(inputFile, writer);
+		} finally {
+			if (writer != null) {
+				try {
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
+		}
 	}
 
-	private void parseFile(String inputFileName, String outputFileName,
-			boolean defineNull) throws IOException, ParserException {
-		File inputFile = new File(baseDir, inputFileName);
-		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
-		Scanner source = new Scanner(inputFile, encoding);
-		InputReader reader = new InputReader(source);
-
+	private BufferedWriter getOutputWriter(String outputFileName)
+			throws UnsupportedEncodingException, FileNotFoundException,
+			IOException {
 		File outputFile = new File(outDir, outputFileName);
 		System.out.println("Output file: " + outputFile.getAbsolutePath());
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), encoding));
+		if (encoding.equalsIgnoreCase("UTF-16LE")) {
+			writer.write("\uFEFF");
+		} else if (encoding.equalsIgnoreCase("UTF-16BE")) {
+			writer.write("\uFFFE");
+		}
+		return writer;
+	}
 
+	private void parseFile(File inputFile, BufferedWriter writer)
+			throws IOException, ParserException {
+		Scanner source = new Scanner(inputFile, encoding);
+		InputReader reader = new InputReader(source);
 		fileCount++;
 		try {
-			if (encoding.equalsIgnoreCase("UTF-16LE")) {
-				writer.write("\uFEFF");
-			} else if (encoding.equalsIgnoreCase("UTF-16BE")) {
-				writer.write("\uFFFE");
-			}
-
-			if (defineNull) {
-				writer.write(statementFactory.nullDefine());
-			}
 			while (reader.goToNextStatement()) {
-				writer.write(parse(reader));
+				writer.write(parseStatement(reader));
 				writer.write(InputReader.NEW_LINE);
 			}
 			System.out.println(String.format(
@@ -92,14 +109,13 @@ public class Parser {
 			throw new ParserException(inputFile.getAbsolutePath(),
 					reader.getLinesRead(), e);
 		} finally {
-			writer.flush();
-			writer.close();
 			source.close();
 		}
 	}
 
-	protected String parse(InputReader reader) throws InvalidSyntaxException,
-			EnvironmentException, ParserException {
+	protected String parseStatement(InputReader reader)
+			throws InvalidSyntaxException, EnvironmentException,
+			ParserException {
 		if (!reader.hasNextWord()) {
 			return reader.getCurrentStatement();
 		}
@@ -108,7 +124,7 @@ public class Parser {
 		if (tail.startsWith("=")) {
 			return parseVarAssign(word, reader);
 		} else if (tail.startsWith("(")) {
-			return parseCallable(word, null, reader);
+			return parseCall(word, null, reader);
 		} else if (word.equals("var")) {
 			return parseVarDeclare(reader);
 		} else if (word.equals("function")) {
@@ -256,7 +272,7 @@ public class Parser {
 		if (excludeFiles.contains(inputFileName)
 				|| excludeFiles.contains(inputFile.getAbsolutePath())) {
 			System.out.println(String.format(
-					"Include file '%s' omitted being marked as excluded",
+					"Include file '%s' omitted being marked as excluded.",
 					inputFileName));
 			String outputFileName = MakeBridleNSIS
 					.getBridleNSISFileName(inputFileName);
@@ -269,16 +285,31 @@ public class Parser {
 			statement = statementFactory.include(reader.getIndent(),
 					outputFileName);
 		} else if (!inputFile.exists()) {
-			System.out.println(String.format(
-					"Include file '%s' not found, assuming it's found by NSIS",
-					inputFileName));
+			System.out
+					.println(String
+							.format("Include file '%s' not found, assuming it's found by NSIS.",
+									inputFileName));
 			statement = reader.getCurrentStatement();
 		} else {
-			System.out.println("Follow include: " + inputFileName);
+			System.out
+					.println("Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
 					.getBridleNSISFileName(inputFileName);
 			try {
-				parseFile(inputFileName, outputFileName, false);
+				BufferedWriter writer = null;
+				try {
+					writer = getOutputWriter(outputFileName);
+					parseFile(inputFile, writer);
+				} finally {
+					if (writer != null) {
+						try {
+							writer.flush();
+							writer.close();
+						} catch (IOException e) {
+							// Ignore
+						}
+					}
+				}
 			} catch (ParserException | IOException e) {
 				throw new InvalidSyntaxException(e.getMessage(), e);
 			}
@@ -354,7 +385,7 @@ public class Parser {
 		if (tail.endsWith("+")) {
 			value = getExpression(value, sb, reader);
 		} else if (tail.startsWith("(")) {
-			sb.append(parseCallable(value, variable, reader));
+			sb.append(parseCall(value, variable, reader));
 			sb.append(InputReader.NEW_LINE);
 			if (reader.getWordTail().endsWith("+")) {
 				value = getExpression(variable.getName(), sb, reader);
@@ -419,9 +450,8 @@ public class Parser {
 		return statementFactory.functionEnd(reader.getIndent());
 	}
 
-	private String parseCallable(String name, Variable returnVar,
-			InputReader reader) throws InvalidSyntaxException,
-			EnvironmentException {
+	private String parseCall(String name, Variable returnVar, InputReader reader)
+			throws InvalidSyntaxException, EnvironmentException {
 		Callable callable = environment.getCallable(name);
 		if (returnVar != null && callable.getReturnType() == ReturnType.VOID) {
 			throw new InvalidSyntaxException("Function doesn't return a value");
@@ -516,7 +546,7 @@ public class Parser {
 		buffer.append(statementFactory.variableDeclare(reader.getIndent(),
 				fReturn));
 		buffer.append(InputReader.NEW_LINE);
-		buffer.append(parseCallable(callableName, fReturn, reader));
+		buffer.append(parseCall(callableName, fReturn, reader));
 		buffer.append(InputReader.NEW_LINE);
 		return fReturn;
 	}

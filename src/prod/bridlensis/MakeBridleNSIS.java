@@ -167,7 +167,7 @@ public class MakeBridleNSIS {
 				excludeFiles);
 
 		long time = System.currentTimeMillis();
-		parser.start(inputFile.getName(), outputFile.getName());
+		parser.parse(inputFile.getName(), outputFile.getName());
 		time = System.currentTimeMillis() - time;
 		time = time < 1000 ? 1 : time / 1000;
 
