@@ -29,8 +29,8 @@ Function return_foo
     DetailPrint "Never gets here"
 FunctionEnd
 
-Call return_foo
 Var /GLOBAL bridlensis_nullvar
+Call return_foo
 Pop $bridlensis_nullvar
 
 Call return_foo

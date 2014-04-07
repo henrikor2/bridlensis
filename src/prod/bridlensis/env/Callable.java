@@ -1,26 +1,22 @@
 package bridlensis.env;
 
-public abstract class Callable {
+import java.util.List;
 
-	private final String name;
+import bridlensis.InvalidSyntaxException;
 
-	Callable(String name) {
-		this.name = name;
-	}
+public interface Callable {
 
-	public String getName() {
-		return name;
+	public static enum ReturnType {
+		VOID, OPTIONAL, REQUIRED, ERRORFLAG
 	}
 
 	public abstract int getMandatoryArgsCount();
 
 	public abstract int getArgsCount();
 
-	public abstract boolean hasReturn();
+	public abstract ReturnType getReturnType();
 
-	@Override
-	public String toString() {
-		return name;
-	}
+	public abstract String statementFor(String indent, List<String> args,
+			Variable returnVar) throws InvalidSyntaxException;
 
 }

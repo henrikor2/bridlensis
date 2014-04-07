@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Scanner;
 
 import bridlensis.env.Callable;
+import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.UserFunction;
@@ -439,7 +440,7 @@ public class Parser {
 			InputReader reader) throws InvalidSyntaxException,
 			EnvironmentException {
 		Callable callable = environment.getCallable(name);
-		if (returnVar != null && !callable.hasReturn()) {
+		if (returnVar != null && callable.getReturnType() == ReturnType.VOID) {
 			throw new InvalidSyntaxException("Function doesn't return a value");
 		}
 

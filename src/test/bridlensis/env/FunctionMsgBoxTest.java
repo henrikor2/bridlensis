@@ -2,14 +2,13 @@ package bridlensis.env;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
 import org.junit.Test;
 
 import bridlensis.InvalidSyntaxException;
-import bridlensis.env.FunctionMsgBox;
+import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.FunctionMsgBox.ButtonGroup;
 import bridlensis.env.FunctionMsgBox.ReturnOption;
 
@@ -22,9 +21,9 @@ public class FunctionMsgBoxTest {
 	}
 
 	@Test
-	public void testHasReturn() {
+	public void testGetReturnType() {
 		FunctionMsgBox mb = new FunctionMsgBox(null);
-		assertTrue(mb.hasReturn());
+		assertEquals(ReturnType.OPTIONAL, mb.getReturnType());
 	}
 
 	@Test

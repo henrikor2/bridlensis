@@ -43,26 +43,23 @@ public class Environment {
 	}
 
 	public void loadBuiltinInstructions() {
-		addBuiltinFunction(new FunctionMsgBox(nameGenerator));
-		addBuiltinFunction(new FunctionFileCopy());
-		addBuiltinFunction(new FunctionDelete());
-		addBuiltinFunction(new FunctionFile());
-		addBuiltinFunction(new FunctionRename());
-		addBuiltinFunction(new FunctionRMDir());
+		callables.put("msgbox", new FunctionMsgBox(nameGenerator));
+		callables.put("filecopy", new FunctionFileCopy());
+		callables.put("delete", new FunctionDelete());
+		callables.put("file", new FunctionFile());
+		callables.put("rename", new FunctionRename());
+		callables.put("rmdir", new FunctionRMDir());
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.length() > 0 && line.charAt(0) != '#') {
 				Instruction instruction = Instruction.parse(line);
-				callables.put(instruction.getName(), instruction);
+				callables.put(instruction.getDisplayName().toLowerCase(),
+						instruction);
 			}
 		}
 		scanner.close();
-	}
-
-	private void addBuiltinFunction(Callable function) {
-		callables.put(function.getName(), function);
 	}
 
 	public void loadBuiltinVariables() {

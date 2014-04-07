@@ -1,12 +1,15 @@
 package bridlensis.env;
 
-public class FunctionFileCopy extends Callable {
+import java.util.List;
 
-	public static final int SOURCE_INDEX = 0;
-	public static final int TARGET_INDEX = 1;
+import bridlensis.InvalidSyntaxException;
+
+public class FunctionFileCopy implements Callable {
+
+	private static final int SOURCE_INDEX = 0;
+	private static final int TARGET_INDEX = 1;
 
 	FunctionFileCopy() {
-		super("filecopy");
 	}
 
 	@Override
@@ -20,8 +23,19 @@ public class FunctionFileCopy extends Callable {
 	}
 
 	@Override
-	public boolean hasReturn() {
-		return true;
+	public ReturnType getReturnType() {
+		return ReturnType.ERRORFLAG;
+	}
+
+	@Override
+	public String statementFor(String indent, List<String> args,
+			Variable returnVar) throws InvalidSyntaxException {
+		StringBuilder sb = new StringBuilder(indent);
+		sb.append("CopyFiles /SILENT ");
+		sb.append(args.get(SOURCE_INDEX));
+		sb.append(" ");
+		sb.append(args.get(TARGET_INDEX));
+		return sb.toString();
 	}
 
 }

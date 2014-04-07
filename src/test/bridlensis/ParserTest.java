@@ -302,7 +302,7 @@ public class ParserTest {
 
 		// Empty stack after function call
 		assertEquals(
-				"Push 1\r\nCall foo\r\nVar /GLOBAL bridlensis_nullvar\r\nPop $bridlensis_nullvar",
+				"Var /GLOBAL bridlensis_nullvar\r\nPush 1\r\nCall foo\r\nPop $bridlensis_nullvar",
 				parser.parse(readerFor("foo(1)")));
 
 		// Reuse null variable to dump stack to

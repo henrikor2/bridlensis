@@ -4,26 +4,27 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import bridlensis.InputReader;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.StatementFactory;
 
-public class FunctionMsgBox extends Callable {
+class FunctionMsgBox implements Callable {
 
-	public static final int BUTTONGROUP_INDEX = 0;
-	public static final int MESSAGE_INDEX = 1;
-	public static final int OPTIONS_INDEX = 2;
-	public static final int SDRETURN_INDEX = 3;
+	private static final int BUTTONGROUP_INDEX = 0;
+	private static final int MESSAGE_INDEX = 1;
+	private static final int OPTIONS_INDEX = 2;
+	private static final int SDRETURN_INDEX = 3;
 
 	private static final String GOTO_PREFIX = "msgbox_";
 
 	private static List<String> buttons = Arrays.asList("OK", "CANCEL",
 			"ABORT", "RETRY", "IGNORE", "YES", "NO");
 
-	public static enum ButtonGroup {
+	protected static enum ButtonGroup {
 		OK, OKCANCEL, ABORTRETRYIGNORE, RETRYCANCEL, YESNO, YESNOCANCEL
 	};
 
-	public static class ReturnOption {
+	protected static class ReturnOption {
 
 		private final String returnValue;
 		private final String goTo;
@@ -46,7 +47,6 @@ public class FunctionMsgBox extends Callable {
 	private NameGenerator nameGenerator;
 
 	FunctionMsgBox(NameGenerator nameGenerator) {
-		super("msgbox");
 		this.nameGenerator = nameGenerator;
 	}
 
@@ -61,15 +61,11 @@ public class FunctionMsgBox extends Callable {
 	}
 
 	@Override
-	public boolean hasReturn() {
-		return true;
+	public ReturnType getReturnType() {
+		return ReturnType.OPTIONAL;
 	}
 
-	public String createExitGoTo() {
-		return GOTO_PREFIX + nameGenerator.generate();
-	}
-
-	public Collection<ReturnOption> returnOptions(ButtonGroup buttons)
+	protected Collection<ReturnOption> returnOptions(ButtonGroup buttons)
 			throws InvalidSyntaxException {
 		switch (buttons) {
 		case OK:
@@ -117,8 +113,71 @@ public class FunctionMsgBox extends Callable {
 		return sb.toString();
 	}
 
-	public static boolean containsButton(String button) {
-		return buttons.contains(button.toUpperCase());
+	@Override
+	public String statementFor(String indent, List<String> args,
+			Variable returnVar) throws InvalidSyntaxException {
+		ButtonGroup buttonGroup;
+		try {
+			buttonGroup = ButtonGroup.valueOf(StatementFactory.deString(args
+					.get(BUTTONGROUP_INDEX)));
+		} catch (IllegalArgumentException e) {
+			throw new InvalidSyntaxException(String.format(
+					"Invalid button group argument '%s'",
+					args.get(BUTTONGROUP_INDEX)));
+		}
+		StringBuilder sb = new StringBuilder(indent);
+		sb.append("MessageBox ");
+		sb.append(optionsList(buttonGroup,
+				StatementFactory.deString(args.get(OPTIONS_INDEX))));
+		sb.append(' ');
+		sb.append(args.get(MESSAGE_INDEX));
+
+		if (!args.get(SDRETURN_INDEX).equals(StatementFactory.NULL)) {
+			String button = StatementFactory.deString(args.get(SDRETURN_INDEX));
+			if (!buttons.contains(button.toUpperCase())) {
+				throw new InvalidSyntaxException(
+						"Unsupported MsgBox SD return " + button);
+			}
+			sb.append(" /SD ID");
+			sb.append(button);
+		}
+
+		if (returnVar != null) {
+			String exit_jump = GOTO_PREFIX + nameGenerator.generate();
+			indent += StatementFactory.DEFAULT_INDENT;
+			StringBuilder sbRet = new StringBuilder();
+			for (ReturnOption ro : returnOptions(buttonGroup)) {
+				sb.append(" ID");
+				sb.append(ro.getReturnValue());
+				sb.append(' ');
+				sb.append(ro.getGoTo());
+
+				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(indent);
+				sbRet.append(ro.getGoTo());
+				sbRet.append(':');
+				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(indent);
+				sbRet.append(StatementFactory.DEFAULT_INDENT);
+				sbRet.append("StrCpy ");
+				sbRet.append(returnVar.getNSISExpression());
+				sbRet.append(" \"");
+				sbRet.append(ro.getReturnValue());
+				sbRet.append('"');
+				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(indent);
+				sbRet.append(StatementFactory.DEFAULT_INDENT);
+				sbRet.append("GoTo ");
+				sbRet.append(exit_jump);
+			}
+			sb.append(sbRet);
+			sb.append(InputReader.NEW_LINE);
+			sb.append(indent);
+			sb.append(exit_jump);
+			sb.append(':');
+		}
+
+		return sb.toString();
 	}
 
 }

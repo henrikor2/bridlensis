@@ -1,6 +1,11 @@
 package bridlensis.env;
 
-public class Instruction extends Callable {
+import java.util.ArrayList;
+import java.util.List;
+
+import bridlensis.StatementFactory;
+
+class Instruction implements Callable {
 
 	private String displayName;
 	private int argsCount;
@@ -17,16 +22,17 @@ public class Instruction extends Callable {
 		}
 		int argsCount = returnArgIndex == -1 ? parts.length - 1
 				: parts.length - 2;
-		return new Instruction(parts[0].toLowerCase(), parts[0], argsCount,
-				returnArgIndex);
+		return new Instruction(parts[0], argsCount, returnArgIndex);
 	}
 
-	private Instruction(String name, String displayName, int argsCount,
-			int returnArgIndex) {
-		super(name);
+	private Instruction(String displayName, int argsCount, int returnArgIndex) {
 		this.displayName = displayName;
 		this.argsCount = argsCount;
 		this.returnArgIndex = returnArgIndex;
+	}
+
+	public String getDisplayName() {
+		return displayName;
 	}
 
 	@Override
@@ -40,16 +46,27 @@ public class Instruction extends Callable {
 	}
 
 	@Override
-	public boolean hasReturn() {
-		return getReturnArgIndex() != -1;
+	public ReturnType getReturnType() {
+		return returnArgIndex == -1 ? ReturnType.VOID : ReturnType.REQUIRED;
 	}
 
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public int getReturnArgIndex() {
-		return returnArgIndex;
+	@Override
+	public String statementFor(String indent, List<String> args,
+			Variable returnVar) {
+		StringBuilder sb = new StringBuilder(indent);
+		ArrayList<String> cArgs = new ArrayList<>(args);
+		if (getReturnType() != ReturnType.VOID) {
+			cArgs.add(returnArgIndex, returnVar.getNSISExpression());
+		}
+		sb.append(displayName);
+		sb.append(' ');
+		for (String cArg : cArgs) {
+			if (!cArg.equals(StatementFactory.NULL)) {
+				sb.append(cArg);
+				sb.append(' ');
+			}
+		}
+		return sb.toString();
 	}
 
 }

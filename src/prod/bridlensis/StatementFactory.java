@@ -1,29 +1,20 @@
 package bridlensis;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import bridlensis.env.Callable;
+import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
-import bridlensis.env.FunctionDelete;
-import bridlensis.env.FunctionFile;
-import bridlensis.env.FunctionFileCopy;
-import bridlensis.env.FunctionMsgBox;
-import bridlensis.env.FunctionMsgBox.ButtonGroup;
-import bridlensis.env.FunctionMsgBox.ReturnOption;
-import bridlensis.env.FunctionRMDir;
-import bridlensis.env.FunctionRename;
-import bridlensis.env.Instruction;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
 
 public class StatementFactory {
 
 	public static final String NULL = "${BRIDLE_NULL}";
-	private static final String DEFAULT_INDENT = "    ";
+	public static final String DEFAULT_INDENT = "    ";
 
 	private Environment environment;
 	private Variable functionNullReturn = null;
@@ -117,245 +108,38 @@ public class StatementFactory {
 	public String call(String indent, Callable callable, List<String> args,
 			Variable returnVar) throws InvalidSyntaxException,
 			EnvironmentException {
-		if (callable instanceof UserFunction) {
-			return callUserFunction(indent, (UserFunction) callable, args,
-					returnVar);
-		} else if (callable instanceof FunctionMsgBox) {
-			return callMsgBox(indent, (FunctionMsgBox) callable, args,
-					returnVar);
-		} else if (callable instanceof FunctionFileCopy) {
-			return callFileCopy(indent, args, returnVar);
-		} else if (callable instanceof FunctionDelete) {
-			return callDelete(indent, args, returnVar);
-		} else if (callable instanceof FunctionFile) {
-			return callFile(indent, args, returnVar);
-		} else if (callable instanceof FunctionRename) {
-			return callRename(indent, args, returnVar);
-		} else if (callable instanceof FunctionRMDir) {
-			return callRMDir(indent, args, returnVar);
-		} else {
-			return callInstruction(indent, (Instruction) callable, args,
-					returnVar);
-		}
-	}
-
-	private Variable getFunctionNullReturn(String indent, StringBuilder sb)
-			throws EnvironmentException {
-		if (functionNullReturn == null) {
-			sb.append(InputReader.NEW_LINE);
-			sb.append(indent);
-			functionNullReturn = environment.registerVariable(
-					"bridlensis_nullvar", null);
-			sb.append(variableDeclare(indent, functionNullReturn));
-		}
-		return functionNullReturn;
-	}
-
-	private String callUserFunction(String indent, UserFunction function,
-			List<String> args, Variable returnVar) throws EnvironmentException {
-		StringBuilder sb = begin(indent);
-		for (int i = args.size() - 1; i >= 0; i--) {
-			sb.append("Push ");
-			sb.append(args.get(i));
-			sb.append(InputReader.NEW_LINE);
-			sb.append(indent);
-		}
-		sb.append("Call ");
-		sb.append(function.getName());
-		if (function.hasReturn()) {
-			if (returnVar == null) {
-				returnVar = getFunctionNullReturn(indent, sb);
+		StringBuilder sb = new StringBuilder();
+		if (returnVar == null && callable.getReturnType() != ReturnType.VOID
+				&& callable.getReturnType() != ReturnType.OPTIONAL
+				&& callable.getReturnType() != ReturnType.ERRORFLAG) {
+			if (functionNullReturn == null) {
+				functionNullReturn = environment.registerVariable(
+						"bridlensis_nullvar", null);
+				sb.append(variableDeclare(indent, functionNullReturn));
+				sb.append(InputReader.NEW_LINE);
 			}
-			sb.append(InputReader.NEW_LINE);
-			sb.append(indent);
-			sb.append("Pop ");
-			sb.append(returnVar.getNSISExpression());
+			returnVar = functionNullReturn;
+		} else if (returnVar != null
+				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
+			sb.append(beginValueReturnFunctionStatement(indent, returnVar));
+		}
+		sb.append(callable.statementFor(indent, args, returnVar));
+		if (returnVar != null
+				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
+			sb.append(endValueReturnFunctionStatement(indent, returnVar));
 		}
 		return sb.toString();
 	}
 
-	private String callInstruction(String indent, Instruction instruction,
-			List<String> argValues, Variable returnVar)
-			throws EnvironmentException {
-		StringBuilder sb = begin(indent);
-		ArrayList<String> cArgs = new ArrayList<>(argValues);
-		if (instruction.hasReturn()) {
-			if (returnVar == null) {
-				returnVar = getFunctionNullReturn(indent, sb);
-			}
-			cArgs.add(instruction.getReturnArgIndex(),
-					returnVar.getNSISExpression());
-		}
-		sb.append(instruction.getDisplayName());
-		sb.append(' ');
-		for (String cArg : cArgs) {
-			if (!cArg.equals(NULL)) {
-				sb.append(cArg);
-				sb.append(' ');
-			}
-		}
-		return sb.toString();
-	}
-
-	private static String deString(String expr) {
+	public static String deString(String expr) {
 		if (expr.length() > 1 && expr.charAt(0) == '"') {
 			return expr.substring(1, expr.length() - 1);
 		}
 		return expr;
 	}
 
-	private String callMsgBox(String indent, FunctionMsgBox msgBox,
-			List<String> argValues, Variable returnVar)
-			throws InvalidSyntaxException {
-		ButtonGroup buttonGroup;
-		try {
-			buttonGroup = ButtonGroup.valueOf(deString(argValues
-					.get(FunctionMsgBox.BUTTONGROUP_INDEX)));
-		} catch (IllegalArgumentException e) {
-			throw new InvalidSyntaxException(String.format(
-					"Invalid button group argument '%s'",
-					argValues.get(FunctionMsgBox.BUTTONGROUP_INDEX)));
-		}
-		StringBuilder sb = begin(indent);
-		sb.append("MessageBox ");
-		sb.append(FunctionMsgBox.optionsList(buttonGroup,
-				deString(argValues.get(FunctionMsgBox.OPTIONS_INDEX))));
-		sb.append(' ');
-		sb.append(argValues.get(FunctionMsgBox.MESSAGE_INDEX));
-
-		if (!argValues.get(FunctionMsgBox.SDRETURN_INDEX).equals(NULL)) {
-			String button = deString(argValues
-					.get(FunctionMsgBox.SDRETURN_INDEX));
-			if (!FunctionMsgBox.containsButton(button)) {
-				throw new InvalidSyntaxException(
-						"Unsupported MsgBox SD return " + button);
-			}
-			sb.append(" /SD ID");
-			sb.append(button);
-		}
-
-		if (returnVar != null) {
-			String exit_jump = msgBox.createExitGoTo();
-			indent += DEFAULT_INDENT;
-			StringBuilder sbRet = new StringBuilder();
-			for (ReturnOption ro : msgBox.returnOptions(buttonGroup)) {
-				sb.append(" ID");
-				sb.append(ro.getReturnValue());
-				sb.append(' ');
-				sb.append(ro.getGoTo());
-
-				sbRet.append(InputReader.NEW_LINE);
-				sbRet.append(indent);
-				sbRet.append(ro.getGoTo());
-				sbRet.append(':');
-				sbRet.append(InputReader.NEW_LINE);
-				sbRet.append(indent + DEFAULT_INDENT);
-				sbRet.append("StrCpy ");
-				sbRet.append(returnVar.getNSISExpression());
-				sbRet.append(" \"");
-				sbRet.append(ro.getReturnValue());
-				sbRet.append('"');
-				sbRet.append(InputReader.NEW_LINE);
-				sbRet.append(indent + DEFAULT_INDENT);
-				sbRet.append("GoTo ");
-				sbRet.append(exit_jump);
-			}
-			sb.append(sbRet);
-			sb.append(InputReader.NEW_LINE);
-			sb.append(indent);
-			sb.append(exit_jump);
-			sb.append(':');
-		}
-
-		return sb.toString();
-	}
-
-	private String callFileCopy(String indent, List<String> argValues,
-			Variable returnVar) {
-		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
-		sb.append("CopyFiles /SILENT ");
-		sb.append(argValues.get(FunctionFileCopy.SOURCE_INDEX));
-		sb.append(" ");
-		sb.append(argValues.get(FunctionFileCopy.TARGET_INDEX));
-		sb.append(endBuiltinFunctionStatement(indent, returnVar));
-		return sb.toString();
-	}
-
-	private String callDelete(String indent, List<String> argValues,
-			Variable returnVar) {
-		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
-		sb.append("Delete ");
-		if (!argValues.get(FunctionDelete.OPTIONS_INDEX).equals(NULL)) {
-			String options = deString(argValues
-					.get(FunctionDelete.OPTIONS_INDEX));
-			if (!options.isEmpty()) {
-				sb.append(options);
-				sb.append(' ');
-			}
-		}
-		sb.append(argValues.get(FunctionDelete.FILE_INDEX));
-		sb.append(endBuiltinFunctionStatement(indent, returnVar));
-		return sb.toString();
-	}
-
-	private String callFile(String indent, List<String> argValues,
-			Variable returnVar) throws InvalidSyntaxException {
-		StringBuilder sb = begin(indent);
-		if (!argValues.get(FunctionFile.OUTPATH_INDEX).equals(NULL)) {
-			sb.append("SetOutPath ");
-			sb.append(argValues.get(FunctionFile.OUTPATH_INDEX));
-			sb.append(InputReader.NEW_LINE);
-			sb.append(indent);
-		}
-		sb.append("File ");
-		if (!argValues.get(FunctionFile.OPTIONS_INDEX).equals(NULL)) {
-			String options = deString(argValues.get(FunctionFile.OPTIONS_INDEX));
-			if (!options.isEmpty()) {
-				sb.append(options);
-				sb.append(' ');
-			}
-		}
-		sb.append(argValues.get(FunctionFile.FILE_INDEX));
-		return sb.toString();
-	}
-
-	private String callRename(String indent, List<String> argValues,
-			Variable returnVar) {
-		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
-		sb.append("Rename ");
-		if (!argValues.get(FunctionRename.OPTIONS_INDEX).equals(NULL)) {
-			String options = deString(argValues
-					.get(FunctionRename.OPTIONS_INDEX));
-			if (!options.isEmpty()) {
-				sb.append(options);
-				sb.append(' ');
-			}
-		}
-		sb.append(argValues.get(FunctionRename.SOURCE_INDEX));
-		sb.append(" ");
-		sb.append(argValues.get(FunctionRename.TARGET_INDEX));
-		sb.append(endBuiltinFunctionStatement(indent, returnVar));
-		return sb.toString();
-	}
-
-	private String callRMDir(String indent, List<String> argValues,
-			Variable returnVar) throws InvalidSyntaxException {
-		StringBuilder sb = beginBuiltinFunctionStatement(indent, returnVar);
-		sb.append("RMDir ");
-		if (!argValues.get(FunctionRMDir.OPTIONS_INDEX).equals(NULL)) {
-			String options = deString(argValues.get(FunctionFile.OPTIONS_INDEX));
-			if (!options.isEmpty()) {
-				sb.append(options);
-				sb.append(' ');
-			}
-		}
-		sb.append(argValues.get(FunctionRMDir.DIR_INDEX));
-		sb.append(endBuiltinFunctionStatement(indent, returnVar));
-		return sb.toString();
-	}
-
-	private static StringBuilder beginBuiltinFunctionStatement(String indent,
-			Variable returnVar) {
+	private static StringBuilder beginValueReturnFunctionStatement(
+			String indent, Variable returnVar) {
 		StringBuilder sb = begin(indent);
 		if (returnVar != null) {
 			sb.append("StrCpy ");
@@ -370,7 +154,7 @@ public class StatementFactory {
 		return sb;
 	}
 
-	private static String endBuiltinFunctionStatement(String indent,
+	private static String endValueReturnFunctionStatement(String indent,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder();
 		if (returnVar != null) {

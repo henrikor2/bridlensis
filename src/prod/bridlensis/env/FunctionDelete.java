@@ -1,12 +1,15 @@
 package bridlensis.env;
 
-public class FunctionDelete extends Callable {
+import java.util.List;
 
-	public static final int FILE_INDEX = 0;
-	public static final int OPTIONS_INDEX = 1;
+import bridlensis.StatementFactory;
+
+class FunctionDelete implements Callable {
+
+	private static final int FILE_INDEX = 0;
+	private static final int OPTIONS_INDEX = 1;
 
 	FunctionDelete() {
-		super("delete");
 	}
 
 	@Override
@@ -20,8 +23,24 @@ public class FunctionDelete extends Callable {
 	}
 
 	@Override
-	public boolean hasReturn() {
-		return true;
+	public ReturnType getReturnType() {
+		return ReturnType.ERRORFLAG;
+	}
+
+	@Override
+	public String statementFor(String indent, List<String> args,
+			Variable returnVar) {
+		StringBuilder sb = new StringBuilder(indent);
+		sb.append("Delete ");
+		if (!args.get(OPTIONS_INDEX).equals(StatementFactory.NULL)) {
+			String options = StatementFactory.deString(args.get(OPTIONS_INDEX));
+			if (!options.isEmpty()) {
+				sb.append(options);
+				sb.append(' ');
+			}
+		}
+		sb.append(args.get(FILE_INDEX));
+		return sb.toString();
 	}
 
 }
