@@ -124,51 +124,34 @@ public class Parser {
 		} else if (word.equals("endif")) {
 			return statementFactory.logicLibDefine(reader.getIndent(), "EndIf");
 		} else if (word.equals("do")) {
-			return parseDo(reader);
+			return parseDoLoop("Do", reader);
 		} else if (word.equals("continue")) {
 			return statementFactory.logicLibDefine(reader.getIndent(),
 					"Continue");
 		} else if (word.equals("break")) {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
 		} else if (word.equals("loop")) {
-			return parseLoop(reader);
+			return parseDoLoop("Loop", reader);
 		} else if (word.equals("!include")) {
 			return parseInclude(reader);
 		}
 		return reader.getCurrentStatement();
 	}
 
-	private String parseDo(InputReader reader) throws InvalidSyntaxException,
-			EnvironmentException {
+	private String parseDoLoop(String keyword, InputReader reader)
+			throws InvalidSyntaxException, EnvironmentException {
 		if (!reader.hasNextWord()) {
-			return statementFactory.logicLibDefine(reader.getIndent(), "Do");
+			return statementFactory.logicLibDefine(reader.getIndent(), keyword);
 		}
 		StringBuilder sb = new StringBuilder();
 		ComparisonStatement statement = getComparisonStatement(reader
 				.nextWord().toLowerCase(), reader, sb);
 		if (statement.isNot()) {
-			throw new InvalidSyntaxException(
-					"Illegal modifier 'Not' in Do statement");
+			throw new InvalidSyntaxException(String.format(
+					"Illegal modifier 'Not' in %s statement", keyword));
 		}
 		sb.append(statementFactory.logicLibComparisonStatement(
-				reader.getIndent(), "Do", statement));
-		return sb.toString();
-	}
-
-	private String parseLoop(InputReader reader) throws InvalidSyntaxException,
-			EnvironmentException {
-		if (!reader.hasNextWord()) {
-			return statementFactory.logicLibDefine(reader.getIndent(), "Loop");
-		}
-		StringBuilder sb = new StringBuilder();
-		ComparisonStatement statement = getComparisonStatement(reader
-				.nextWord().toLowerCase(), reader, sb);
-		if (statement.isNot()) {
-			throw new InvalidSyntaxException(
-					"Illegal modifier 'Not' in Loop statement");
-		}
-		sb.append(statementFactory.logicLibComparisonStatement(
-				reader.getIndent(), "Loop", statement));
+				reader.getIndent(), keyword, statement));
 		return sb.toString();
 	}
 
