@@ -40,3 +40,7 @@ FileRename("autoexec.bak", "autoexec.bat", "/REBOOTOK")
 ; RMDir
 RMDir(pluginsdir)
 RMDir($%TEMP% + "\BridleNSIS", "/r /REBOOTOK")
+
+; FunctionReserveFile
+ReserveFile("autoexec.bat")
+ReserveFile("time.dll", "/plugin")

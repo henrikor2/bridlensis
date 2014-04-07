@@ -44,9 +44,10 @@ public class Environment {
 
 	public void loadBuiltinFunctions() {
 		add(new FunctionMsgBox(nameGenerator), "msgbox");
+		add(new FunctionFile(), "file");
+		add(new FunctionReserveFile(), "reservefile");
 		add(new FunctionCopy(), "filecopy", "copy");
 		add(new FunctionDelete(), "filedelete", "delete");
-		add(new FunctionFile(), "file");
 		add(new FunctionRename(), "filerename", "rename");
 		add(new FunctionRMDir(), "rmdir");
 

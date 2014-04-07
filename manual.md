@@ -202,6 +202,13 @@ Adds file(s) to be extracted. Wildcards are supported. See NSIS File instruction
          instdir + "\doc")          ; To $INSTDIR\doc
 
 
+#### ReserveFile(file [, options])
+
+Reserves a file in the data block for later use. See NSIS ReserveFile instruction documentation for options.
+
+    ReserveFile("time.dll", "/plugin")
+
+
 #### FileCopy(source, target)
 
 Alias: Copy
