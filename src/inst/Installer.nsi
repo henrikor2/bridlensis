@@ -11,7 +11,8 @@
 !endif
 
 !define PRODUCT_NAME        "BridleNSIS"
-!define APP_REG_PATH        "Software\${PRODUCT_NAME}\${BRIDLE_VERSION}"
+!define PRODUCT_REG_PATH    "Software\${PRODUCT_NAME}"
+!define VERSION_REG_PATH    "${PRODUCT_REG_PATH}\${BRIDLE_VERSION}"
 !define WIN_UNINST_REG_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${BRIDLE_VERSION}"
 !define UNINSTALLER_EXE     "Uninstall.exe"
 
@@ -36,7 +37,7 @@ Var replace_version ; Will contain version of Bridle in current instdir if found
 Name                  "${PRODUCT_NAME} v${BRIDLE_VERSION}"
 OutFile               "${BRIDLE_HOME}\${PRODUCT_NAME}-${BRIDLE_VERSION}.exe"
 InstallDir            "$PROGRAMFILES\${PRODUCT_NAME}"
-InstallDirRegKey      HKLM "${APP_REG_PATH}" "InstallDir"
+InstallDirRegKey      HKLM "${VERSION_REG_PATH}" "InstallDir"
 RequestExecutionLevel admin
 ShowInstDetails       show
 
@@ -53,13 +54,15 @@ VIProductVersion "${BRIDLE_VERSION}.0"
 
 Function .onInit
 
-    old_install_dir = ReadRegStr("HKLM", "Software\${PRODUCT_NAME}\" + ${BRIDLE_VERSION}, "InstallDir")
+    old_install_dir = ReadRegStr("HKLM", \
+                                 ${PRODUCT_REG_PATH} + "\" + ${BRIDLE_VERSION}, \
+                                 "InstallDir")
 
     If old_install_dir != ""
 
         If "CANCEL" == MsgBox("OKCANCEL", \
                               "BridleNSIS version " + ${BRIDLE_VERSION} + " is already installed to " + old_install_dir + ".$\n$\n \
-                                   Click OK to replace it with new version or Cancel to quit installer.", \
+                                   Click OK to replace it with new version or Cancel to quit the installer.", \
                               "ICONQUESTION|DEFBUTTON2")
 
             Abort ; User want's to quit
@@ -69,7 +72,7 @@ Function .onInit
         ; Mark existing version to be removed
         global.replace_instdir = old_install_dir
 
-        ; New copy will be installed to same directory by default
+        ; New copy will be installed to the same directory by default
         instdir = old_install_dir
 
     EndIf
@@ -91,7 +94,7 @@ Function UninstallOldVersion(version, directory)
 
     temp_file = GetTempFileName()
 
-    If FileCopy(uninst_exe, temp_file) != 0
+    If FileCopy(uninst_exe, temp_file) <> 0
         SetDetailsPrint lastused
         Abort("Old version uninstaller not found.")
     EndIf
@@ -100,7 +103,7 @@ Function UninstallOldVersion(version, directory)
 
     Delete(temp_file)
 
-    If result != 0
+    If result <> 0
         SetDetailsPrint lastused
         Abort("Old version uninstall returned " + result + ".")
     EndIf
@@ -135,7 +138,7 @@ Section "Main"
     File /r "${BRIDLE_HOME}\Example\*.nsh"
     File    "${BRIDLE_HOME}\Example\MakeInstaller.bat"
     
-    WriteRegStr("HKLM",   ${APP_REG_PATH}         "InstallDir",      instdir)
+    WriteRegStr("HKLM",   ${VERSION_REG_PATH}     "InstallDir",      instdir)
     
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayName",     ${PRODUCT_NAME})
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayVersion",  ${BRIDLE_VERSION})
@@ -157,8 +160,8 @@ SectionEnd
 Section "Uninstall"
 
     DeleteRegKey          HKLM "${WIN_UNINST_REG_PATH}"
-    DeleteRegKey /ifempty HKLM "Software\${PRODUCT_NAME}"
-    DeleteRegKey          HKLM "${APP_REG_PATH}"
+    DeleteRegKey          HKLM "${VERSION_REG_PATH}"
+    DeleteRegKey /ifempty HKLM "${PRODUCT_REG_PATH}"
 
     Delete "$INSTDIR\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar"
     Delete "$INSTDIR\LICENSE"

@@ -35,11 +35,11 @@
 Function DirectoryPageLeave()
 
     index = 0
-    version = EnumRegKey("HKLM", "Software\${PRODUCT_NAME}", index)
+    version = EnumRegKey("HKLM", ${PRODUCT_REG_PATH}, index)
     
     Do Until version == ""
         
-        folder = ReadRegStr("HKLM", "Software\${PRODUCT_NAME}\" + version, "InstallDir")
+        folder = ReadRegStr("HKLM", ${PRODUCT_REG_PATH} + "\" + version, "InstallDir")
         
         If folder == global.instdir And version != ${BRIDLE_VERSION}
         
@@ -60,7 +60,7 @@ Function DirectoryPageLeave()
         EndIf
         
         index = IntOp(index, "+", 1)
-        version = EnumRegKey("HKLM", "Software\${PRODUCT_NAME}", index)
+        version = EnumRegKey("HKLM", ${PRODUCT_REG_PATH}, index)
     
     Loop
 
