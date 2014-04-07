@@ -43,38 +43,49 @@ public class Environment {
 	}
 
 	public void loadBuiltinFunctions() {
-		loadCustomFunction(new FunctionMsgBox(nameGenerator), "msgbox");
-		loadCustomFunction(new FunctionCopy(), "filecopy", "copy");
-		loadCustomFunction(new FunctionDelete(), "filedelete", "delete");
-		loadCustomFunction(new FunctionFile(), "file");
-		loadCustomFunction(new FunctionRename(), "filerename", "rename");
-		loadCustomFunction(new FunctionRMDir(), "rmdir");
+		add(new FunctionMsgBox(nameGenerator), "msgbox");
+		add(new FunctionCopy(), "filecopy", "copy");
+		add(new FunctionDelete(), "filedelete", "delete");
+		add(new FunctionFile(), "file");
+		add(new FunctionRename(), "filerename", "rename");
+		add(new FunctionRMDir(), "rmdir");
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.length() > 0 && line.charAt(0) != '#') {
 				Instruction instruction = Instruction.parse(line);
-				callables.put(instruction.getDisplayName().toLowerCase(),
-						instruction);
+				add(instruction, instruction.getDisplayName().toLowerCase());
 			}
 		}
 		scanner.close();
-	}
-
-	private void loadCustomFunction(Callable function, String... names) {
-		for (String name : names) {
-			callables.put(name, function);
-		}
 	}
 
 	public void loadBuiltinVariables() {
 		Scanner scanner = getBuiltinVariablesDef();
 		while (scanner.hasNext()) {
 			Variable variable = new Variable(scanner.next().toLowerCase());
-			vars.put(variable.getName(), variable);
+			add(variable);
 		}
 		scanner.close();
+	}
+
+	private void add(Callable function, String... aliases) {
+		for (String name : aliases) {
+			if (callables.containsKey(name)) {
+				throw new java.lang.AssertionError("Function " + name
+						+ " already defined.");
+			}
+			callables.put(name, function);
+		}
+	}
+
+	private void add(Variable variable) throws AssertionError {
+		if (vars.containsKey(variable.getName())) {
+			throw new java.lang.AssertionError("Variable " + variable.getName()
+					+ " already defined.");
+		}
+		vars.put(variable.getName(), variable);
 	}
 
 	public Variable registerVariable(String name, UserFunction enclosingFunction)
