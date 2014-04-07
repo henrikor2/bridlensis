@@ -35,7 +35,7 @@ File("*.html", "", instdir + "\doc")
 
 ; FunctionRename
 Rename("autoexec.bak", "autoexec.bat")
-Rename("autoexec.bak", "autoexec.bat", "/REBOOTOK")
+FileRename("autoexec.bak", "autoexec.bat", "/REBOOTOK")
 
 ; RMDir
 RMDir(pluginsdir)

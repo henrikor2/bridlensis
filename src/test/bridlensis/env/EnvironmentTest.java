@@ -10,9 +10,9 @@ import org.junit.Test;
 public class EnvironmentTest {
 
 	@Test
-	public void testLoadBuiltinInstructions() {
+	public void testLoadBuiltinFunctions() {
 		Environment env = new Environment(new SimpleNameGenerator());
-		env.loadBuiltinInstructions();
+		env.loadBuiltinFunctions();
 		try {
 			env.registerUserFunction("DetailPrint");
 			fail();

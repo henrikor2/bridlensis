@@ -4,12 +4,12 @@ import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 
-public class FunctionFileCopy implements Callable {
+public class FunctionCopy implements Callable {
 
 	private static final int SOURCE_INDEX = 0;
 	private static final int TARGET_INDEX = 1;
 
-	FunctionFileCopy() {
+	FunctionCopy() {
 	}
 
 	@Override

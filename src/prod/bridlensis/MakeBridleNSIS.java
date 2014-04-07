@@ -162,7 +162,7 @@ public class MakeBridleNSIS {
 
 		Environment environment = new Environment(nameGenerator);
 		environment.loadBuiltinVariables();
-		environment.loadBuiltinInstructions();
+		environment.loadBuiltinFunctions();
 		Parser parser = new Parser(environment, baseDir, outDir, encoding,
 				excludeFiles);
 

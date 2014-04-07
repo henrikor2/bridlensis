@@ -42,13 +42,13 @@ public class Environment {
 		return nameGenerator;
 	}
 
-	public void loadBuiltinInstructions() {
-		callables.put("msgbox", new FunctionMsgBox(nameGenerator));
-		callables.put("filecopy", new FunctionFileCopy());
-		callables.put("delete", new FunctionDelete());
-		callables.put("file", new FunctionFile());
-		callables.put("rename", new FunctionRename());
-		callables.put("rmdir", new FunctionRMDir());
+	public void loadBuiltinFunctions() {
+		loadCustomFunction(new FunctionMsgBox(nameGenerator), "msgbox");
+		loadCustomFunction(new FunctionCopy(), "filecopy", "copy");
+		loadCustomFunction(new FunctionDelete(), "filedelete", "delete");
+		loadCustomFunction(new FunctionFile(), "file");
+		loadCustomFunction(new FunctionRename(), "filerename", "rename");
+		loadCustomFunction(new FunctionRMDir(), "rmdir");
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {
@@ -60,6 +60,12 @@ public class Environment {
 			}
 		}
 		scanner.close();
+	}
+
+	private void loadCustomFunction(Callable function, String... names) {
+		for (String name : names) {
+			callables.put(name, function);
+		}
 	}
 
 	public void loadBuiltinVariables() {

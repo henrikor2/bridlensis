@@ -22,7 +22,7 @@ public class ParserTest {
 	private Parser createParser() {
 		Environment environment = new Environment(new SimpleNameGenerator());
 		environment.loadBuiltinVariables();
-		environment.loadBuiltinInstructions();
+		environment.loadBuiltinFunctions();
 		Parser parser = new Parser(environment, null, null, null, null);
 		return parser;
 	}

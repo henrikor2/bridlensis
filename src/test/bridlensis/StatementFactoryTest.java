@@ -22,7 +22,7 @@ public class StatementFactoryTest {
 	public StatementFactoryTest() {
 		env = new Environment(new SimpleNameGenerator());
 		env.loadBuiltinVariables();
-		env.loadBuiltinInstructions();
+		env.loadBuiltinFunctions();
 		sf = new StatementFactory(env);
 	}
 

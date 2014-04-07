@@ -204,26 +204,32 @@ Adds file(s) to be extracted. Wildcards are supported. See NSIS File instruction
 
 #### FileCopy(source, target)
 
+Alias: Copy
+
 Copies files silently from the source to the target on the installing system. Returns `0` for success with error flag cleared, `1` for error with error flag set. Error flag is not cleared unless function return value is assigned for a variable or used in operation.
 
-    If FileCopy("C:\autoexec.bat", $%TEMP%) <> 0
-        Abort("File copy failed.")
+    If Copy("C:\autoexec.bat", $%TEMP%) <> 0
+        Abort "File copy failed."
+    EndIf
 
+#### FileDelete(file [, options])
 
-#### Delete(file [, options])
+Alias: Delete
 
 Delete file (which can be a file or wildcard, but should be specified with a full path) from the target system. See NSIS documentation for supported options (`/REBOOTOK`) and their behavior. Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
     If Delete("C:\autoexec.bat") == 0
-        DetailPrint("File delete succeeded.")
+        DetailPrint "File delete succeeded."
+        ...
 
+#### FileRename(source, target [, options])
 
-#### Rename(source, target [, options])
+Alias: Rename
 
 Rename source file to target file. See NSIS documentation for supported options (`/REBOOTOK`) and their behavior. Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
     If Rename("C:\autoexec.bat", "C:\autoexec.bak") == 0
-        DetailPrint("Rename succeeded.")
+        DetailPrint "Rename succeeded."
         ...
 
 
@@ -232,7 +238,7 @@ Rename source file to target file. See NSIS documentation for supported options 
 Remove the specified directory from the target system. See NSIS documentation for supported options (`/r` and `/REBOOTOK`) and their behavior. Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
     If RMDir(pluginsdir) <> 0
-        DetailPrint "Error when deleting directory $PLUGINSDIR.
+        DetailPrint "Error when deleting directory $PLUGINSDIR."
         ...
 
 
