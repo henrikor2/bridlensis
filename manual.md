@@ -47,6 +47,12 @@ Example:
     java -jar bridlensis.jar -e Cp1252 -x "LangStrings_ru.nsh:LangStrings_ja.nsh" MultiLanguageProject.nsi
 
 
+### Editor Plugins
+
+*   **[BridleNSIS Sublime Text](https://github.com/idleberg/BridleNSIS-Sublime-Text)**
+    BridleNSIS syntax definitions and completions for Sublime Text. The former work for TextMate as well.
+
+
 ## Language Reference
 
 Unless stated otherwise BridleNSIS follows [the NSIS Scripting Reference](http://nsis.sf.net/Docs/Chapter4.html).
