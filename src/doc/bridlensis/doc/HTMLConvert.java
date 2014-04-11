@@ -2,8 +2,10 @@ package bridlensis.doc;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 import org.markdown4j.Markdown4jProcessor;
@@ -20,10 +22,17 @@ public class HTMLConvert {
 		int exitCode = 0;
 
 		BufferedWriter output = null;
+		InputStreamReader input = null;
 		try {
+			input = new InputStreamReader(new FileInputStream(new File(
+					MANUAL_MD)), "UTF-8");
+			if (input.read() != 0xFEFF) {
+				throw new java.lang.AssertionError(MANUAL_MD
+						+ " must be UTF-8 with BOM.");
+			}
 			output = beginHTMLFile(new File(MANUAL_HTML), new Scanner(new File(
-					MANUAL_CSS)));
-			output.write(new Markdown4jProcessor().process(new File(MANUAL_MD)));
+					MANUAL_CSS), "UTF-8"));
+			output.write(new Markdown4jProcessor().process(input));
 			writeInstructions(output);
 			output.write("<p style=\"color: #CCCCCC; margin-top: 24px;\">;eof BridleNSIS Manual</p>");
 			endHTMLFile(output);
@@ -32,6 +41,13 @@ public class HTMLConvert {
 			System.err.println(e.getMessage());
 			exitCode = 1;
 		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					// Ignore
+				}
+			}
 			if (output != null) {
 				try {
 					output.close();
@@ -85,6 +101,9 @@ public class HTMLConvert {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(htmlFile));
 
 		writer.write("<html>\r\n");
+		writer.write("<head>\r\n");
+		writer.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\r\n");
+		writer.write("</head>\r\n");
 
 		while (cssFileScanner.hasNextLine()) {
 			writer.write(cssFileScanner.nextLine());
