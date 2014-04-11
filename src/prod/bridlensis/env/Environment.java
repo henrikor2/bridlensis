@@ -13,9 +13,9 @@ public class Environment {
 	private static final String GLOBAL_VARIABLE_PREFIX = "global.";
 
 	private static List<String> RESERVED_WORDS = Arrays.asList("var", "global",
-			"function", "return", "functionend", "if", "or", "and", "elseif",
-			"else", "endif", "do", "while", "until", "continue", "break",
-			"loop");
+			"function", "return", "functionend", "if", "not", "or", "and",
+			"elseif", "else", "endif", "do", "while", "until", "continue",
+			"break", "loop");
 
 	public static Scanner getBuiltinInstructionsDef() {
 		return new Scanner(
