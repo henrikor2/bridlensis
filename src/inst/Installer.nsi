@@ -132,6 +132,7 @@ Section "Main"
     File "${BRIDLE_HOME}\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar"
     File "${BRIDLE_HOME}\LICENSE"
     File "${BRIDLE_HOME}\Manual.html"
+    File "${BRIDLE_HOME}\Release Notes.html"
 
     SetOutPath "$INSTDIR\Example"
     File /r "${BRIDLE_HOME}\Example\*.nsi"
@@ -165,6 +166,7 @@ Section "Uninstall"
 
     Delete "$INSTDIR\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar"
     Delete "$INSTDIR\LICENSE"
+    Delete "$INSTDIR\Release Notes.html"
     Delete "$INSTDIR\Manual.html"
     Delete "$INSTDIR\${UNINSTALLER_EXE}"
 
