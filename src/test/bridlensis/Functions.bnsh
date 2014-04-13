@@ -68,3 +68,9 @@ RMDir /r /REBOOTOK "$%TEMP%\BridleNSIS"
 ; FunctionReserveFile
 ReserveFile "autoexec.bat"
 ReserveFile /plugin "time.dll"
+
+; DeleteRegKey
+Var /GLOBAL root_key
+StrCpy $root_key "HKLM"
+DeleteRegKey $root_key "Software\BridleNSIS\temp"
+DeleteRegKey /ifempty $root_key "Software\BridleNSIS"

@@ -50,6 +50,7 @@ public class Environment {
 		add(new FunctionDelete(), "filedelete", "delete");
 		add(new FunctionRename(), "filerename", "rename");
 		add(new FunctionRMDir(), "rmdir");
+		add(new FunctionDeleteRegKey(), "deleteregkey");
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {

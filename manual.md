@@ -257,6 +257,13 @@ Remove the specified directory from the target system. See NSIS documentation fo
         ...
 
 
+#### DeleteRegKey(root_key, subkey [, options])
+
+Deletes a registry key. See NSIS documentation for supported options (`/ifempty`). Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
+
+    DeleteRegKey("HKLM", "Software\BridleNSIS", "/ifempty")
+
+
 ### NSIS Instructions As Functions
 
 BridleNSIS gives programmers a function-like access to several NSIS built-in instructions. Bridle allows passing zero to maximum defined number of arguments so please refer to [the NSIS Instructions](http://nsis.sourceforge.net/Docs/Chapter4.html#4.9) documentation for usage. All NSIS instructions, including the ones not listed below, can still be used in plain NSIS syntax, for example `File /oname=somedata.temp something.dat`.

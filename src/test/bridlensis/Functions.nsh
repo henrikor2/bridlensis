@@ -44,3 +44,8 @@ RMDir($%TEMP% + "\BridleNSIS", "/r /REBOOTOK")
 ; FunctionReserveFile
 ReserveFile("autoexec.bat")
 ReserveFile("time.dll", "/plugin")
+
+; DeleteRegKey
+root_key = "HKLM"
+DeleteRegKey(root_key, "Software\BridleNSIS\temp")
+DeleteRegKey(root_key, "Software\BridleNSIS", "/ifempty")
