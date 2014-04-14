@@ -49,3 +49,7 @@ ReserveFile("time.dll", "/plugin")
 root_key = "HKLM"
 DeleteRegKey(root_key, "Software\BridleNSIS\temp")
 DeleteRegKey(root_key, "Software\BridleNSIS", "/ifempty")
+
+; GetFullPathName
+r0 = GetFullPathName("\Program Files")
+r0 = GetFullPathName(instdir, "/SHORT")

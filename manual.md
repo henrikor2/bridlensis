@@ -264,6 +264,13 @@ Deletes a registry key. See NSIS documentation for supported options (`/ifempty`
     DeleteRegKey("HKLM", "Software\BridleNSIS", "/ifempty")
 
 
+#### GetFullPathName(path [, options])
+
+Returns the full path of the file specified. If the path portion of the parameter is not found, the error flag will be set and return value will be empty. See NSIS documentation for supported options (`/SHORT`). 
+
+    GetFullPathName(programfiles + "\NSIS")
+
+
 ### NSIS Instructions As Functions
 
 BridleNSIS gives programmers a function-like access to several NSIS built-in instructions. Bridle allows passing zero to maximum defined number of arguments so please refer to [the NSIS Instructions](http://nsis.sourceforge.net/Docs/Chapter4.html#4.9) documentation for usage. All NSIS instructions, including the ones not listed below, can still be used in plain NSIS syntax, for example `File /oname=somedata.temp something.dat`.

@@ -74,3 +74,9 @@ Var /GLOBAL root_key
 StrCpy $root_key "HKLM"
 DeleteRegKey $root_key "Software\BridleNSIS\temp"
 DeleteRegKey /ifempty $root_key "Software\BridleNSIS"
+
+; GetFullPathName
+GetFullPathName $r0 "\Program Files"
+
+GetFullPathName /SHORT $r0 $instdir
+
