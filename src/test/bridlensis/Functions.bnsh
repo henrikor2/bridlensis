@@ -35,7 +35,6 @@ Pop $bridlensis_nullvar
 
 Call return_foo
 Pop $r0
-
 DetailPrint $r0 
 
 ;DetailPrint (return_foo())
@@ -77,6 +76,4 @@ DeleteRegKey /ifempty $root_key "Software\BridleNSIS"
 
 ; GetFullPathName
 GetFullPathName $r0 "\Program Files"
-
 GetFullPathName /SHORT $r0 $instdir
-

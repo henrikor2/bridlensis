@@ -386,8 +386,8 @@ public class Parser {
 			value = getExpression(value, sb, reader);
 		} else if (tail.startsWith("(")) {
 			sb.append(parseCall(value, variable, reader));
-			sb.append(InputReader.NEW_LINE);
 			if (reader.getWordTail().endsWith("+")) {
+				sb.append(InputReader.NEW_LINE);
 				value = getExpression(variable.getName(), sb, reader);
 			} else {
 				return sb.toString();

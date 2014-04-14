@@ -309,7 +309,7 @@ public class ParserTest {
 		assertEquals("Push $r1\r\nCall foo\r\nPop $bridlensis_nullvar",
 				parser.parseStatement(readerFor("foo(R1)")));
 
-		assertEquals("Var /GLOBAL a\r\nPush $r1\r\nCall foo\r\nPop $a\r\n",
+		assertEquals("Var /GLOBAL a\r\nPush $r1\r\nCall foo\r\nPop $a",
 				parser.parseStatement(readerFor("a = foo(r1)")));
 
 		assertEquals("Function bar", parser.parseStatement(readerFor("Function bar()")));
@@ -334,17 +334,17 @@ public class ParserTest {
 				parser.parseStatement(readerFor("    Return a")));
 		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
 
-		assertEquals("Var /GLOBAL a\r\nPush \"1\"\r\nCall foo\r\nPop $a\r\n",
+		assertEquals("Var /GLOBAL a\r\nPush \"1\"\r\nCall foo\r\nPop $a",
 				parser.parseStatement(readerFor("a = foo(\"1\")")));
 
 		assertEquals(
-				"StrCpy $a \"$a world$R0\" \"\" \"\" \r\n",
+				"StrCpy $a \"$a world$R0\" \"\" \"\" ",
 				parser.parseStatement(readerFor("a = StrCpy(\"$a world$R0\", \"\", \"\") ; <-- \"hello world!\"")));
 
-		assertEquals("StrCpy $a \"foobar\" \r\n",
+		assertEquals("StrCpy $a \"foobar\" ",
 				parser.parseStatement(readerFor("a = StrCpy(\"foobar\")")));
 
-		assertEquals("Var /GLOBAL b\r\nIntOp $b $a \"+\" 1 \r\n",
+		assertEquals("Var /GLOBAL b\r\nIntOp $b $a \"+\" 1 ",
 				parser.parseStatement(readerFor("b = IntOp(a, \"+\", 1)")));
 
 		assertEquals(
@@ -387,12 +387,12 @@ public class ParserTest {
 				"ExecShell \"open\" \"http://nsis.sf.net/\" ",
 				parser.parseStatement(readerFor("ExecShell(\"open\", \\\r\n    \"http://nsis.sf.net/\")")));
 		assertEquals(
-				"Var /GLOBAL ret\r\nExecWait '\"$INSTDIR\\someprogram.exe\"' $ret \r\n",
+				"Var /GLOBAL ret\r\nExecWait '\"$INSTDIR\\someprogram.exe\"' $ret ",
 				parser.parseStatement(readerFor("ret = ExecWait('\"$INSTDIR\\someprogram.exe\"')")));
-		assertEquals("StrCpy $r0 \"hello world!\" 5 \r\n",
+		assertEquals("StrCpy $r0 \"hello world!\" 5 ",
 				parser.parseStatement(readerFor("r0 = StrCpy(\"hello world!\", 5)")));
 		assertEquals(
-				"FileOpen $r1 \"C:\\temp\\makensis.log\" \"r\" \r\n",
+				"FileOpen $r1 \"C:\\temp\\makensis.log\" \"r\" ",
 				parser.parseStatement(readerFor("R1 = FileOpen(\"C:\\temp\\makensis.log\", \"r\")")));
 	}
 
