@@ -1,6 +1,8 @@
 /.settings
+/src/inst/*.bnsi
+/src/inst/*.bnsh
 /build
 /example
 /*.exe
 /*.jar
-*.html
+/*.html
