@@ -280,6 +280,11 @@ Multi-features string function. Acts as a convenience function for the NSIS [Wor
     r3 = WordFind("[1.AAB];[2.BAA];[3.BBB];", "+1", "[", "];", "AA") ; <-- "1.AAB"
 
 
+#### WordFindS(string, options, delim1 [, delim2 [, center]])
+
+Same as WordFind but case sensitive.
+
+
 ### NSIS Instructions As Functions
 
 BridleNSIS gives programmers a function-like access to several NSIS built-in instructions. Bridle allows passing zero to maximum defined number of arguments so please refer to [the NSIS Instructions](http://nsis.sourceforge.net/Docs/Chapter4.html#4.9) documentation for usage. All NSIS instructions, including the ones not listed below, can still be used in plain NSIS syntax, for example `File /oname=somedata.temp something.dat`.

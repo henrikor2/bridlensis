@@ -12,7 +12,10 @@ class FunctionWordFind implements Callable {
 	private static final int DELIM2_INDEX = 3;
 	private static final int CENTER_INDEX = 4;
 
-	FunctionWordFind() {
+	private final boolean caseSensitive;
+
+	FunctionWordFind(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
 	}
 
 	@Override
@@ -36,7 +39,11 @@ class FunctionWordFind implements Callable {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("${WordFind");
 		if (!args.get(CENTER_INDEX).equals(StatementFactory.NULL)) {
-			sb.append("3X} ");
+			sb.append("3X");
+			if (caseSensitive) {
+				sb.append('S');
+			}
+			sb.append("} ");
 			sb.append(args.get(STRING_INDEX));
 			sb.append(' ');
 			sb.append(args.get(DELIM1_INDEX));
@@ -46,7 +53,11 @@ class FunctionWordFind implements Callable {
 			sb.append(args.get(DELIM2_INDEX));
 			sb.append(' ');
 		} else if (!args.get(DELIM2_INDEX).equals(StatementFactory.NULL)) {
-			sb.append("2X} ");
+			sb.append("2X");
+			if (caseSensitive) {
+				sb.append('S');
+			}
+			sb.append("} ");
 			sb.append(args.get(STRING_INDEX));
 			sb.append(' ');
 			sb.append(args.get(DELIM1_INDEX));
@@ -54,6 +65,9 @@ class FunctionWordFind implements Callable {
 			sb.append(args.get(DELIM2_INDEX));
 			sb.append(' ');
 		} else {
+			if (caseSensitive) {
+				sb.append('S');
+			}
 			sb.append("} ");
 			sb.append(args.get(STRING_INDEX));
 			sb.append(' ');

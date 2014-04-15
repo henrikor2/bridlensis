@@ -54,7 +54,7 @@ DeleteRegKey(root_key, "Software\BridleNSIS", "/ifempty")
 r0 = GetFullPathName("\Program Files")
 r0 = GetFullPathName(instdir, "/SHORT")
 
-; WordFind
+; WordFind(S)
 r1 = WordFind("C:\io.sys C:\Program Files C:\WINDOWS", "-02", " C:\")
-r2 = WordFind("[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]", "+2", "[C:\", "];")
+r2 = WordFindS("[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]", "+2", "[C:\", "];")
 r3 = WordFind("[1.AAB];[2.BAA];[3.BBB];", "+1", "[", "];", "AA")
