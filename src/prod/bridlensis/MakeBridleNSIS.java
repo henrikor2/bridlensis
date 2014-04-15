@@ -194,8 +194,9 @@ public class MakeBridleNSIS {
 
 	private static void usage() {
 		stdout.println("Usage:");
-		stdout.println("  java -jar bridlensis-" + VERSION
-				+ ".jar [-n <NSIS home>] [-o <outdir>] <file> [<NSIS options>]");
+		stdout.println("  java -jar bridlensis-"
+				+ VERSION
+				+ ".jar [-n <NSIS home>] [-o <outdir>] [-e <encoding>] [-x <file1:file2:..>] <script file> [<NSIS options>]");
 	}
 
 	protected static void makeBridleNSIS(NameGenerator nameGenerator,
