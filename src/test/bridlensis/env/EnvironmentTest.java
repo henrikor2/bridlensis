@@ -26,6 +26,8 @@ public class EnvironmentTest {
 		Environment env = new Environment(new SimpleNameGenerator());
 		assertFalse(env.containsVariable("r9", null));
 		env.loadBuiltinVariables();
+		assertTrue(env.containsVariable("r2", null));
+		assertTrue(env.containsVariable("r3", null));
 		assertTrue(env.containsVariable("r9", null));
 	}
 

@@ -13,7 +13,8 @@ Release date: TBD
 
 ### Fixes
 
-*   Fix `not` not being a reserved word (may have caused ambiguous syntax and parser errors)
+*   Fix `Not` not being a reserved word (may have caused ambiguous syntax and parser errors)
+*   Fix `r2` ($R2) not being recognized as a built-in variable
 *   Fix uninstaller leaving empty paths to registry
 
 ## Version 0.1.0
