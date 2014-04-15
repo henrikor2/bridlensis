@@ -9,6 +9,7 @@ Release date: TBD
 *   New convenience functions File, ReserveFile, FileCopy, FileRename, RMDir, DeleteRegKey, GetFullPathName, and WordFind(S)
 *   Function aliases Delete, Copy, Rename, and RMDir
 *   Function FileDelete Optional argument rebootok must be passed as defined in NSIS, e.g. `Delete("file.dat", "/REBOOTOK")`
+*   Improved NSIS home directory detection unless specified with command-line argument `-n`
 *   Showing off more BridleNSIS features in the example script
 
 ### Fixes

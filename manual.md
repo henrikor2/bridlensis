@@ -24,7 +24,7 @@ Use Java 1.7 or newer to run BridleNSIS compiler:
 
 Arguments:
 
-*   __-n &lt;NSIS home&gt;__: Defines NSIS home directory (required if it's not found from Windows %PATH%)
+*   __-n &lt;NSIS home&gt;__: NSIS home directory (tried to detect automatically if not specified)
 *   __-o &lt;output&gt;__: Output directory for converted script files (.snsi or .snsh)
 *   __-e &lt;encoding&gt;__: File encoding (defaults to Windows system encoding)
 *   __-x &lt;files&gt;__: Colon-separated list of files to exclude (or not to follow when found in !include)

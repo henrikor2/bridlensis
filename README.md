@@ -7,7 +7,7 @@ First public version.
 
 ## Build From Source Code
 
-In order to build the project you need JDK 1.7 or newer, Apache ANT 1.8 or newer, and NSIS for compiling the installer. If NSIS home directory is not found from the Windows %PATH% define it in property `bridle.nsis.home` at `build.properties` file.
+In order to build the project you need JDK 1.7 or newer, Apache ANT 1.8 or newer, and NSIS for compiling the installer. BridleNSIS tries to detect the NSIS home directory automatically unless explicitly defined in property `bridle.nsis.home` at `build.properties` file.
 
 1.   Compile BridleNSIS Java classes: `ant compile`
 2.   Compile and run JUnit tests: `ant test`
