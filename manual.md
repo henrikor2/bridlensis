@@ -257,7 +257,7 @@ Remove the specified directory from the target system. See NSIS documentation fo
         ...
 
 
-#### DeleteRegKey(root_key, subkey [, options])
+#### DeleteRegKey(rootkey, subkey [, options])
 
 Deletes a registry key. See NSIS documentation for supported options (`/ifempty`). Error flag is cleared if the return value `0` for success is assigned for a variable or used in operation. Returns `1` for error with error flag set.
 
@@ -269,6 +269,15 @@ Deletes a registry key. See NSIS documentation for supported options (`/ifempty`
 Returns the full path of the file specified. If the path portion of the parameter is not found, the error flag will be set and return value will be empty. See NSIS documentation for supported options (`/SHORT`). 
 
     GetFullPathName(programfiles + "\NSIS")
+
+
+#### WordFind(string, options, delim1 [, delim2 [, center]])
+
+Multi-features string function. Acts as a convenience function for the NSIS [WordFind](http://nsis.sourceforge.net/WordFind) when passing `delim1` alone, as [WordFind2X](http://nsis.sourceforge.net/WordFind2X) when defining `delim2`, and as [WordFind3X](http://nsis.sourceforge.net/WordFind3X) when defining also `center`. See the NSIS documentation for `options` and detailed usage.
+
+    r1 = WordFind("C:\io.sys C:\Program Files C:\WINDOWS", "-02", " C:\") ; <-- "Program Files"
+    r2 = WordFind("[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]", "+2", "[C:\", "];") ; <-- "logo.sys"
+    r3 = WordFind("[1.AAB];[2.BAA];[3.BBB];", "+1", "[", "];", "AA") ; <-- "1.AAB"
 
 
 ### NSIS Instructions As Functions

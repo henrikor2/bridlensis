@@ -52,6 +52,7 @@ public class Environment {
 		add(new FunctionRMDir(), "rmdir");
 		add(new FunctionDeleteRegKey(), "deleteregkey");
 		add(new FunctionGetFullPathName(), "getfullpathname");
+		add(new FunctionWordFind(), "wordfind");
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {

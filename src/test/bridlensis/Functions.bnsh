@@ -77,3 +77,8 @@ DeleteRegKey /ifempty $root_key "Software\BridleNSIS"
 ; GetFullPathName
 GetFullPathName $r0 "\Program Files"
 GetFullPathName /SHORT $r0 $instdir
+
+; WordFind
+${WordFind} "C:\io.sys C:\Program Files C:\WINDOWS" " C:\" "-02" $r1
+${WordFind2X} "[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]" "[C:\" "];" "+2" $r2
+${WordFind3X} "[1.AAB];[2.BAA];[3.BBB];" "[" "AA" "];" "+1" $r3
