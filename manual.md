@@ -31,6 +31,15 @@ Arguments:
 *   __&lt;script file&gt;__: BridleNSIS script file to compile
 *   __&lt;NSIS options&gt;__: Options passed to NSIS compiler, e.g. /Dname=value
 
+Error codes:
+
+*   __10__: Unable to create or resolve output directory
+*   __11__: Errors in BridleNSIS script
+*   __12__: NSIS home directory not found
+*   __13__: Unexpected error when executing makensis.exe
+
+Otherwise BridleNSIS returns whatever makensis.exe returns.
+
 Example:
 
     java -jar bridlensis.jar -n "C:\Program Files(x86)\NSIS" example.nsi
