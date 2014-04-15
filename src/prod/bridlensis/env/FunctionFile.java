@@ -12,7 +12,7 @@ public class FunctionFile implements Callable {
 	private static final int OPTIONS_INDEX = 1;
 	private static final int OUTPATH_INDEX = 2;
 
-	public FunctionFile() {
+	FunctionFile() {
 	}
 
 	@Override
