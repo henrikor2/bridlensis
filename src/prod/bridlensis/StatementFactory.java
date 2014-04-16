@@ -146,7 +146,8 @@ public class StatementFactory {
 	}
 
 	public static String deString(String expr) {
-		if (expr.length() > 1 && expr.charAt(0) == '"') {
+		if (expr.length() > 1
+				&& (expr.charAt(0) == '"' || expr.charAt(0) == '\'')) {
 			return expr.substring(1, expr.length() - 1);
 		}
 		return expr;
