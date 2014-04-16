@@ -28,7 +28,7 @@ public class ParserTest {
 	}
 
 	@Test
-	public void testGetExpression() throws InvalidSyntaxException,
+	public void testParseExpression() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
 		InputReader reader;
@@ -40,25 +40,25 @@ public class ParserTest {
 
 		reader = readerFor("a + b + c");
 		assertEquals("\"$a$b$c\"",
-				parser.getExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader));
 
 		reader = readerFor("a + b + c");
 		assertEquals("\"$a$b$c\"",
-				parser.getExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader));
 
 		reader = readerFor("a + \"b\" + c");
 		assertEquals("\"$ab$c\"",
-				parser.getExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader));
 
 		reader = readerFor("\"a + b\" + c");
 		assertEquals("\"a + b$c\"",
-				parser.getExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader));
 
 		parser.parseStatement(readerFor("FUnction foo(a)"));
 		try {
 			buffer = new StringBuilder();
 			reader = readerFor("a + foo(b)");
-			parser.getExpression(reader.nextWord(), buffer, reader);
+			parser.parseExpression(reader.nextWord(), buffer, reader);
 			fail();
 		} catch (InvalidSyntaxException e) {
 			// All good
@@ -70,7 +70,7 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(b)");
 		assertEquals("$foo.s02", // readerFor("a + foo(b)") eat one s0
-				parser.getExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader));
 		assertEquals(
 				"Var /GLOBAL foo.s02\r\nPush $foo.b\r\nCall foo\r\nPop $foo.s02\r\n",
 				buffer.toString());
@@ -78,7 +78,7 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("a + foo(1)");
 		assertEquals("\"$foo.a$foo.s03\"",
-				parser.getExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader));
 		assertEquals(
 				"Var /GLOBAL foo.s03\r\nPush 1\r\nCall foo\r\nPop $foo.s03\r\n",
 				buffer.toString());
@@ -86,7 +86,7 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(1) + a");
 		assertEquals("\"$foo.s04$foo.a\"",
-				parser.getExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader));
 		assertEquals(
 				"Var /GLOBAL foo.s04\r\nPush 1\r\nCall foo\r\nPop $foo.s04\r\n",
 				buffer.toString());
@@ -96,7 +96,7 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(\"hello\") + \" \" + foo(\"world!\")");
 		assertEquals("\"$s05 $s06\"",
-				parser.getExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader));
 		assertEquals(
 				"Var /GLOBAL s05\r\nPush \"hello\"\r\nCall foo\r\nPop $s05\r\nVar /GLOBAL s06\r\nPush \"world!\"\r\nCall foo\r\nPop $s06\r\n",
 				buffer.toString());
@@ -120,7 +120,8 @@ public class ParserTest {
 				"\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example",
 				parser.parseStatement(readerFor("\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example")));
 
-		assertEquals("Delete $INSTDIR\\bridlensis.nsi",
+		assertEquals(
+				"Delete $INSTDIR\\bridlensis.nsi",
 				parser.parseStatement(readerFor("Delete $INSTDIR\\bridlensis.nsi")));
 	}
 
@@ -138,7 +139,8 @@ public class ParserTest {
 		assertEquals("StrCpy $a \"wo$\\\"rl$\\\"d!'\"",
 				parser.parseStatement(readerFor("a=\"wo$\\\"rl$\\\"d!'\"")));
 
-		assertEquals("StrCpy $instdir \"C:\\BridleNSIS\"",
+		assertEquals(
+				"StrCpy $instdir \"C:\\BridleNSIS\"",
 				parser.parseStatement(readerFor("INSTDIR = \"C:\\BridleNSIS\"")));
 
 		assertEquals("StrCpy $instdir $a",
@@ -179,11 +181,14 @@ public class ParserTest {
 			System.err.println(e.getMessage());
 		}
 
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("functionend")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("functionend")));
 
-		assertEquals(" Function foo",
+		assertEquals(
+				" Function foo",
 				parser.parseStatement(readerFor(" Function foo() ; Yoyou mama!")));
-		assertEquals(" FunctionEnd", parser.parseStatement(readerFor(" FunctionEnd")));
+		assertEquals(" FunctionEnd",
+				parser.parseStatement(readerFor(" FunctionEnd")));
 
 		try {
 			parser.parseStatement(readerFor("Function OldSchool() ; Yet again!"));
@@ -196,7 +201,8 @@ public class ParserTest {
 		assertEquals(
 				"Var /GLOBAL bar.a\r\nVar /GLOBAL bar.b\r\nFunction bar\r\n    Pop $bar.a\r\n    Pop $bar.b",
 				parser.parseStatement(readerFor("Function bar(a, b)")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 	}
 
 	@Test
@@ -207,7 +213,8 @@ public class ParserTest {
 		// Function OldSchool define
 		assertEquals("Function oldschool",
 				parser.parseStatement(readerFor("Function OldSchool")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		// Function OldSchool call
 		assertEquals(
@@ -241,7 +248,8 @@ public class ParserTest {
 			// We're good
 		}
 
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		// Function foo call
 		assertEquals("Var /GLOBAL a", parser.parseStatement(readerFor("Var a")));
@@ -298,7 +306,8 @@ public class ParserTest {
 				parser.parseStatement(readerFor("Function foo(a)")));
 		assertEquals("  Push $foo.a\r\n  Return",
 				parser.parseStatement(readerFor("  Return a")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		// Empty stack after function call
 		assertEquals(
@@ -312,15 +321,18 @@ public class ParserTest {
 		assertEquals("Var /GLOBAL a\r\nPush $r1\r\nCall foo\r\nPop $a",
 				parser.parseStatement(readerFor("a = foo(r1)")));
 
-		assertEquals("Function bar", parser.parseStatement(readerFor("Function bar()")));
+		assertEquals("Function bar",
+				parser.parseStatement(readerFor("Function bar()")));
 		assertEquals("  Push \"\"\r\n  Return",
 				parser.parseStatement(readerFor("  Return \"\"")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		assertEquals("Function empty",
 				parser.parseStatement(readerFor("Function empty()")));
 		assertEquals("  Return", parser.parseStatement(readerFor("  Return")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 	}
 
 	@Test
@@ -332,7 +344,8 @@ public class ParserTest {
 				parser.parseStatement(readerFor("Function foo(a)")));
 		assertEquals("    Push $foo.a\r\n    Return",
 				parser.parseStatement(readerFor("    Return a")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		assertEquals("Var /GLOBAL a\r\nPush \"1\"\r\nCall foo\r\nPop $a",
 				parser.parseStatement(readerFor("a = foo(\"1\")")));
@@ -362,7 +375,8 @@ public class ParserTest {
 				parser.parseStatement(readerFor("Function join(a, b)")));
 		assertEquals("  Push \"$join.a$join.b\"\r\n  Return",
 				parser.parseStatement(readerFor("  Return a + b")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		assertEquals(
 				"Var /GLOBAL len.a\r\nVar /GLOBAL len.b\r\nFunction len\r\n    Pop $len.a\r\n    Pop $len.b",
@@ -370,7 +384,8 @@ public class ParserTest {
 		assertEquals(
 				"  Var /GLOBAL len.s01\r\n  Var /GLOBAL len.s02\r\n  Push $len.b\r\n  Push $len.a\r\n  Call join\r\n  Pop $len.s02\r\n  StrLen $len.s01 $len.s02 \r\n  Push $len.s01\r\n  Return",
 				parser.parseStatement(readerFor("  Return StrLen(join(a, b))")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 	}
 
 	@Test
@@ -389,7 +404,8 @@ public class ParserTest {
 		assertEquals(
 				"Var /GLOBAL ret\r\nExecWait '\"$INSTDIR\\someprogram.exe\"' $ret ",
 				parser.parseStatement(readerFor("ret = ExecWait('\"$INSTDIR\\someprogram.exe\"')")));
-		assertEquals("StrCpy $r0 \"hello world!\" 5 ",
+		assertEquals(
+				"StrCpy $r0 \"hello world!\" 5 ",
 				parser.parseStatement(readerFor("r0 = StrCpy(\"hello world!\", 5)")));
 		assertEquals(
 				"FileOpen $r1 \"C:\\temp\\makensis.log\" \"r\" ",
@@ -403,14 +419,16 @@ public class ParserTest {
 
 		assertEquals("Var /GLOBAL a\r\nStrCpy $a \"hello\"",
 				parser.parseStatement(readerFor("a = \"hello\"")));
-		assertEquals("StrCpy $a \"$a world, oh my!\"",
+		assertEquals(
+				"StrCpy $a \"$a world, oh my!\"",
 				parser.parseStatement(readerFor("a = a + \" world\" + \", oh my!\"")));
 
 		assertEquals("Var /GLOBAL foo.a\r\nFunction foo\r\n    Pop $foo.a",
 				parser.parseStatement(readerFor("Function foo(a)")));
 		assertEquals("    Push \"$foo.a times\"\r\n    Return",
 				parser.parseStatement(readerFor("    Return a + \" times\"")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		assertEquals(
 				"Var /GLOBAL s01\r\nPush 1\r\nCall foo\r\nPop $s01\r\nStrCpy $a \"foo: $s01\"",
@@ -433,7 +451,8 @@ public class ParserTest {
 				parser.parseStatement(readerFor("DetailPrint(global.a)")));
 		assertEquals("DetailPrint $r0 ",
 				parser.parseStatement(readerFor("DetailPrint(global.r0)")));
-		assertEquals("FunctionEnd", parser.parseStatement(readerFor("FunctionEnd")));
+		assertEquals("FunctionEnd",
+				parser.parseStatement(readerFor("FunctionEnd")));
 
 		try {
 			parser.parseStatement(readerFor("Var foo.a"));
@@ -485,10 +504,12 @@ public class ParserTest {
 				"Var /GLOBAL s01\r\nCall hello\r\nPop $s01\r\n${If} $world == \"world\"\r\n${AndIf} $s01 != \"hello \"",
 				parser.parseStatement(readerFor("if world == \"world\" \\\r\n    and hello() != \"hello \"")));
 
-		assertEquals("${ElseIf} $world != \"hello world\"",
+		assertEquals(
+				"${ElseIf} $world != \"hello world\"",
 				parser.parseStatement(readerFor("elseif world != \"hello world\"")));
 
-		assertEquals("${ElseIf} $world > 1\r\n${AndIf} \"${Errors}\"",
+		assertEquals(
+				"${ElseIf} $world > 1\r\n${AndIf} \"${Errors}\"",
 				parser.parseStatement(readerFor("elseif world > 1 and \"${Errors}\"")));
 
 		assertEquals("${Else}", parser.parseStatement(readerFor("else")));
@@ -515,7 +536,8 @@ public class ParserTest {
 				"${DoWhile} ${FileExists} \"$instdir\\foo.txt\"",
 				parser.parseStatement(readerFor("Do While ${FileExists} \"$instdir\\foo.txt\"")));
 
-		assertEquals("${Continue}", parser.parseStatement(readerFor("Continue")));
+		assertEquals("${Continue}",
+				parser.parseStatement(readerFor("Continue")));
 		assertEquals("${Break}", parser.parseStatement(readerFor("Break")));
 
 		assertEquals("${Loop}", parser.parseStatement(readerFor("Loop")));

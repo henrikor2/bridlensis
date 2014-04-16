@@ -234,16 +234,16 @@ public class Parser {
 			if (!reader.hasNextWord()) {
 				throw new InvalidSyntaxException("Unexpected end of 'if'");
 			}
-			left = getExpression(reader.nextWord(), buffer, reader);
+			left = parseExpression(reader.nextWord(), buffer, reader);
 		} else {
-			left = getExpression(left, buffer, reader);
+			left = parseExpression(left, buffer, reader);
 		}
 		statement.addLeft(left);
 
 		while (reader.hasNextWord()) {
 			String compare = reader.getWordTail().replaceAll("[^=!\\<\\>]", "");
 			if (compare.isEmpty()) {
-				statement.addLeft(getExpression(reader.nextWord(), buffer,
+				statement.addLeft(parseExpression(reader.nextWord(), buffer,
 						reader));
 			} else {
 				statement.setCompare(compare);
@@ -252,8 +252,8 @@ public class Parser {
 		}
 
 		if (reader.hasNextWord()) {
-			statement
-					.addRight(getExpression(reader.nextWord(), buffer, reader));
+			statement.addRight(parseExpression(reader.nextWord(), buffer,
+					reader));
 		}
 
 		return statement;
@@ -382,12 +382,12 @@ public class Parser {
 		String value = reader.nextWord();
 		String tail = reader.getWordTail();
 		if (tail.endsWith("+")) {
-			value = getExpression(value, sb, reader);
+			value = parseExpression(value, sb, reader);
 		} else if (tail.startsWith("(")) {
 			sb.append(parseCall(value, variable, reader));
 			if (reader.getWordTail().endsWith("+")) {
 				sb.append(InputReader.NEW_LINE);
-				value = getExpression(variable.getName(), sb, reader);
+				value = parseExpression(variable.getName(), sb, reader);
 			} else {
 				return sb.toString();
 			}
@@ -428,7 +428,7 @@ public class Parser {
 			value = reader.nextWord();
 			String tail = reader.getWordTail();
 			if (tail.startsWith("(") || tail.endsWith("+")) {
-				value = getExpression(value, sb, reader);
+				value = parseExpression(value, sb, reader);
 			} else if (!isString(value) && !isUntouchable(value)) {
 				value = environment.getVariable(value, enclosingFunction)
 						.getNSISExpression();
@@ -466,7 +466,7 @@ public class Parser {
 			tail = reader.getWordTail();
 			if (!tail.startsWith(")")
 					&& (tail.startsWith("(") || tail.endsWith("+"))) {
-				arg = getExpression(arg, sb, reader);
+				arg = parseExpression(arg, sb, reader);
 			} else if (!isString(arg) && !isUntouchable(arg)) {
 				arg = environment.getVariable(arg, enclosingFunction)
 						.getNSISExpression();
@@ -495,49 +495,50 @@ public class Parser {
 		return sb.toString();
 	}
 
-	protected String getExpression(String current, StringBuilder buffer,
+	protected String parseExpression(String expr, StringBuilder buffer,
 			InputReader reader) throws InvalidSyntaxException,
 			EnvironmentException {
 		String tail = reader.getWordTail();
 		if (tail.startsWith("(")) {
-			Variable fReturn = inExpressionCall(current, buffer, reader);
+			// Function call
+			Variable fReturn = parseInExpressionCall(expr, buffer, reader);
 			if (tail.endsWith("==") || tail.endsWith("!=")) {
-				current = fReturn.getName();
+				expr = fReturn.getName();
 			} else {
-				return getExpression(fReturn.getName(), buffer, reader);
+				expr = parseExpression(fReturn.getName(), buffer, reader);
 			}
 		} else if (tail.endsWith("+")) {
+			// Concatenation
 			if (!reader.hasNextWord()) {
 				throw new InvalidSyntaxException(
 						"'+' must be followed by an expression");
 			}
 			String right = reader.nextWord();
 			if (reader.getWordTail().startsWith("(")) {
-				right = getExpression(right, buffer, reader);
+				right = parseExpression(right, buffer, reader);
 			}
-			if (isString(right)) {
-				right = right.substring(1, right.length() - 1);
-			} else if (!isUntouchable(right)) {
-				right = environment.getVariable(right, enclosingFunction)
-						.getNSISExpression();
-			}
-			if (isString(current)) {
-				current = current.substring(1, current.length() - 1);
-			} else if (!isUntouchable(current)) {
-				current = environment.getVariable(current, enclosingFunction)
-						.getNSISExpression();
-			}
-			return getExpression(String.format("\"%s%s\"", current, right),
-					buffer, reader);
+			expr = parseExpression(String.format("\"%s%s\"",
+					getNSISExpression(expr), getNSISExpression(right)), buffer,
+					reader);
 		}
-		if (!isString(current) && !isUntouchable(current)) {
-			current = environment.getVariable(current, enclosingFunction)
+		if (!isString(expr) && !isUntouchable(expr)) {
+			expr = environment.getVariable(expr, enclosingFunction)
 					.getNSISExpression();
 		}
-		return current;
+		return expr;
 	}
 
-	private Variable inExpressionCall(String callableName,
+	private String getNSISExpression(String expr) throws EnvironmentException {
+		if (isString(expr)) {
+			expr = expr.substring(1, expr.length() - 1);
+		} else if (!isUntouchable(expr)) {
+			expr = environment.getVariable(expr, enclosingFunction)
+					.getNSISExpression();
+		}
+		return expr;
+	}
+
+	private Variable parseInExpressionCall(String callableName,
 			StringBuilder buffer, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
 		Variable fReturn = environment.registerVariable(environment
