@@ -56,9 +56,8 @@ public class Parser {
 
 	public void parse(String inputFileName, String outputFileName)
 			throws IOException, ParserException {
-		File inputFile1 = new File(baseDir, inputFileName);
-		System.out.println("Begin parse file: " + inputFile1.getAbsolutePath());
-		File inputFile = inputFile1;
+		File inputFile = new File(baseDir, inputFileName);
+		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
 		BufferedWriter writer = null;
 		try {
 			writer = getOutputWriter(outputFileName);
