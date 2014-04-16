@@ -109,9 +109,8 @@ public class StatementFactory {
 			Variable returnVar) throws InvalidSyntaxException,
 			EnvironmentException {
 		StringBuilder sb = new StringBuilder();
-		if (returnVar == null && callable.getReturnType() != ReturnType.VOID
-				&& callable.getReturnType() != ReturnType.OPTIONAL
-				&& callable.getReturnType() != ReturnType.ERRORFLAG) {
+		if (returnVar == null
+				&& callable.getReturnType() == ReturnType.REQUIRED) {
 			if (functionNullReturn == null) {
 				functionNullReturn = environment.registerVariable(
 						"bridlensis_nullvar", null);
@@ -121,27 +120,6 @@ public class StatementFactory {
 			returnVar = functionNullReturn;
 		} else if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append(beginValueReturnFunctionStatement(indent, returnVar));
-		}
-		sb.append(callable.statementFor(indent, args, returnVar));
-		if (returnVar != null
-				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append(endValueReturnFunctionStatement(indent, returnVar));
-		}
-		return sb.toString();
-	}
-
-	public static String deString(String expr) {
-		if (expr.length() > 1 && expr.charAt(0) == '"') {
-			return expr.substring(1, expr.length() - 1);
-		}
-		return expr;
-	}
-
-	private static StringBuilder beginValueReturnFunctionStatement(
-			String indent, Variable returnVar) {
-		StringBuilder sb = begin(indent);
-		if (returnVar != null) {
 			sb.append("StrCpy ");
 			sb.append(returnVar.getNSISExpression());
 			sb.append(" 1");
@@ -151,13 +129,9 @@ public class StatementFactory {
 			sb.append(InputReader.NEW_LINE);
 			sb.append(indent);
 		}
-		return sb;
-	}
-
-	private static String endValueReturnFunctionStatement(String indent,
-			Variable returnVar) {
-		StringBuilder sb = new StringBuilder();
-		if (returnVar != null) {
+		sb.append(callable.statementFor(indent, args, returnVar));
+		if (returnVar != null
+				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append(InputReader.NEW_LINE);
 			sb.append(indent);
 			sb.append("IfErrors +2");
@@ -169,6 +143,13 @@ public class StatementFactory {
 			sb.append(" 0");
 		}
 		return sb.toString();
+	}
+
+	public static String deString(String expr) {
+		if (expr.length() > 1 && expr.charAt(0) == '"') {
+			return expr.substring(1, expr.length() - 1);
+		}
+		return expr;
 	}
 
 	public String include(String indent, String filename) {
