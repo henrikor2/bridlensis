@@ -156,8 +156,7 @@ public class MakeBridleNSIS {
 	private static String findNSIS(String path) {
 		String parent = null;
 		try {
-			String cmd = String.format("\"%s\" /VERSION", path);
-			ProcessBuilder builder = new ProcessBuilder(cmd);
+			ProcessBuilder builder = new ProcessBuilder(path, "/VERSION");
 			Process process = builder.start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					process.getInputStream()));
