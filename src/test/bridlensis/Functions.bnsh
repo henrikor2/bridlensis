@@ -82,3 +82,7 @@ GetFullPathName /SHORT $r0 $instdir
 ${WordFind} "C:\io.sys C:\Program Files C:\WINDOWS" " C:\" "-02" $r1
 ${WordFind2XS} "[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]" "[C:\" "];" "+2" $r2
 ${WordFind3X} "[1.AAB];[2.BAA];[3.BBB];" "[" "AA" "];" "+1" $r3
+
+; WordReplace(S)
+${WordReplace} "C:\io.sys C:\logo.sys C:\WINDOWS" "SYS" "bmp" "+2" $r1
+${WordReplaceS} "C:\io.sys C:\logo.sys C:\WINDOWS" "SYS" "" "+" $bridlensis_nullvar

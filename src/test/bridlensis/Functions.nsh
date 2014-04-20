@@ -58,3 +58,7 @@ r0 = GetFullPathName(instdir, "/SHORT")
 r1 = WordFind("C:\io.sys C:\Program Files C:\WINDOWS", "-02", " C:\")
 r2 = WordFindS("[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]", "+2", "[C:\", "];")
 r3 = WordFind("[1.AAB];[2.BAA];[3.BBB];", "+1", "[", "];", "AA")
+
+; WordReplace(S)
+r1 = WordReplace("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "bmp", "+2")
+WordReplaceS("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "", "+")

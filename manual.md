@@ -282,7 +282,7 @@ Returns the full path of the file specified. If the path portion of the paramete
 
 #### WordFind(string, options, delim1 [, delim2 [, center]])
 
-Multi-features string function. Acts as a convenience function for the NSIS [WordFind](http://nsis.sourceforge.net/WordFind) when passing `delim1` alone, as [WordFind2X](http://nsis.sourceforge.net/WordFind2X) when defining `delim2`, and as [WordFind3X](http://nsis.sourceforge.net/WordFind3X) when defining also `center`. See the NSIS documentation for `options` and detailed usage.
+Multi-features string function. Acts as a convenience function for the NSIS [WordFind](http://nsis.sourceforge.net/WordFind) when passing `delim1` alone, as [WordFind2X](http://nsis.sourceforge.net/WordFind2X) when defining `delim2`, and as [WordFind3X](http://nsis.sourceforge.net/WordFind3X) when defining also `center`. See NSIS documentation for `options` and detailed usage.
 
     r1 = WordFind("C:\io.sys C:\Program Files C:\WINDOWS", "-02", " C:\") ; <-- "Program Files"
     r2 = WordFind("[C:\io.sys];[C:\logo.sys];[C:\WINDOWS]", "+2", "[C:\", "];") ; <-- "logo.sys"
@@ -292,6 +292,19 @@ Multi-features string function. Acts as a convenience function for the NSIS [Wor
 #### WordFindS(string, options, delim1 [, delim2 [, center]])
 
 Same as WordFind but case sensitive.
+
+
+#### WordReplace(string, word1, word2, options)
+
+Convenience function for the NSIS [WordReplace](http://nsis.sourceforge.net/WordReplace). See NSIS documentation for `options` and detailed usage.
+
+    r1 = WordReplace("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "bmp", "+2") ; <-- "C:\io.sys C:\logo.bmp C:\WINDOWS"
+    r2 = WordReplaceS("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "", "+") ; <-- "C:\io. C:\logo. C:\WINDOWS"
+
+
+#### WordReplaceS(string, word1, word2, options)
+
+Same as WordReplace but case sensitive.
 
 
 ### NSIS Instructions As Functions

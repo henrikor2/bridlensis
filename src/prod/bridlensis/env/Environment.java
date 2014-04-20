@@ -54,6 +54,8 @@ public class Environment {
 		add(new FunctionGetFullPathName(), "getfullpathname");
 		add(new FunctionWordFind(false), "wordfind");
 		add(new FunctionWordFind(true), "wordfinds");
+		add(new FunctionWordReplace(false), "wordreplace");
+		add(new FunctionWordReplace(true), "wordreplaces");
 
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {

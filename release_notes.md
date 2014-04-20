@@ -6,7 +6,7 @@ Release date: TBD
 
 ### What's New
 
-*   New convenience functions File, ReserveFile, FileCopy, FileRename, RMDir, DeleteRegKey, GetFullPathName, and WordFind(S)
+*   New convenience functions File, ReserveFile, FileCopy, FileRename, RMDir, DeleteRegKey, GetFullPathName, WordFind(S), and WordReplace(S)
 *   Function aliases Delete, Copy, Rename, and RMDir
 *   Function FileDelete Optional argument rebootok must be passed as defined in NSIS, e.g. `Delete("file.dat", "/REBOOTOK")`
 *   Improved NSIS home directory detection unless specified with command-line argument `-n`
