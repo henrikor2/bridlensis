@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import bridlensis.InputReader;
 import bridlensis.InvalidSyntaxException;
+import bridlensis.Parser;
 import bridlensis.StatementFactory;
 
 class FunctionMsgBox implements Callable {
@@ -152,11 +152,11 @@ class FunctionMsgBox implements Callable {
 				sb.append(' ');
 				sb.append(ro.getGoTo());
 
-				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(Parser.NEWLINE_MARKER);
 				sbRet.append(indent);
 				sbRet.append(ro.getGoTo());
 				sbRet.append(':');
-				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(Parser.NEWLINE_MARKER);
 				sbRet.append(indent);
 				sbRet.append(StatementFactory.DEFAULT_INDENT);
 				sbRet.append("StrCpy ");
@@ -164,14 +164,14 @@ class FunctionMsgBox implements Callable {
 				sbRet.append(" \"");
 				sbRet.append(ro.getReturnValue());
 				sbRet.append('"');
-				sbRet.append(InputReader.NEW_LINE);
+				sbRet.append(Parser.NEWLINE_MARKER);
 				sbRet.append(indent);
 				sbRet.append(StatementFactory.DEFAULT_INDENT);
 				sbRet.append("GoTo ");
 				sbRet.append(exit_jump);
 			}
 			sb.append(sbRet);
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append(exit_jump);
 			sb.append(':');

@@ -4,8 +4,6 @@ import java.util.Scanner;
 
 public class InputReader {
 
-	public static final String NEW_LINE = "\r\n";
-
 	private static final char LINE_CONTINUE = '\\';
 	private static final String SPACE_MARKERS = " \t\r\n" + LINE_CONTINUE;
 	private static final String COMMENT_MARKERS = ";#";
@@ -57,7 +55,7 @@ public class InputReader {
 			text.set(str, startPos);
 			while (text.endsWith(LINE_CONTINUE, SPACE_MARKERS)) {
 				// Ensure line continuation
-				text.append(NEW_LINE + pullNextLine());
+				text.append(Parser.NEWLINE_MARKER + pullNextLine());
 			}
 			skipCommentsAtCursor();
 			tail = "";
@@ -140,8 +138,8 @@ public class InputReader {
 		while (!text.seekString(COMMENTBLOCK_END)) {
 			text.goToEnd();
 			String nextLine = pullNextLine();
-			text.append(NEW_LINE + nextLine);
-			text.skip(NEW_LINE.length() + indexOfNextNonSpace(nextLine));
+			text.append(Parser.NEWLINE_MARKER + nextLine);
+			text.skip(Parser.NEWLINE_MARKER.length() + indexOfNextNonSpace(nextLine));
 		}
 
 		// Move cursor beyond comment block

@@ -2,8 +2,8 @@ package bridlensis.env;
 
 import java.util.List;
 
-import bridlensis.InputReader;
 import bridlensis.InvalidSyntaxException;
+import bridlensis.Parser;
 import bridlensis.StatementFactory;
 
 public class FunctionFile implements Callable {
@@ -37,7 +37,7 @@ public class FunctionFile implements Callable {
 		if (!args.get(OUTPATH_INDEX).equals(StatementFactory.NULL)) {
 			sb.append("SetOutPath ");
 			sb.append(args.get(OUTPATH_INDEX));
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("File ");

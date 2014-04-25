@@ -27,10 +27,6 @@ class InputText {
 	}
 
 	protected void append(String nextLine) {
-		if (!nextLine.startsWith(InputReader.NEW_LINE)) {
-			throw new IllegalArgumentException(
-					"Expecting line feed at the beginning of next line");
-		}
 		text += nextLine;
 	}
 

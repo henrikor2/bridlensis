@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import bridlensis.InputReader;
+import bridlensis.Parser;
 
 public class UserFunction implements Callable {
 
@@ -55,13 +55,13 @@ public class UserFunction implements Callable {
 		for (int i = args.size() - 1; i >= 0; i--) {
 			sb.append("Push ");
 			sb.append(args.get(i));
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("Call ");
 		sb.append(getName());
 		if (hasReturn) {
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("Pop ");
 			sb.append(returnVar.getNSISExpression());

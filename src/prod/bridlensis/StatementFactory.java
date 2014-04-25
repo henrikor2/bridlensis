@@ -32,13 +32,13 @@ public class StatementFactory {
 	public String nullDefine() {
 		StringBuilder sb = new StringBuilder(80);
 		sb.append("!ifndef BRIDLE_NULL");
-		sb.append(InputReader.NEW_LINE);
+		sb.append(Parser.NEWLINE_MARKER);
 		sb.append(DEFAULT_INDENT);
 		sb.append("!define BRIDLE_NULL \"BridleNSIS_NULL\"");
-		sb.append(InputReader.NEW_LINE);
+		sb.append(Parser.NEWLINE_MARKER);
 		sb.append("!endif");
-		sb.append(InputReader.NEW_LINE);
-		sb.append(InputReader.NEW_LINE);
+		sb.append(Parser.NEWLINE_MARKER);
+		sb.append(Parser.NEWLINE_MARKER);
 		return sb.toString();
 	}
 
@@ -64,7 +64,7 @@ public class StatementFactory {
 		Iterator<Variable> args = function.argumentsIterator();
 		while (args.hasNext()) {
 			sb.append(variableDeclare("", args.next()));
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 
@@ -73,7 +73,7 @@ public class StatementFactory {
 
 		args = function.argumentsIterator();
 		while (args.hasNext()) {
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			if (indent.length() != 0) {
 				sb.append(indent);
 				sb.append(indent);
@@ -92,7 +92,7 @@ public class StatementFactory {
 		if (value != null) {
 			sb.append("Push ");
 			sb.append(value);
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("Return");
@@ -115,7 +115,7 @@ public class StatementFactory {
 				functionNullReturn = environment.registerVariable(
 						"bridlensis_nullvar", null);
 				sb.append(variableDeclare(indent, functionNullReturn));
-				sb.append(InputReader.NEW_LINE);
+				sb.append(Parser.NEWLINE_MARKER);
 			}
 			returnVar = functionNullReturn;
 		} else if (returnVar != null
@@ -123,19 +123,19 @@ public class StatementFactory {
 			sb.append("StrCpy ");
 			sb.append(returnVar.getNSISExpression());
 			sb.append(" 1");
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("ClearErrors");
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append(callable.statementFor(indent, args, returnVar));
 		if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("IfErrors +2");
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append(DEFAULT_INDENT);
 			sb.append("StrCpy ");

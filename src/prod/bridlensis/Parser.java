@@ -23,6 +23,8 @@ import bridlensis.env.Variable;
 
 public class Parser {
 
+	public static final String NEWLINE_MARKER = "\r\n";
+
 	private File baseDir;
 	private File outDir;
 	private String encoding;
@@ -98,7 +100,7 @@ public class Parser {
 		try {
 			while (reader.goToNextStatement()) {
 				writer.write(parseStatement(reader));
-				writer.write(InputReader.NEW_LINE);
+				writer.write(Parser.NEWLINE_MARKER);
 			}
 			System.out.println(String.format(
 					"End parsing %d lines in file %s.", reader.getLinesRead(),
@@ -190,7 +192,7 @@ public class Parser {
 		while (reader.hasNextWord()) {
 			String word = reader.nextWord();
 			if (word.equalsIgnoreCase("and") || word.equalsIgnoreCase("or")) {
-				sb.append(InputReader.NEW_LINE);
+				sb.append(Parser.NEWLINE_MARKER);
 				sb.append(statementFactory.logicLibComparisonStatement(
 						reader.getIndent(),
 						getComparisonStatement(word.toLowerCase(), reader,
@@ -374,7 +376,7 @@ public class Parser {
 			variable = environment.registerVariable(varName, enclosingFunction);
 			sb.append(statementFactory.variableDeclare(reader.getIndent(),
 					variable));
-			sb.append(InputReader.NEW_LINE);
+			sb.append(Parser.NEWLINE_MARKER);
 		}
 
 		if (!reader.hasNextWord()) {
@@ -388,7 +390,7 @@ public class Parser {
 		} else if (tail.startsWith("(")) {
 			sb.append(parseCall(value, variable, reader));
 			if (reader.getWordTail().endsWith("+")) {
-				sb.append(InputReader.NEW_LINE);
+				sb.append(Parser.NEWLINE_MARKER);
 				value = parseExpression(variable.getName(), sb, reader);
 			} else {
 				return sb.toString();
@@ -547,9 +549,9 @@ public class Parser {
 				.getNameGenerator().generate(), enclosingFunction);
 		buffer.append(statementFactory.variableDeclare(reader.getIndent(),
 				fReturn));
-		buffer.append(InputReader.NEW_LINE);
+		buffer.append(Parser.NEWLINE_MARKER);
 		buffer.append(parseCall(callableName, fReturn, reader));
-		buffer.append(InputReader.NEW_LINE);
+		buffer.append(Parser.NEWLINE_MARKER);
 		return fReturn;
 	}
 
