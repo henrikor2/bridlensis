@@ -23,6 +23,8 @@ import bridlensis.env.Variable;
 
 public class Parser {
 
+	public static final char UTF16BE_BOM = '\uFFFE';
+	public static final char UTF16LE_BOM = '\uFEFF';
 	public static final String NEWLINE_MARKER = "\r\n";
 
 	private File baseDir;
@@ -85,9 +87,9 @@ public class Parser {
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), encoding));
 		if (encoding.equalsIgnoreCase("UTF-16LE")) {
-			writer.write("\uFEFF");
+			writer.write(UTF16LE_BOM);
 		} else if (encoding.equalsIgnoreCase("UTF-16BE")) {
-			writer.write("\uFFFE");
+			writer.write(UTF16BE_BOM);
 		}
 		return writer;
 	}

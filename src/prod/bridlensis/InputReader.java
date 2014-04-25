@@ -46,7 +46,7 @@ public class InputReader {
 		if (input.hasNextLine()) {
 			String str = pullNextLine();
 			if (str.length() > 0
-					&& (str.charAt(0) == '\uFEFF' || str.charAt(0) == '\uFFFE')) {
+					&& (str.charAt(0) == Parser.UTF16LE_BOM || str.charAt(0) == Parser.UTF16BE_BOM)) {
 				// Skip UTF-16 BOM
 				str = str.substring(1);
 			}
@@ -139,7 +139,8 @@ public class InputReader {
 			text.goToEnd();
 			String nextLine = pullNextLine();
 			text.append(Parser.NEWLINE_MARKER + nextLine);
-			text.skip(Parser.NEWLINE_MARKER.length() + indexOfNextNonSpace(nextLine));
+			text.skip(Parser.NEWLINE_MARKER.length()
+					+ indexOfNextNonSpace(nextLine));
 		}
 
 		// Move cursor beyond comment block
