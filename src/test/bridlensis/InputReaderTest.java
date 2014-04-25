@@ -29,7 +29,7 @@ public class InputReaderTest {
 		reader = readerFor("     ");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("     ", reader.getIndent());
-		assertEquals(false, reader.hasNextWord());
+		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("  ; hello world!");
 		assertTrue(reader.goToNextStatement());
@@ -229,6 +229,13 @@ public class InputReaderTest {
 		assertFalse(reader.hasNextWord());
 		assertFalse(reader.goToNextStatement());
 
+		reader = readerFor("a = b;How about this?");
+		assertTrue(reader.goToNextStatement());
+		assertEquals("a", reader.nextWord());
+		assertEquals("b", reader.nextWord());
+		assertFalse(reader.hasNextWord());
+		assertFalse(reader.goToNextStatement());
+
 		reader = readerFor("Name/* comment */mysetup");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("Name", reader.nextWord());
@@ -318,7 +325,20 @@ public class InputReaderTest {
 		reader = readerFor("!include foo.nsh");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("", reader.getWordTail());
-		assertEquals("!include", reader.nextWord());
+		assertEquals("", reader.nextWord());
+		assertEquals("!", reader.getWordTail());
+		assertEquals("include", reader.nextWord());
+		assertEquals("", reader.getWordTail());
+		assertEquals("foo.nsh", reader.nextWord());
+		assertEquals("", reader.getWordTail());
+		assertFalse(reader.hasNextWord());
+
+		reader = readerFor("  !include foo.nsh");
+		assertTrue(reader.goToNextStatement());
+		assertEquals("", reader.getWordTail());
+		assertEquals("", reader.nextWord());
+		assertEquals("!", reader.getWordTail());
+		assertEquals("include", reader.nextWord());
 		assertEquals("", reader.getWordTail());
 		assertEquals("foo.nsh", reader.nextWord());
 		assertEquals("", reader.getWordTail());

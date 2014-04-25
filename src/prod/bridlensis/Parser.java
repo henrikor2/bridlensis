@@ -147,7 +147,9 @@ public class Parser {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
 		} else if (word.equals("loop")) {
 			return parseDoLoop("Loop", reader);
-		} else if (word.equals("!include")) {
+		} else if (word.equals("") && tail.equals("!") && reader.hasNextWord()
+				&& (word = reader.nextWord().toLowerCase()).equals("include")) {
+
 			return parseInclude(reader);
 		}
 		return reader.getCurrentStatement();

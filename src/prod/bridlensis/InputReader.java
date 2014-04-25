@@ -6,28 +6,34 @@ public class InputReader {
 
 	public static final String NEW_LINE = "\r\n";
 
-	private static final String TAIL_CHARS = "=+(,)!<>";
-	private static final String SEPARATORS = " \t=(,)+!<>;#";
-	private static final String BLOCKCOMMENT_END = "*/";
-	private static final String BLOCKCOMMENT_START = "/*";
-	private static final String BACKSLASH_MASK = "$\\";
+	private static final char LINE_CONTINUE = '\\';
+	private static final String SPACE_MARKERS = " \t\r\n" + LINE_CONTINUE;
+	private static final String COMMENT_MARKERS = ";#";
+	private static final String COMMENTBLOCK_START = "/*";
+	private static final String COMMENTBLOCK_END = "*/";
+	private static final String TAIL_MARKERS = "=+(,)!<>";
+	private static final String WORD_MARKERS = TAIL_MARKERS + SPACE_MARKERS
+			+ COMMENT_MARKERS + COMMENTBLOCK_START.charAt(0);
+	private static final String STRING_MARKERS = "\"'";
+	private static final String CHAR_MASK = "$\\";
+	private static final String LANGSTRING_START = "$(";
+	private static final String LANGSTRING_END = ")";
 
 	private Scanner input;
-	private String text;
+	private InputText text;
 	private String indent;
-	private StringBuilder tail;
-	private int endOfPreviousWord;
-	private int startOfNextWord;
+	private String tail;
 	private int linesRead;
 
 	public InputReader(Scanner input) {
 		this.input = input;
-		linesRead = 0;
+		this.linesRead = 0;
+		this.text = new InputText();
 	}
 
 	@Override
 	public String toString() {
-		return text;
+		return text.toString();
 	}
 
 	public int getLinesRead() {
@@ -40,232 +46,130 @@ public class InputReader {
 
 	public boolean goToNextStatement() throws InvalidSyntaxException {
 		if (input.hasNextLine()) {
-			text = nextLine();
-			endOfPreviousWord = 0;
-			char c;
-			while (text.length() > endOfPreviousWord
-					&& ((c = text.charAt(endOfPreviousWord)) == ' '
-							|| c == '\t' || c == '\uFEFF' || c == '\uFFFE')) {
-				endOfPreviousWord++;
+			String str = pullNextLine();
+			if (str.length() > 0
+					&& (str.charAt(0) == '\uFEFF' || str.charAt(0) == '\uFFFE')) {
+				// Skip UTF-16 BOM
+				str = str.substring(1);
 			}
-			indent = text.substring(0, endOfPreviousWord);
-			if (endOfPreviousWord > 0
-					&& (indent.charAt(0) == '\uFEFF' || indent.charAt(0) == '\uFFFE')) {
-				indent = indent.substring(1);
+			int startPos = indexOfNextNonSpace(str);
+			indent = str.substring(0, startPos);
+			text.set(str, startPos);
+			while (text.endsWith(LINE_CONTINUE, SPACE_MARKERS)) {
+				// Ensure line continuation
+				text.append(NEW_LINE + pullNextLine());
 			}
-			tail = new StringBuilder();
-			findStartOfNextWord();
+			skipCommentsAtCursor();
+			tail = "";
 			return true;
 		}
 		return false;
 	}
 
 	public String getCurrentStatement() throws InvalidSyntaxException {
-		if (!hasNextWord()) {
-			return text;
+		if (text.seekString(COMMENTBLOCK_START)) {
+			skipCommentBlockAtCursor();
 		}
-
-		int commentBlockStart = text.indexOf(BLOCKCOMMENT_START);
-		if (commentBlockStart != -1) {
-			int commentBlockEnd;
-			while ((commentBlockEnd = text.indexOf(BLOCKCOMMENT_END,
-					commentBlockStart + 2)) == -1) {
-				if (!input.hasNextLine()) {
-					startOfNextWord = text.length();
-					return text;
-				}
-				text += NEW_LINE + nextLine();
-			}
-			return text.substring(0, commentBlockEnd + 2);
-		}
-
-		do {
-			int lastCharIndex = text.length() - 1;
-			char lastChar;
-			while ((lastChar = text.charAt(lastCharIndex)) == ' '
-					|| lastChar == '\t') {
-				lastCharIndex--;
-			}
-			if (lastChar != '\\') {
-				break;
-			}
-			if (!input.hasNextLine()) {
-				startOfNextWord = text.length();
-				return text.substring(startOfNextWord);
-			}
-			text += NEW_LINE + nextLine();
-		} while (true);
-		return text;
+		return text.toString();
 	}
 
 	public boolean hasNextWord() {
-		return startOfNextWord < text.length();
+		return !text.isAtEnd();
 	}
 
 	public String nextWord() throws InvalidSyntaxException {
-		tail = new StringBuilder();
-		char firstChar = text.charAt(startOfNextWord);
-		if (firstChar == '"' || firstChar == '\'') {
-			return parseStringWord(firstChar);
+		// Cursor is at the start of the next word
+		int start = text.cursorPos();
+
+		// Move cursor to the end of the word
+		if (text.charAtCursorIn(STRING_MARKERS)) {
+			// Parse string
+			String strOpenChar = Character.toString(text.charAtCursor());
+			do {
+				text.skip(1);
+				if (!text.seekString(strOpenChar)) {
+					throw new InvalidSyntaxException("Unterminated string");
+				}
+			} while (text.cursorPrecededBy(CHAR_MASK));
+			text.skip(1);
+		} else if (text.seekChars(WORD_MARKERS) && isCursorAtLangString()) {
+			// Parse LangString
+			if (!text.seekString(LANGSTRING_END)) {
+				throw new InvalidSyntaxException("Unterminated LangString");
+			}
+			text.skip(1);
 		}
-		endOfPreviousWord = startOfNextWord + 1;
-		for (; endOfPreviousWord < text.length(); endOfPreviousWord++) {
-			if ((isWordSeparator(endOfPreviousWord) && !isLangStringStart(endOfPreviousWord))
-					|| isCommentBlockStart(endOfPreviousWord)) {
+
+		// Save the word before moving cursor any further
+		String word = text.toString().substring(start, text.cursorPos());
+
+		// Collect tail characters
+		StringBuilder tailBuilder = new StringBuilder(10);
+		while (!text.isAtEnd()) {
+			skipCommentsAtCursor();
+			if (text.charAtCursorIn(TAIL_MARKERS)) {
+				tailBuilder.append(text.charAtCursor());
+			} else if (!text.charAtCursorIn(WORD_MARKERS)) {
 				break;
 			}
+			text.skip(1);
 		}
-		if (isLangStringStart(startOfNextWord + 1)) {
-			// Add missing LangString closing parenthesis
-			endOfPreviousWord++;
-		}
-		String word = text.substring(startOfNextWord, endOfPreviousWord);
-		findStartOfNextWord();
+		tail = tailBuilder.toString();
+
 		return word;
-	}
-
-	private boolean isWordSeparator(int index) {
-		return SEPARATORS.indexOf(text.charAt(index)) != -1;
-	}
-
-	private boolean isLangStringStart(int index) {
-		return index < text.length() && text.charAt(index) == '(' && index > 0
-				&& text.charAt(index - 1) == '$';
-	}
-
-	private boolean isCommentBlockStart(int index) {
-		return text.charAt(index) == '/' && (index + 1) < text.length()
-				&& text.substring(index, index + 2).equals(BLOCKCOMMENT_START);
 	}
 
 	public String getWordTail() {
-		return tail.toString();
+		return tail;
 	}
 
-	private String parseStringWord(char strOpenChar)
-			throws InvalidSyntaxException {
-		endOfPreviousWord = goToStringEnd(strOpenChar, startOfNextWord + 1);
-		do {
-			int lastCharIndex = endOfPreviousWord - 1;
-			char lastChar;
-			while ((lastChar = text.charAt(lastCharIndex)) == ' '
-					|| lastChar == '\t') {
-				lastCharIndex--;
-			}
-			if (lastChar != '\\') {
-				break;
-			}
-			if (!input.hasNextLine()) {
-				startOfNextWord = endOfPreviousWord;
-				return text.substring(startOfNextWord);
-			}
-			String nextWord = nextLine().replaceAll("^\\s+", "");
-			text = text.substring(0, lastCharIndex) + " " + nextWord;
-			endOfPreviousWord = goToStringEnd(strOpenChar, endOfPreviousWord);
-		} while (true);
-		String word = text.substring(startOfNextWord, endOfPreviousWord);
-		findStartOfNextWord();
-		return word;
-	}
-
-	private int goToStringEnd(char strOpenChar, int startIndex)
-			throws InvalidSyntaxException {
-		int endIndex = startIndex;
-		for (; endIndex < text.length(); endIndex++) {
-			char charAtWordEnd = text.charAt(endIndex);
-			if ((charAtWordEnd == strOpenChar)
-					&& (endIndex < 2 || (!text
-							.substring(endIndex - 2, endIndex).equals(
-									BACKSLASH_MASK)))) {
-				endIndex++;
-				return endIndex;
-			}
-		}
-		for (endIndex--; endIndex > startOfNextWord; endIndex--) {
-			char charAtWordEnd = text.charAt(endIndex);
-			if (charAtWordEnd == ' ' || charAtWordEnd == '\t') {
-				continue;
-			}
-			if (charAtWordEnd == '\\'
-					&& !text.substring(endIndex - 2, endIndex).equals(
-							BACKSLASH_MASK)) {
-				endIndex = pullNextLine();
-				return goToStringEnd(strOpenChar, endIndex);
-			}
-		}
-		throw new InvalidSyntaxException("Unexpected EOF");
-	}
-
-	private void findStartOfNextWord() throws InvalidSyntaxException {
-		startOfNextWord = endOfPreviousWord;
-		while (startOfNextWord < text.length()) {
-			char c = text.charAt(startOfNextWord);
-			if (TAIL_CHARS.indexOf(c) != -1) {
-				if (c != '!'
-						|| (c == '!' && startOfNextWord + 1 < text.length() && TAIL_CHARS
-								.indexOf(text.charAt(startOfNextWord + 1)) != -1)) {
-					tail.append(c);
-				} else {
-					break;
-				}
-			} else if (c == ';' || c == '#') {
-				goToLineCommentEnd();
-				startOfNextWord = text.length() - 1;
-			} else if (c == '\\'
-					&& !text.substring(startOfNextWord - 2, startOfNextWord)
-							.equals(BACKSLASH_MASK)) {
-				startOfNextWord = pullNextLine() - 1;
-			} else if (c == '/'
-					&& startOfNextWord <= text.length() - 2
-					&& text.substring(startOfNextWord, startOfNextWord + 2)
-							.equals(BLOCKCOMMENT_START)) {
-				startOfNextWord += 2;
-				if (startOfNextWord >= text.length()) {
-					startOfNextWord = pullNextLine();
-				}
-				while ((startOfNextWord = text.indexOf(BLOCKCOMMENT_END,
-						startOfNextWord)) == -1) {
-					startOfNextWord = pullNextLine();
-				}
-				startOfNextWord++;
-			} else if (c != ' ' && c != '\t') {
-				break;
-			}
-			startOfNextWord++;
+	private void skipCommentsAtCursor() throws InvalidSyntaxException {
+		if (text.charAtCursorIn(COMMENT_MARKERS)) {
+			// Line comment will always end the statement
+			text.goToEnd();
+		} else if (text.cursorFollowedBy(COMMENTBLOCK_START)) {
+			skipCommentBlockAtCursor();
 		}
 	}
 
-	private void goToLineCommentEnd() throws InvalidSyntaxException {
-		do {
-			int lastCharIndex = text.length() - 1;
-			char lastChar = '_';
-			while (lastCharIndex > -1
-					&& ((lastChar = text.charAt(lastCharIndex)) == ' ' || lastChar == '\t')) {
-				lastCharIndex--;
-			}
-			if (lastChar == '\\') {
-				pullNextLine();
-			} else {
-				break;
-			}
-		} while (true);
+	private void skipCommentBlockAtCursor() throws InvalidSyntaxException {
+		// Cursor is at the start of comment block
+		text.skip(COMMENTBLOCK_START.length());
+
+		// Pull new lines until comment block end is found
+		while (!text.seekString(COMMENTBLOCK_END)) {
+			text.goToEnd();
+			String nextLine = pullNextLine();
+			text.append(NEW_LINE + nextLine);
+			text.skip(NEW_LINE.length() + indexOfNextNonSpace(nextLine));
+		}
+
+		// Move cursor beyond comment block
+		text.skip(COMMENTBLOCK_END.length());
 	}
 
-	private int pullNextLine() throws InvalidSyntaxException {
-		if (!input.hasNextLine())
-			throw new InvalidSyntaxException(
-					"Line ends with '\\' but no further lines available");
-		int endIndex = text.length();
-		StringBuilder sb = new StringBuilder(text.substring(0, endIndex));
-		sb.append(NEW_LINE);
-		sb.append(nextLine());
-		text = sb.toString();
-		return endIndex + 2;
+	private boolean isCursorAtLangString() {
+		return text.charAtCursor() == LANGSTRING_START.charAt(LANGSTRING_START
+				.length() - 1)
+				&& text.cursorPrecededBy(LANGSTRING_START.substring(0,
+						LANGSTRING_START.length() - 1));
 	}
 
-	private String nextLine() {
+	private String pullNextLine() throws InvalidSyntaxException {
+		if (!input.hasNextLine()) {
+			throw new InvalidSyntaxException("Unexpected end of file");
+		}
 		linesRead++;
 		return input.nextLine();
+	}
+
+	private static int indexOfNextNonSpace(String text) {
+		int index = 0;
+		while (index < text.length()
+				&& SPACE_MARKERS.indexOf(text.charAt(index)) != -1) {
+			index++;
+		}
+		return index;
 	}
 
 }
