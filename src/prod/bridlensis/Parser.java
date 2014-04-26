@@ -151,9 +151,8 @@ public class Parser {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
 		} else if (word.equals("loop")) {
 			return parseDoLoop("Loop", reader);
-		} else if (word.equals("") && tail.equals("!") && reader.hasNextWord()
-				&& (word = reader.nextWord().toLowerCase()).equals("include")) {
-
+		} else if (tail.equals("!")
+				&& reader.nextWord().equalsIgnoreCase("include")) {
 			return parseInclude(reader);
 		}
 		return reader.getCurrentStatement();
@@ -180,17 +179,10 @@ public class Parser {
 			throws InvalidSyntaxException, EnvironmentException {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder buffer = new StringBuilder();
-
-		if (!reader.hasNextWord()) {
-			throw new InvalidSyntaxException(
-					"Unexpexted end of statement after 'if'");
-		}
-
 		ComparisonStatement ifStatement = getComparisonStatement(keyword,
 				reader, buffer);
 		sb.append(statementFactory.logicLibComparisonStatement(
 				reader.getIndent(), ifStatement));
-
 		while (reader.hasNextWord()) {
 			String word = reader.nextWord();
 			if (word.equalsIgnoreCase("and") || word.equalsIgnoreCase("or")) {
@@ -204,7 +196,6 @@ public class Parser {
 						"Unexpected operation '%s' in IF statement", word));
 			}
 		}
-
 		if (buffer.length() > 0) {
 			sb.insert(0, buffer.toString());
 		}
@@ -237,9 +228,6 @@ public class Parser {
 		String left = reader.nextWord();
 		if (left.equalsIgnoreCase("not")) {
 			statement.setNot(true);
-			if (!reader.hasNextWord()) {
-				throw new InvalidSyntaxException("Unexpected end of 'if'");
-			}
 			left = parseExpression(reader.nextWord(), buffer, reader);
 		} else {
 			left = parseExpression(left, buffer, reader);
@@ -358,9 +346,6 @@ public class Parser {
 
 	private String parseVarDeclare(InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		if (!reader.hasNextWord()) {
-			throw new InvalidSyntaxException("Variable name not defined");
-		}
 		String name = reader.nextWord();
 		Variable variable = environment.registerVariable(name,
 				enclosingFunction);
@@ -381,10 +366,6 @@ public class Parser {
 			sb.append(Parser.NEWLINE_MARKER);
 		}
 
-		if (!reader.hasNextWord()) {
-			throw new InvalidSyntaxException(String.format(
-					"Variable '%s' assign not defined", varName));
-		}
 		String value = reader.nextWord();
 		String tail = reader.getWordTail();
 		if (tail.endsWith("+")) {
@@ -515,10 +496,6 @@ public class Parser {
 			}
 		} else if (tail.endsWith("+")) {
 			// Concatenation
-			if (!reader.hasNextWord()) {
-				throw new InvalidSyntaxException(
-						"'+' must be followed by an expression");
-			}
 			String right = reader.nextWord();
 			if (reader.getWordTail().startsWith("(")) {
 				right = parseExpression(right, buffer, reader);

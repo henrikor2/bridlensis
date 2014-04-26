@@ -76,6 +76,10 @@ public class InputReader {
 	}
 
 	public String nextWord() throws InvalidSyntaxException {
+		if (text.isAtEnd()) {
+			throw new InvalidSyntaxException("Unexpected end of statement");
+		}
+
 		// Cursor is at the start of the next word
 		int start = text.cursorPos();
 
