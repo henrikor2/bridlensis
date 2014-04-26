@@ -17,10 +17,59 @@ public class InputReader {
 	private static final String LANGSTRING_START = "$(";
 	private static final String LANGSTRING_END = ")";
 
+	private static final WordTail EMPTY_TAIL = new WordTail();
+
+	static class WordTail {
+
+		private String pattern = "";
+
+		private void add(char c) {
+			pattern += c;
+		}
+
+		@Override
+		public String toString() {
+			return pattern;
+		}
+
+		public boolean isCompilerCommand() {
+			return pattern.equals("!");
+		}
+
+		public boolean isAssignment() {
+			return pattern.startsWith("=");
+		}
+
+		public boolean isFunctionArgsOpen() {
+			return pattern.startsWith("(");
+		}
+
+		public boolean isConcatenation() {
+			return pattern.endsWith("+");
+		}
+
+		public boolean containsFunctionArgsClose() {
+			return pattern.matches(".*\\).*");
+		}
+
+		public boolean isFunctionArgsClose() {
+			return pattern.startsWith(")");
+		}
+
+		public boolean isComparison() {
+			return pattern.matches(".*(==|!=|[<>]).*");
+		}
+
+		public String getComparison() {
+			return pattern.replaceAll("[^=!\\<\\>]", "");
+		}
+
+	}
+
 	private Scanner input;
 	private InputText text;
 	private String indent;
-	private String tail;
+	private WordTail tail;
 	private int linesRead;
 
 	public InputReader(Scanner input) {
@@ -58,7 +107,7 @@ public class InputReader {
 				text.append(Parser.NEWLINE_MARKER + pullNextLine());
 			}
 			skipCommentsAtCursor();
-			tail = "";
+			tail = EMPTY_TAIL;
 			return true;
 		}
 		return false;
@@ -106,22 +155,21 @@ public class InputReader {
 		String word = text.toString().substring(start, text.cursorPos());
 
 		// Collect tail characters
-		StringBuilder tailBuilder = new StringBuilder(10);
+		tail = new WordTail();
 		while (!text.isAtEnd()) {
 			skipCommentsAtCursor();
 			if (text.charAtCursorIn(TAIL_MARKERS)) {
-				tailBuilder.append(text.charAtCursor());
+				tail.add(text.charAtCursor());
 			} else if (!text.charAtCursorIn(WORD_MARKERS)) {
 				break;
 			}
 			text.skip(1);
 		}
-		tail = tailBuilder.toString();
 
 		return word;
 	}
 
-	public String getWordTail() {
+	public WordTail getWordTail() {
 		return tail;
 	}
 

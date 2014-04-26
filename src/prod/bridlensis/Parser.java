@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 
+import bridlensis.InputReader.WordTail;
 import bridlensis.env.Callable;
 import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.Environment;
@@ -123,10 +124,10 @@ public class Parser {
 			return reader.getCurrentStatement();
 		}
 		String word = reader.nextWord().toLowerCase();
-		String tail = reader.getWordTail();
-		if (tail.startsWith("=")) {
+		WordTail tail = reader.getWordTail();
+		if (tail.isAssignment()) {
 			return parseVarAssign(word, reader);
-		} else if (tail.startsWith("(")) {
+		} else if (tail.isFunctionArgsOpen()) {
 			return parseCall(word, null, reader);
 		} else if (word.equals("var")) {
 			return parseVarDeclare(reader);
@@ -151,7 +152,7 @@ public class Parser {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
 		} else if (word.equals("loop")) {
 			return parseDoLoop("Loop", reader);
-		} else if (tail.equals("!")
+		} else if (tail.isCompilerCommand()
 				&& reader.nextWord().equalsIgnoreCase("include")) {
 			return parseInclude(reader);
 		}
@@ -235,7 +236,7 @@ public class Parser {
 		statement.addLeft(left);
 
 		while (reader.hasNextWord()) {
-			String compare = reader.getWordTail().replaceAll("[^=!\\<\\>]", "");
+			String compare = reader.getWordTail().getComparison();
 			if (compare.isEmpty()) {
 				statement.addLeft(parseExpression(reader.nextWord(), buffer,
 						reader));
@@ -367,12 +368,12 @@ public class Parser {
 		}
 
 		String value = reader.nextWord();
-		String tail = reader.getWordTail();
-		if (tail.endsWith("+")) {
+		WordTail tail = reader.getWordTail();
+		if (tail.isConcatenation()) {
 			value = parseExpression(value, sb, reader);
-		} else if (tail.startsWith("(")) {
+		} else if (tail.isFunctionArgsOpen()) {
 			sb.append(parseCall(value, variable, reader));
-			if (reader.getWordTail().endsWith("+")) {
+			if (reader.getWordTail().isConcatenation()) {
 				sb.append(Parser.NEWLINE_MARKER);
 				value = parseExpression(variable.getName(), sb, reader);
 			} else {
@@ -413,8 +414,8 @@ public class Parser {
 		if (reader.hasNextWord()) {
 			enclosingFunction.setHasReturn(true);
 			value = reader.nextWord();
-			String tail = reader.getWordTail();
-			if (tail.startsWith("(") || tail.endsWith("+")) {
+			WordTail tail = reader.getWordTail();
+			if (tail.isFunctionArgsOpen() || tail.isConcatenation()) {
 				value = parseExpression(value, sb, reader);
 			} else if (!isString(value) && !isUntouchable(value)) {
 				value = environment.getVariable(value, enclosingFunction)
@@ -447,12 +448,12 @@ public class Parser {
 		ArrayList<String> args = new ArrayList<String>();
 
 		// Parse arguments
-		String tail = reader.getWordTail();
-		while (reader.hasNextWord() && !tail.matches(".*\\).*")) {
+		WordTail tail = reader.getWordTail();
+		while (reader.hasNextWord() && !tail.containsFunctionArgsClose()) {
 			String arg = reader.nextWord();
 			tail = reader.getWordTail();
-			if (!tail.startsWith(")")
-					&& (tail.startsWith("(") || tail.endsWith("+"))) {
+			if (!tail.isFunctionArgsClose()
+					&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
 				arg = parseExpression(arg, sb, reader);
 			} else if (!isString(arg) && !isUntouchable(arg)) {
 				arg = environment.getVariable(arg, enclosingFunction)
@@ -485,19 +486,17 @@ public class Parser {
 	protected String parseExpression(String expr, StringBuilder buffer,
 			InputReader reader) throws InvalidSyntaxException,
 			EnvironmentException {
-		String tail = reader.getWordTail();
-		if (tail.startsWith("(")) {
-			// Function call
+		WordTail tail = reader.getWordTail();
+		if (tail.isFunctionArgsOpen()) {
 			Variable fReturn = parseInExpressionCall(expr, buffer, reader);
-			if (tail.endsWith("==") || tail.endsWith("!=")) {
+			if (tail.isComparison()) {
 				expr = fReturn.getName();
 			} else {
 				expr = parseExpression(fReturn.getName(), buffer, reader);
 			}
-		} else if (tail.endsWith("+")) {
-			// Concatenation
+		} else if (tail.isConcatenation()) {
 			String right = reader.nextWord();
-			if (reader.getWordTail().startsWith("(")) {
+			if (reader.getWordTail().isFunctionArgsOpen()) {
 				right = parseExpression(right, buffer, reader);
 			}
 			expr = parseExpression(String.format("\"%s%s\"",
