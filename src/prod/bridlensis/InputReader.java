@@ -19,6 +19,47 @@ public class InputReader {
 
 	private static final WordTail EMPTY_TAIL = new WordTail();
 
+	static class Word {
+
+		private final String value;
+
+		public Word(String value) {
+			this.value = value;
+		}
+
+		public boolean isString() {
+			return (STRING_MARKERS.indexOf(value.charAt(0)) != -1);
+		}
+
+		public boolean isUntouchable() {
+			if (value.charAt(0) == '$') {
+				return true; // It's NSIS constant or lang string
+			}
+			// Check for numeric value
+			char[] charArray = value.toCharArray();
+			for (int i = charArray[0] == '-' ? 1 : 0; i < charArray.length; i++) {
+				if (!Character.isDigit(charArray[i]))
+					return false; // It's not numeric
+			}
+			return true;// It's numeric
+		}
+
+		public String asName() {
+			return value.toLowerCase();
+		}
+
+		public String asBareString() {
+			if (isString()) {
+				return value.substring(1, value.length() - 1);
+			}
+			return value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+	}
+
 	static class WordTail {
 
 		private String pattern = "";
@@ -63,7 +104,6 @@ public class InputReader {
 		public String getComparison() {
 			return pattern.replaceAll("[^=!\\<\\>]", "");
 		}
-
 	}
 
 	private Scanner input;
@@ -124,7 +164,7 @@ public class InputReader {
 		return !text.isAtEnd();
 	}
 
-	public String nextWord() throws InvalidSyntaxException {
+	public Word nextWord() throws InvalidSyntaxException {
 		if (text.isAtEnd()) {
 			throw new InvalidSyntaxException("Unexpected end of statement");
 		}
@@ -166,7 +206,7 @@ public class InputReader {
 			text.skip(1);
 		}
 
-		return word;
+		return new Word(word);
 	}
 
 	public WordTail getWordTail() {

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 
+import bridlensis.InputReader.Word;
 import bridlensis.InputReader.WordTail;
 import bridlensis.env.Callable;
 import bridlensis.env.Callable.ReturnType;
@@ -123,37 +124,37 @@ public class Parser {
 		if (!reader.hasNextWord()) {
 			return reader.getCurrentStatement();
 		}
-		String word = reader.nextWord().toLowerCase();
-		WordTail tail = reader.getWordTail();
-		if (tail.isAssignment()) {
+		Word word = reader.nextWord();
+		String keyword = word.asName();
+		if (reader.getWordTail().isAssignment()) {
 			return parseVarAssign(word, reader);
-		} else if (tail.isFunctionArgsOpen()) {
+		} else if (reader.getWordTail().isFunctionArgsOpen()) {
 			return parseCall(word, null, reader);
-		} else if (word.equals("var")) {
+		} else if (keyword.equals("var")) {
 			return parseVarDeclare(reader);
-		} else if (word.equals("function")) {
+		} else if (keyword.equals("function")) {
 			return parseFunctionBegin(reader);
-		} else if (word.equals("return")) {
+		} else if (keyword.equals("return")) {
 			return parseFunctionReturn(reader);
-		} else if (word.equals("functionend")) {
+		} else if (keyword.equals("functionend")) {
 			return parseFunctionEnd(reader);
-		} else if (word.equals("if") || word.equals("elseif")) {
+		} else if (keyword.equals("if") || keyword.equals("elseif")) {
 			return parseIf(word, reader);
-		} else if (word.equals("else")) {
+		} else if (keyword.equals("else")) {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Else");
-		} else if (word.equals("endif")) {
+		} else if (keyword.equals("endif")) {
 			return statementFactory.logicLibDefine(reader.getIndent(), "EndIf");
-		} else if (word.equals("do")) {
+		} else if (keyword.equals("do")) {
 			return parseDoLoop("Do", reader);
-		} else if (word.equals("continue")) {
+		} else if (keyword.equals("continue")) {
 			return statementFactory.logicLibDefine(reader.getIndent(),
 					"Continue");
-		} else if (word.equals("break")) {
+		} else if (keyword.equals("break")) {
 			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
-		} else if (word.equals("loop")) {
+		} else if (keyword.equals("loop")) {
 			return parseDoLoop("Loop", reader);
-		} else if (tail.isCompilerCommand()
-				&& reader.nextWord().equalsIgnoreCase("include")) {
+		} else if (reader.getWordTail().isCompilerCommand()
+				&& reader.nextWord().asName().equals("include")) {
 			return parseInclude(reader);
 		}
 		return reader.getCurrentStatement();
@@ -165,8 +166,8 @@ public class Parser {
 			return statementFactory.logicLibDefine(reader.getIndent(), keyword);
 		}
 		StringBuilder sb = new StringBuilder();
-		ComparisonStatement statement = getComparisonStatement(reader
-				.nextWord().toLowerCase(), reader, sb);
+		ComparisonStatement statement = parseComparisonStatement(
+				reader.nextWord(), reader, sb);
 		if (statement.isNot()) {
 			throw new InvalidSyntaxException(String.format(
 					"Illegal modifier 'Not' in %s statement", keyword));
@@ -176,26 +177,19 @@ public class Parser {
 		return sb.toString();
 	}
 
-	private String parseIf(String keyword, InputReader reader)
+	private String parseIf(Word keyword, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder buffer = new StringBuilder();
-		ComparisonStatement ifStatement = getComparisonStatement(keyword,
+		ComparisonStatement ifStatement = parseComparisonStatement(keyword,
 				reader, buffer);
 		sb.append(statementFactory.logicLibComparisonStatement(
 				reader.getIndent(), ifStatement));
 		while (reader.hasNextWord()) {
-			String word = reader.nextWord();
-			if (word.equalsIgnoreCase("and") || word.equalsIgnoreCase("or")) {
-				sb.append(Parser.NEWLINE_MARKER);
-				sb.append(statementFactory.logicLibComparisonStatement(
-						reader.getIndent(),
-						getComparisonStatement(word.toLowerCase(), reader,
-								buffer)));
-			} else {
-				throw new InvalidSyntaxException(String.format(
-						"Unexpected operation '%s' in IF statement", word));
-			}
+			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(statementFactory.logicLibComparisonStatement(
+					reader.getIndent(),
+					parseComparisonStatement(reader.nextWord(), reader, buffer)));
 		}
 		if (buffer.length() > 0) {
 			sb.insert(0, buffer.toString());
@@ -203,43 +197,27 @@ public class Parser {
 		return sb.toString();
 	}
 
-	private ComparisonStatement getComparisonStatement(String keyword,
+	private ComparisonStatement parseComparisonStatement(Word keyword,
 			InputReader reader, StringBuilder buffer)
 			throws InvalidSyntaxException, EnvironmentException {
-		String key;
-		if (keyword.equals("if")) {
-			key = "If";
-		} else if (keyword.equals("and")) {
-			key = "AndIf";
-		} else if (keyword.equals("or")) {
-			key = "OrIf";
-		} else if (keyword.equals("elseif")) {
-			key = "ElseIf";
-		} else if (keyword.equals("while")) {
-			key = "While";
-		} else if (keyword.equals("until")) {
-			key = "Until";
-		} else {
-			throw new InvalidSyntaxException(String.format(
-					"Internal error: Unsupported operation '%s'", keyword));
+		String key = keyword.getValue();
+		if (key.equalsIgnoreCase("and") || key.equalsIgnoreCase("or")) {
+			key += "If";
 		}
-
 		ComparisonStatement statement = new ComparisonStatement(key);
 
-		String left = reader.nextWord();
-		if (left.equalsIgnoreCase("not")) {
+		Word left = reader.nextWord();
+		if (left.asName().equals("not")) {
 			statement.setNot(true);
-			left = parseExpression(reader.nextWord(), buffer, reader);
-		} else {
-			left = parseExpression(left, buffer, reader);
+			left = reader.nextWord();
 		}
-		statement.addLeft(left);
+		statement.addLeft(parseExpression(left, buffer, reader).getValue());
 
 		while (reader.hasNextWord()) {
 			String compare = reader.getWordTail().getComparison();
 			if (compare.isEmpty()) {
 				statement.addLeft(parseExpression(reader.nextWord(), buffer,
-						reader));
+						reader).getValue());
 			} else {
 				statement.setCompare(compare);
 				break;
@@ -248,7 +226,7 @@ public class Parser {
 
 		if (reader.hasNextWord()) {
 			statement.addRight(parseExpression(reader.nextWord(), buffer,
-					reader));
+					reader).getValue());
 		}
 
 		return statement;
@@ -256,13 +234,9 @@ public class Parser {
 
 	private String parseInclude(InputReader reader)
 			throws InvalidSyntaxException, ParserException {
-		String inputFileName = reader.nextWord();
-		if (isString(inputFileName)) {
-			inputFileName = inputFileName.substring(1,
-					inputFileName.length() - 1);
-		}
-		String statement;
+		String inputFileName = reader.nextWord().asBareString();
 		File inputFile = new File(baseDir, inputFileName);
+		String statement;
 		if (excludeFiles.contains(inputFileName)
 				|| excludeFiles.contains(inputFile.getAbsolutePath())) {
 			System.out.println(String.format(
@@ -347,27 +321,29 @@ public class Parser {
 
 	private String parseVarDeclare(InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		String name = reader.nextWord();
-		Variable variable = environment.registerVariable(name,
+		Word name = reader.nextWord();
+		Variable variable = environment.registerVariable(name.asName(),
 				enclosingFunction);
 		return statementFactory.variableDeclare(reader.getIndent(), variable);
 	}
 
-	private String parseVarAssign(String varName, InputReader reader)
+	private String parseVarAssign(Word varName, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
 		StringBuilder sb = new StringBuilder();
 		Variable variable;
 
-		if (environment.containsVariable(varName, enclosingFunction)) {
-			variable = environment.getVariable(varName, enclosingFunction);
+		if (environment.containsVariable(varName.asName(), enclosingFunction)) {
+			variable = environment.getVariable(varName.asName(),
+					enclosingFunction);
 		} else {
-			variable = environment.registerVariable(varName, enclosingFunction);
+			variable = environment.registerVariable(varName.asName(),
+					enclosingFunction);
 			sb.append(statementFactory.variableDeclare(reader.getIndent(),
 					variable));
 			sb.append(Parser.NEWLINE_MARKER);
 		}
 
-		String value = reader.nextWord();
+		Word value = reader.nextWord();
 		WordTail tail = reader.getWordTail();
 		if (tail.isConcatenation()) {
 			value = parseExpression(value, sb, reader);
@@ -375,16 +351,17 @@ public class Parser {
 			sb.append(parseCall(value, variable, reader));
 			if (reader.getWordTail().isConcatenation()) {
 				sb.append(Parser.NEWLINE_MARKER);
-				value = parseExpression(variable.getName(), sb, reader);
+				value = parseExpression(new Word(variable.getName()), sb,
+						reader);
 			} else {
 				return sb.toString();
 			}
-		} else if (!isString(value) && !isUntouchable(value)) {
-			value = environment.getVariable(value, enclosingFunction)
-					.getNSISExpression();
+		} else if (!value.isString() && !value.isUntouchable()) {
+			value = new Word(environment.getVariable(value.asName(),
+					enclosingFunction).getNSISExpression());
 		}
 		sb.append(statementFactory.variableAssign(reader.getIndent(), variable,
-				value));
+				value.getValue()));
 		return sb.toString();
 	}
 
@@ -394,10 +371,11 @@ public class Parser {
 			throw new InvalidSyntaxException(
 					"Cannot declare function within a function");
 		}
-		enclosingFunction = environment.registerUserFunction(reader.nextWord());
+		enclosingFunction = environment.registerUserFunction(reader.nextWord()
+				.asName());
 		while (reader.hasNextWord()) {
-			enclosingFunction.addArgument(environment.registerVariable(
-					reader.nextWord(), enclosingFunction));
+			enclosingFunction.addArgument(environment.registerVariable(reader
+					.nextWord().asName(), enclosingFunction));
 		}
 		return statementFactory.functionBegin(reader.getIndent(),
 				enclosingFunction);
@@ -410,20 +388,20 @@ public class Parser {
 					"Return is not allowed outside function");
 		}
 		StringBuilder sb = new StringBuilder();
-		String value = null;
+		Word value = null;
 		if (reader.hasNextWord()) {
 			enclosingFunction.setHasReturn(true);
 			value = reader.nextWord();
 			WordTail tail = reader.getWordTail();
 			if (tail.isFunctionArgsOpen() || tail.isConcatenation()) {
 				value = parseExpression(value, sb, reader);
-			} else if (!isString(value) && !isUntouchable(value)) {
-				value = environment.getVariable(value, enclosingFunction)
-						.getNSISExpression();
+			} else if (!value.isString() && !value.isUntouchable()) {
+				value = new Word(environment.getVariable(value.asName(),
+						enclosingFunction).getNSISExpression());
 			}
 		}
 		sb.append(statementFactory.functionReturn(reader.getIndent(),
-				enclosingFunction, value));
+				enclosingFunction, (value != null ? value.getValue() : null)));
 		return sb.toString();
 	}
 
@@ -437,9 +415,9 @@ public class Parser {
 		return statementFactory.functionEnd(reader.getIndent());
 	}
 
-	private String parseCall(String name, Variable returnVar, InputReader reader)
+	private String parseCall(Word name, Variable returnVar, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		Callable callable = environment.getCallable(name);
+		Callable callable = environment.getCallable(name.asName());
 		if (returnVar != null && callable.getReturnType() == ReturnType.VOID) {
 			throw new InvalidSyntaxException("Function doesn't return a value");
 		}
@@ -450,16 +428,16 @@ public class Parser {
 		// Parse arguments
 		WordTail tail = reader.getWordTail();
 		while (reader.hasNextWord() && !tail.containsFunctionArgsClose()) {
-			String arg = reader.nextWord();
+			Word arg = reader.nextWord();
 			tail = reader.getWordTail();
 			if (!tail.isFunctionArgsClose()
 					&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
 				arg = parseExpression(arg, sb, reader);
-			} else if (!isString(arg) && !isUntouchable(arg)) {
-				arg = environment.getVariable(arg, enclosingFunction)
-						.getNSISExpression();
+			} else if (!arg.isString() && !arg.isUntouchable()) {
+				arg = new Word(environment.getVariable(arg.asName(),
+						enclosingFunction).getNSISExpression());
 			}
-			args.add(arg);
+			args.add(arg.getValue());
 		}
 		if (args.size() > callable.getArgsCount()) {
 			throw new InvalidSyntaxException(
@@ -483,44 +461,48 @@ public class Parser {
 		return sb.toString();
 	}
 
-	protected String parseExpression(String expr, StringBuilder buffer,
+	protected Word parseExpression(Word expr, StringBuilder buffer,
 			InputReader reader) throws InvalidSyntaxException,
 			EnvironmentException {
 		WordTail tail = reader.getWordTail();
 		if (tail.isFunctionArgsOpen()) {
 			Variable fReturn = parseInExpressionCall(expr, buffer, reader);
 			if (tail.isComparison()) {
-				expr = fReturn.getName();
+				expr = new Word(fReturn.getNSISExpression());
 			} else {
-				expr = parseExpression(fReturn.getName(), buffer, reader);
+				expr = parseExpression(new Word(fReturn.getNSISExpression()),
+						buffer, reader);
 			}
 		} else if (tail.isConcatenation()) {
-			String right = reader.nextWord();
+			Word right = reader.nextWord();
 			if (reader.getWordTail().isFunctionArgsOpen()) {
 				right = parseExpression(right, buffer, reader);
 			}
-			expr = parseExpression(String.format("\"%s%s\"",
-					getNSISExpression(expr), getNSISExpression(right)), buffer,
-					reader);
+			expr = parseExpression(concatenate(expr, right), buffer, reader);
 		}
-		if (!isString(expr) && !isUntouchable(expr)) {
-			expr = environment.getVariable(expr, enclosingFunction)
-					.getNSISExpression();
+		if (!expr.isString() && !expr.isUntouchable()) {
+			expr = new Word(environment.getVariable(expr.asName(),
+					enclosingFunction).getNSISExpression());
 		}
 		return expr;
 	}
 
-	private String getNSISExpression(String expr) throws EnvironmentException {
-		if (isString(expr)) {
-			expr = expr.substring(1, expr.length() - 1);
-		} else if (!isUntouchable(expr)) {
-			expr = environment.getVariable(expr, enclosingFunction)
-					.getNSISExpression();
-		}
-		return expr;
+	private Word concatenate(Word left, Word right) throws EnvironmentException {
+		return new Word(String.format("\"%s%s\"", convertToString(left),
+				convertToString(right)));
 	}
 
-	private Variable parseInExpressionCall(String callableName,
+	private String convertToString(Word expr) throws EnvironmentException {
+		if (expr.isString()) {
+			expr = new Word(expr.asBareString());
+		} else if (!expr.isUntouchable()) {
+			expr = new Word(environment.getVariable(expr.asName(),
+					enclosingFunction).getNSISExpression());
+		}
+		return expr.getValue();
+	}
+
+	private Variable parseInExpressionCall(Word callableName,
 			StringBuilder buffer, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
 		Variable fReturn = environment.registerVariable(environment
@@ -532,24 +514,4 @@ public class Parser {
 		buffer.append(Parser.NEWLINE_MARKER);
 		return fReturn;
 	}
-
-	private static boolean isUntouchable(String expr) {
-		if (expr.charAt(0) == '$') {
-			return true; // It's NSIS constant or lang string
-		}
-
-		// Check for numeric value
-		char[] charArray = expr.toCharArray();
-		for (int i = charArray[0] == '-' ? 1 : 0; i < charArray.length; i++) {
-			if (!Character.isDigit(charArray[i]))
-				return false; // It's not numeric
-		}
-		return true;// It's numeric
-	}
-
-	private static boolean isString(String expr) {
-		char c = expr.charAt(0);
-		return (c == '"' || c == '\'');
-	}
-
 }

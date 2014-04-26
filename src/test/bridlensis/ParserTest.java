@@ -40,19 +40,23 @@ public class ParserTest {
 
 		reader = readerFor("a + b + c");
 		assertEquals("\"$a$b$c\"",
-				parser.parseExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader)
+						.getValue());
 
 		reader = readerFor("a + b + c");
 		assertEquals("\"$a$b$c\"",
-				parser.parseExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader)
+						.getValue());
 
 		reader = readerFor("a + \"b\" + c");
 		assertEquals("\"$ab$c\"",
-				parser.parseExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader)
+						.getValue());
 
 		reader = readerFor("\"a + b\" + c");
 		assertEquals("\"a + b$c\"",
-				parser.parseExpression(reader.nextWord(), null, reader));
+				parser.parseExpression(reader.nextWord(), null, reader)
+						.getValue());
 
 		parser.parseStatement(readerFor("FUnction foo(a)"));
 		try {
@@ -70,7 +74,8 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(b)");
 		assertEquals("$foo.s02", // readerFor("a + foo(b)") eat one s0
-				parser.parseExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader)
+						.getValue());
 		assertEquals(
 				"Var /GLOBAL foo.s02\r\nPush $foo.b\r\nCall foo\r\nPop $foo.s02\r\n",
 				buffer.toString());
@@ -78,7 +83,8 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("a + foo(1)");
 		assertEquals("\"$foo.a$foo.s03\"",
-				parser.parseExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader)
+						.getValue());
 		assertEquals(
 				"Var /GLOBAL foo.s03\r\nPush 1\r\nCall foo\r\nPop $foo.s03\r\n",
 				buffer.toString());
@@ -86,7 +92,8 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(1) + a");
 		assertEquals("\"$foo.s04$foo.a\"",
-				parser.parseExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader)
+						.getValue());
 		assertEquals(
 				"Var /GLOBAL foo.s04\r\nPush 1\r\nCall foo\r\nPop $foo.s04\r\n",
 				buffer.toString());
@@ -96,7 +103,8 @@ public class ParserTest {
 		buffer = new StringBuilder();
 		reader = readerFor("foo(\"hello\") + \" \" + foo(\"world!\")");
 		assertEquals("\"$s05 $s06\"",
-				parser.parseExpression(reader.nextWord(), buffer, reader));
+				parser.parseExpression(reader.nextWord(), buffer, reader)
+						.getValue());
 		assertEquals(
 				"Var /GLOBAL s05\r\nPush \"hello\"\r\nCall foo\r\nPop $s05\r\nVar /GLOBAL s06\r\nPush \"world!\"\r\nCall foo\r\nPop $s06\r\n",
 				buffer.toString());
@@ -490,27 +498,27 @@ public class ParserTest {
 		parser.parseStatement(readerFor("functionend"));
 
 		assertEquals("${If} $world == \"hello world\"",
-				parser.parseStatement(readerFor("if world == \"hello world\"")));
+				parser.parseStatement(readerFor("If world == \"hello world\"")));
 
 		assertEquals(
 				"${IfNot} \"${FileExists}\" \"$instdir\\foo.txt\"",
-				parser.parseStatement(readerFor("if not \"${FileExists}\" \"$instdir\\foo.txt\"")));
+				parser.parseStatement(readerFor("If not \"${FileExists}\" \"$instdir\\foo.txt\"")));
 
 		assertEquals(
 				"${If} \"hello $world\" == \"hello world\"",
-				parser.parseStatement(readerFor("if \"hello \" + world == \"hello world\"")));
+				parser.parseStatement(readerFor("If \"hello \" + world == \"hello world\"")));
 
 		assertEquals(
 				"Var /GLOBAL s01\r\nCall hello\r\nPop $s01\r\n${If} $world == \"world\"\r\n${AndIf} $s01 != \"hello \"",
-				parser.parseStatement(readerFor("if world == \"world\" \\\r\n    and hello() != \"hello \"")));
+				parser.parseStatement(readerFor("If world == \"world\" \\\r\n    And hello() != \"hello \"")));
 
 		assertEquals(
 				"${ElseIf} $world != \"hello world\"",
-				parser.parseStatement(readerFor("elseif world != \"hello world\"")));
+				parser.parseStatement(readerFor("ElseIf world != \"hello world\"")));
 
 		assertEquals(
-				"${ElseIf} $world > 1\r\n${AndIf} \"${Errors}\"",
-				parser.parseStatement(readerFor("elseif world > 1 and \"${Errors}\"")));
+				"${ElseIf} $world > 1\r\n${andIf} \"${Errors}\"",
+				parser.parseStatement(readerFor("ElseIf world > 1 and \"${Errors}\"")));
 
 		assertEquals("${Else}", parser.parseStatement(readerFor("else")));
 
