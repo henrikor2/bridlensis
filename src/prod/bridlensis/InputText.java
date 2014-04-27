@@ -38,7 +38,7 @@ class InputText {
 		cursor = text.length();
 	}
 
-	protected void skip(int numberOfChars) {
+	protected void cursorForward(int numberOfChars) {
 		cursor = Math.min(cursor + numberOfChars, text.length());
 	}
 

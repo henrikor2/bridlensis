@@ -39,9 +39,9 @@ public class InputTextTest {
 		InputText line = new InputText();
 		line.set("DetailPrint \"hello \\ ", 0);
 		assertFalse(line.isAtEnd());
-		line.skip(20);
+		line.cursorForward(20);
 		assertFalse(line.isAtEnd());
-		line.skip(1);
+		line.cursorForward(1);
 		assertTrue(line.isAtEnd());
 	}
 
@@ -55,13 +55,13 @@ public class InputTextTest {
 	}
 
 	@Test
-	public void testSkip() {
+	public void testCursorForward() {
 		InputText line = new InputText();
 		line.set("    a = \"hello\" + foo(bar(a))", 4);
 		assertEquals(4, line.cursorPos());
-		line.skip(10);
+		line.cursorForward(10);
 		assertEquals(14, line.cursorPos());
-		line.skip(19);
+		line.cursorForward(19);
 		assertEquals(29, line.cursorPos());
 	}
 
@@ -70,11 +70,11 @@ public class InputTextTest {
 		InputText line = new InputText();
 		line.set("    a = \"hello\" + foo(bar(a)) ; hellooo", 4);
 		assertTrue(line.charAtCursorIn("a"));
-		line.skip(4);
+		line.cursorForward(4);
 		assertTrue(line.charAtCursorIn("\""));
-		line.skip(10);
+		line.cursorForward(10);
 		assertTrue(line.charAtCursorIn("fxx"));
-		line.skip(12);
+		line.cursorForward(12);
 		assertTrue(line.charAtCursorIn(";#"));
 	}
 
@@ -91,18 +91,18 @@ public class InputTextTest {
 		line.set("    a = 1 ; hellooo \\ ", 4);
 		assertTrue(line.cursorFollowedBy("a = 1"));
 		line.append("\r\n    world \\ ");
-		line.skip(24);
+		line.cursorForward(24);
 		assertTrue(line.cursorFollowedBy("world"));
 		line.append("\r\n    !");
-		line.skip(14);
+		line.cursorForward(14);
 		assertTrue(line.cursorFollowedBy("!"));
 
 		line.set("    a = 1 /* hellooo */ ", 4);
 		assertTrue(line.cursorFollowedBy("a = 1"));
 		assertFalse(line.cursorFollowedBy("A = 1"));
-		line.skip(6);
+		line.cursorForward(6);
 		assertTrue(line.cursorFollowedBy("/*"));
-		line.skip(13);
+		line.cursorForward(13);
 		assertTrue(line.cursorFollowedBy(" "));
 	}
 

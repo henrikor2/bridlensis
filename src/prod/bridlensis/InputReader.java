@@ -133,21 +133,16 @@ public class InputReader {
 
 	public boolean goToNextStatement() throws InvalidSyntaxException {
 		if (input.hasNextLine()) {
-			String str = pullNextLine();
-			if (str.length() > 0
-					&& (str.charAt(0) == Parser.UTF16LE_BOM || str.charAt(0) == Parser.UTF16BE_BOM)) {
-				// Skip UTF-16 BOM
-				str = str.substring(1);
-			}
-			int startPos = indexOfNextNonSpace(str);
-			indent = str.substring(0, startPos);
-			text.set(str, startPos);
+			tail = EMPTY_TAIL;
+			String statement = getStatement();
+			int startPos = indexOfNextNonSpace(statement);
+			indent = statement.substring(0, startPos);
+			text.set(statement, startPos);
 			while (text.endsWith(LINE_CONTINUE, SPACE_MARKERS)) {
 				// Ensure line continuation
 				text.append(Parser.NEWLINE_MARKER + pullNextLine());
 			}
 			skipCommentsAtCursor();
-			tail = EMPTY_TAIL;
 			return true;
 		}
 		return false;
@@ -155,9 +150,14 @@ public class InputReader {
 
 	public String getCurrentStatement() throws InvalidSyntaxException {
 		if (text.seekString(COMMENTBLOCK_START)) {
+			// Ensure line continuation
 			skipCommentBlockAtCursor();
 		}
 		return text.toString();
+	}
+
+	public WordTail getWordTail() {
+		return tail;
 	}
 
 	public boolean hasNextWord() {
@@ -173,44 +173,66 @@ public class InputReader {
 		int start = text.cursorPos();
 
 		// Move cursor to the end of the word
+		findCurrentWordEnd();
+
+		// Save the word before moving cursor any further
+		String word = text.toString().substring(start, text.cursorPos());
+
+		// Move cursor to start of next word and collect tail chars
+		findNextWordStart();
+
+		return new Word(word);
+	}
+
+	private String getStatement() throws InvalidSyntaxException {
+		String line = pullNextLine();
+		if (line.length() > 0
+				&& (line.charAt(0) == Parser.UTF16LE_BOM || line.charAt(0) == Parser.UTF16BE_BOM)) {
+			// Skip UTF-16 BOM
+			line = line.substring(1);
+		}
+		return line;
+	}
+
+	private void findNextWordStart() throws InvalidSyntaxException {
+		tail = new WordTail();
+		while (!text.isAtEnd()) {
+			skipCommentsAtCursor();
+			if (text.charAtCursorIn(TAIL_MARKERS)) {
+				// Collect tail characters
+				tail.add(text.charAtCursor());
+			} else if (!text.charAtCursorIn(WORD_MARKERS)) {
+				break;
+			}
+			text.cursorForward(1);
+		}
+	}
+
+	private void findCurrentWordEnd() throws InvalidSyntaxException {
 		if (text.charAtCursorIn(STRING_MARKERS)) {
 			// Parse string
 			String strOpenChar = Character.toString(text.charAtCursor());
 			do {
-				text.skip(1);
+				text.cursorForward(1);
 				if (!text.seekString(strOpenChar)) {
 					throw new InvalidSyntaxException("Unterminated string");
 				}
 			} while (text.cursorPrecededBy(CHAR_MASK));
-			text.skip(1);
+			text.cursorForward(1);
 		} else if (text.seekChars(WORD_MARKERS) && isCursorAtLangString()) {
 			// Parse LangString
 			if (!text.seekString(LANGSTRING_END)) {
 				throw new InvalidSyntaxException("Unterminated LangString");
 			}
-			text.skip(1);
+			text.cursorForward(1);
 		}
-
-		// Save the word before moving cursor any further
-		String word = text.toString().substring(start, text.cursorPos());
-
-		// Collect tail characters
-		tail = new WordTail();
-		while (!text.isAtEnd()) {
-			skipCommentsAtCursor();
-			if (text.charAtCursorIn(TAIL_MARKERS)) {
-				tail.add(text.charAtCursor());
-			} else if (!text.charAtCursorIn(WORD_MARKERS)) {
-				break;
-			}
-			text.skip(1);
-		}
-
-		return new Word(word);
 	}
 
-	public WordTail getWordTail() {
-		return tail;
+	private boolean isCursorAtLangString() {
+		return text.charAtCursor() == LANGSTRING_START.charAt(LANGSTRING_START
+				.length() - 1)
+				&& text.cursorPrecededBy(LANGSTRING_START.substring(0,
+						LANGSTRING_START.length() - 1));
 	}
 
 	private void skipCommentsAtCursor() throws InvalidSyntaxException {
@@ -224,26 +246,19 @@ public class InputReader {
 
 	private void skipCommentBlockAtCursor() throws InvalidSyntaxException {
 		// Cursor is at the start of comment block
-		text.skip(COMMENTBLOCK_START.length());
+		text.cursorForward(COMMENTBLOCK_START.length());
 
 		// Pull new lines until comment block end is found
 		while (!text.seekString(COMMENTBLOCK_END)) {
 			text.goToEnd();
 			String nextLine = pullNextLine();
 			text.append(Parser.NEWLINE_MARKER + nextLine);
-			text.skip(Parser.NEWLINE_MARKER.length()
+			text.cursorForward(Parser.NEWLINE_MARKER.length()
 					+ indexOfNextNonSpace(nextLine));
 		}
 
 		// Move cursor beyond comment block
-		text.skip(COMMENTBLOCK_END.length());
-	}
-
-	private boolean isCursorAtLangString() {
-		return text.charAtCursor() == LANGSTRING_START.charAt(LANGSTRING_START
-				.length() - 1)
-				&& text.cursorPrecededBy(LANGSTRING_START.substring(0,
-						LANGSTRING_START.length() - 1));
+		text.cursorForward(COMMENTBLOCK_END.length());
 	}
 
 	private String pullNextLine() throws InvalidSyntaxException {
