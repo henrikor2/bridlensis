@@ -10,13 +10,13 @@ public interface Callable {
 		VOID, OPTIONAL, REQUIRED, ERRORFLAG
 	}
 
-	public abstract int getMandatoryArgsCount();
+	int getMandatoryArgsCount();
 
-	public abstract int getArgsCount();
+	int getArgsCount();
 
-	public abstract ReturnType getReturnType();
+	ReturnType getReturnType();
 
-	public abstract String statementFor(String indent, List<String> args,
-			Variable returnVar) throws InvalidSyntaxException;
+	String statementFor(String indent, List<String> args, Variable returnVar)
+			throws InvalidSyntaxException;
 
 }
