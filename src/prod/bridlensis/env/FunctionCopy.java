@@ -38,4 +38,9 @@ public class FunctionCopy implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Function[copy]";
+	}
+
 }

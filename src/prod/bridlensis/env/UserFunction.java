@@ -69,4 +69,9 @@ public class UserFunction implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "UserFunction[" + name + "]";
+	}
+
 }

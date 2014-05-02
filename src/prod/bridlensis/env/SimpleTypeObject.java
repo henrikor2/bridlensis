@@ -23,4 +23,9 @@ public class SimpleTypeObject implements TypeObject {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return type + "[" + value + "]";
+	}
+
 }

@@ -14,7 +14,7 @@ public class Variable implements TypeObject {
 
 	@Override
 	public String toString() {
-		return name;
+		return "Variable[" + name + "]";
 	}
 
 	@Override

@@ -69,4 +69,9 @@ class Instruction implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Instruction[" + displayName + "]";
+	}
+
 }

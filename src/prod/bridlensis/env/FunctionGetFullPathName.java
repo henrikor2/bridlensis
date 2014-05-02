@@ -45,4 +45,9 @@ class FunctionGetFullPathName implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Function[getfullpathname]";
+	}
+
 }

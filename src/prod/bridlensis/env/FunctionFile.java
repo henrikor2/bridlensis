@@ -52,4 +52,9 @@ public class FunctionFile implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Function[file]";
+	}
+
 }

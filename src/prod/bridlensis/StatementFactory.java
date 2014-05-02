@@ -85,8 +85,8 @@ public class StatementFactory {
 			} else {
 				sb.append(DEFAULT_INDENT);
 			}
-			sb.append("Pop $");
-			sb.append(args.next());
+			sb.append("Pop ");
+			sb.append(args.next().getValue());
 		}
 		return sb.toString();
 	}

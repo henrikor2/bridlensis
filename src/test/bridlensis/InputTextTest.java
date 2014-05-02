@@ -10,11 +10,11 @@ public class InputTextTest {
 	public void testSet() {
 		InputText line = new InputText();
 		line.set("DetailPrint hello", 0);
-		assertEquals("DetailPrint hello", line.toString());
+		assertEquals("DetailPrint hello", line.get());
 		assertEquals(0, line.cursorPos());
 
 		line.set("  DetailPrint hello", 2);
-		assertEquals("  DetailPrint hello", line.toString());
+		assertEquals("  DetailPrint hello", line.get());
 		assertEquals(2, line.cursorPos());
 	}
 
@@ -31,7 +31,7 @@ public class InputTextTest {
 		line.set("DetailPrint \"hello \\ ", 0);
 		line.append("\r\n  world!\"");
 		assertEquals(0, line.cursorPos());
-		assertEquals("DetailPrint \"hello \\ \r\n  world!\"", line.toString());
+		assertEquals("DetailPrint \"hello \\ \r\n  world!\"", line.get());
 	}
 
 	@Test

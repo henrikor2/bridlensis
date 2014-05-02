@@ -127,11 +127,12 @@ public class Environment {
 
 	public Variable getVariable(String name, UserFunction enclosingFunction)
 			throws EnvironmentException {
-		Variable variable = vars.get(getNormalizedVariableName(name,
-				enclosingFunction));
+		String normalizedVariableName = getNormalizedVariableName(name,
+				enclosingFunction);
+		Variable variable = vars.get(normalizedVariableName);
 		if (variable == null) {
 			throw new EnvironmentException(String.format(
-					"Unknown variable '%s'", name));
+					"Unknown variable '%s'", normalizedVariableName));
 		}
 		return variable;
 	}

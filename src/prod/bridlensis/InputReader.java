@@ -75,6 +75,11 @@ public class InputReader {
 			return value;
 		}
 
+		@Override
+		public String toString() {
+			return "Word[" + value + "]";
+		}
+
 	}
 
 	static class WordTail {
@@ -85,9 +90,13 @@ public class InputReader {
 			pattern += c;
 		}
 
+		protected String getPattern() {
+			return pattern;
+		}
+
 		@Override
 		public String toString() {
-			return pattern;
+			return "Tail[" + pattern + "]";
 		}
 
 		public boolean isCompilerCommand() {
@@ -137,7 +146,7 @@ public class InputReader {
 
 	@Override
 	public String toString() {
-		return text.toString();
+		return "InputReader[" + text.get() + "]";
 	}
 
 	public int getLinesRead() {
@@ -170,7 +179,7 @@ public class InputReader {
 			// Ensure line continuation
 			skipCommentBlockAtCursor();
 		}
-		return text.toString();
+		return text.get();
 	}
 
 	public WordTail getWordTail() {
@@ -193,7 +202,7 @@ public class InputReader {
 		findCurrentWordEnd();
 
 		// Save the word before moving cursor any further
-		String word = text.toString().substring(start, text.cursorPos());
+		String word = text.get().substring(start, text.cursorPos());
 
 		// Move cursor to start of next word and collect tail chars
 		findNextWordStart();

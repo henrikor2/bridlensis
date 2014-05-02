@@ -44,4 +44,9 @@ public class FunctionRMDir implements Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Function[rmdir]";
+	}
+
 }

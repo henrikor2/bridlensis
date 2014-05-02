@@ -5,14 +5,13 @@ class InputText {
 	private String text;
 	private int cursor;
 
-	@Override
-	public String toString() {
-		return text;
-	}
-
 	protected void set(String line, int startPos) {
 		text = line;
 		cursor = startPos;
+	}
+
+	protected String get() {
+		return text;
 	}
 
 	protected boolean endsWith(char c, String ignorePattern) {
@@ -88,4 +87,10 @@ class InputText {
 	protected int cursorPos() {
 		return cursor;
 	}
+
+	@Override
+	public String toString() {
+		return "InputText[cursor=" + cursor + ", text=" + text + "]";
+	}
+
 }

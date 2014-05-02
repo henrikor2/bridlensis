@@ -55,4 +55,10 @@ public class ComparisonStatement {
 		right.add(expr);
 	}
 
+	@Override
+	public String toString() {
+		return "ComparisonStatement[key=" + key + ", not=" + not + ", left="
+				+ left + ", compare=" + compare + ", right=" + right + "]";
+	}
+
 }

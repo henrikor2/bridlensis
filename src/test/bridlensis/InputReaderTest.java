@@ -53,7 +53,7 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertEquals("\t", reader.getIndent());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("\"hello world!\"", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
@@ -61,7 +61,7 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertEquals("", reader.getIndent());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("${HELLO}", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
@@ -70,7 +70,7 @@ public class InputReaderTest {
 		assertEquals("", reader.getIndent());
 		assertEquals("Function", reader.nextWord().getValue());
 		assertEquals("foo", reader.nextWord().getValue());
-		assertEquals("()", reader.getWordTail().toString());
+		assertEquals("()", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("Function foo (a, b)  ; hi there!");
@@ -78,7 +78,7 @@ public class InputReaderTest {
 		assertEquals("", reader.getIndent());
 		assertEquals("Function", reader.nextWord().getValue());
 		assertEquals("foo", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertEquals("a", reader.nextWord().getValue());
 		assertEquals("b", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
@@ -90,7 +90,7 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertEquals("", reader.getIndent());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("${HELLO}", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
@@ -98,20 +98,20 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertEquals("DetailPrint", reader.nextWord().getValue());
 		assertEquals("foo", reader.nextWord().getValue());
-		assertEquals("()", reader.getWordTail().toString());
+		assertEquals("()", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("a \\ \r\n = \"\"");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("\"\"", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("a = \\ \r\n \"\"");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("\"\"", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
@@ -120,17 +120,17 @@ public class InputReaderTest {
 		assertEquals("", reader.getIndent());
 		assertEquals("a", reader.nextWord().getValue());
 		assertTrue(reader.hasNextWord());
-		assertEquals("=", reader.getWordTail().toString());
+		assertEquals("=", reader.getWordTail().getPattern());
 		assertEquals("${HELLO}", reader.nextWord().getValue());
 		assertTrue(reader.hasNextWord());
-		assertEquals("+", reader.getWordTail().toString());
+		assertEquals("+", reader.getWordTail().getPattern());
 		assertEquals("\" world!\"", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("foo (  ) ; \\o/");
 		assertTrue(reader.goToNextStatement());
 		assertEquals("foo", reader.nextWord().getValue());
-		assertEquals("()", reader.getWordTail().toString());
+		assertEquals("()", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 	}
@@ -141,18 +141,18 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertEquals("DetailPrint", reader.nextWord().getValue());
 		assertEquals("foo", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertTrue(reader.hasNextWord());
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals(",", reader.getWordTail().toString());
+		assertEquals(",", reader.getWordTail().getPattern());
 		assertTrue(reader.hasNextWord());
 		assertEquals("b", reader.nextWord().getValue());
-		assertEquals(")", reader.getWordTail().toString());
+		assertEquals(")", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 		assertTrue(reader.goToNextStatement());
 		assertTrue(reader.hasNextWord());
 		assertEquals("StrCpy", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertTrue(reader.hasNextWord());
 		assertEquals("$a", reader.nextWord().getValue());
 		assertTrue(reader.hasNextWord());
@@ -262,21 +262,21 @@ public class InputReaderTest {
 		assertTrue(reader.goToNextStatement());
 		assertTrue(reader.hasNextWord());
 		assertEquals("fa", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertEquals("va", reader.nextWord().getValue());
-		assertEquals("+", reader.getWordTail().toString());
+		assertEquals("+", reader.getWordTail().getPattern());
 		assertEquals("fb", reader.nextWord().getValue());
-		assertEquals("(),", reader.getWordTail().toString());
+		assertEquals("(),", reader.getWordTail().getPattern());
 		assertEquals("fc", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertEquals("vb", reader.nextWord().getValue());
-		assertEquals(",", reader.getWordTail().toString());
+		assertEquals(",", reader.getWordTail().getPattern());
 		assertEquals("fd", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertEquals("vc", reader.nextWord().getValue());
-		assertEquals(")),", reader.getWordTail().toString());
+		assertEquals(")),", reader.getWordTail().getPattern());
 		assertEquals("vd", reader.nextWord().getValue());
-		assertEquals(")", reader.getWordTail().toString());
+		assertEquals(")", reader.getWordTail().getPattern());
 	}
 
 	@Test
@@ -286,37 +286,37 @@ public class InputReaderTest {
 		reader = readerFor("a == b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("==", reader.getWordTail().toString());
+		assertEquals("==", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 
 		reader = readerFor("a != b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("!=", reader.getWordTail().toString());
+		assertEquals("!=", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 
 		reader = readerFor("a >= b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals(">=", reader.getWordTail().toString());
+		assertEquals(">=", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 
 		reader = readerFor("a <= b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("<=", reader.getWordTail().toString());
+		assertEquals("<=", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 
 		reader = readerFor("a > b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals(">", reader.getWordTail().toString());
+		assertEquals(">", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 
 		reader = readerFor("a < b");
 		reader.goToNextStatement();
 		assertEquals("a", reader.nextWord().getValue());
-		assertEquals("<", reader.getWordTail().toString());
+		assertEquals("<", reader.getWordTail().getPattern());
 		assertEquals("b", reader.nextWord().getValue());
 	}
 
@@ -325,73 +325,73 @@ public class InputReaderTest {
 		InputReader reader;
 		reader = readerFor("!include foo.nsh");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("", reader.nextWord().getValue());
-		assertEquals("!", reader.getWordTail().toString());
+		assertEquals("!", reader.getWordTail().getPattern());
 		assertEquals("include", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("foo.nsh", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("  !include foo.nsh");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("", reader.nextWord().getValue());
-		assertEquals("!", reader.getWordTail().toString());
+		assertEquals("!", reader.getWordTail().getPattern());
 		assertEquals("include", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("foo.nsh", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("SetOutPath ${TEMP}");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("SetOutPath", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("${TEMP}", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("SetOutPath $%TEMP%");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("SetOutPath", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("$%TEMP%", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("LangString TEXT ${LANG_ENGLISH} \"Hello\"");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("LangString", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("TEXT", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("${LANG_ENGLISH}", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("\"Hello\"", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("DetailPrint $(TEXT)");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("DetailPrint", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("$(TEXT)", reader.nextWord().getValue());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 
 		reader = readerFor("DetailPrint($(TEXT))");
 		assertTrue(reader.goToNextStatement());
-		assertEquals("", reader.getWordTail().toString());
+		assertEquals("", reader.getWordTail().getPattern());
 		assertEquals("DetailPrint", reader.nextWord().getValue());
-		assertEquals("(", reader.getWordTail().toString());
+		assertEquals("(", reader.getWordTail().getPattern());
 		assertEquals("$(TEXT)", reader.nextWord().getValue());
-		assertEquals(")", reader.getWordTail().toString());
+		assertEquals(")", reader.getWordTail().getPattern());
 		assertFalse(reader.hasNextWord());
 	}
 
