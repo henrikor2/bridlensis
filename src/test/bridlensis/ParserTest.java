@@ -33,6 +33,7 @@ public class ParserTest {
 		Parser parser = createParser();
 		InputReader reader;
 		StringBuilder buffer;
+		StringBuilder expected;
 
 		parser.parseStatement(readerFor("Var a"));
 		parser.parseStatement(readerFor("Var b"));
@@ -76,27 +77,36 @@ public class ParserTest {
 		assertEquals("$foo.s02", // readerFor("a + foo(b)") eat one s0
 				parser.parseExpression(reader.nextWord(), buffer, reader)
 						.getValue());
-		assertEquals(
-				"Var /GLOBAL foo.s02\r\nPush $foo.b\r\nCall foo\r\nPop $foo.s02\r\n",
-				buffer.toString());
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.s02\r\n");
+		expected.append("Push $foo.b\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $foo.s02\r\n");
+		assertEquals(expected.toString(), buffer.toString());
 
 		buffer = new StringBuilder();
 		reader = readerFor("a + foo(1)");
 		assertEquals("\"$foo.a$foo.s03\"",
 				parser.parseExpression(reader.nextWord(), buffer, reader)
 						.getValue());
-		assertEquals(
-				"Var /GLOBAL foo.s03\r\nPush 1\r\nCall foo\r\nPop $foo.s03\r\n",
-				buffer.toString());
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.s03\r\n");
+		expected.append("Push 1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $foo.s03\r\n");
+		assertEquals(expected.toString(), buffer.toString());
 
 		buffer = new StringBuilder();
 		reader = readerFor("foo(1) + a");
 		assertEquals("\"$foo.s04$foo.a\"",
 				parser.parseExpression(reader.nextWord(), buffer, reader)
 						.getValue());
-		assertEquals(
-				"Var /GLOBAL foo.s04\r\nPush 1\r\nCall foo\r\nPop $foo.s04\r\n",
-				buffer.toString());
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.s04\r\n");
+		expected.append("Push 1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $foo.s04\r\n");
+		assertEquals(expected.toString(), buffer.toString());
 
 		parser.parseStatement(readerFor("FunctionEnd"));
 
@@ -105,9 +115,16 @@ public class ParserTest {
 		assertEquals("\"$s05 $s06\"",
 				parser.parseExpression(reader.nextWord(), buffer, reader)
 						.getValue());
-		assertEquals(
-				"Var /GLOBAL s05\r\nPush \"hello\"\r\nCall foo\r\nPop $s05\r\nVar /GLOBAL s06\r\nPush \"world!\"\r\nCall foo\r\nPop $s06\r\n",
-				buffer.toString());
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL s05\r\n");
+		expected.append("Push \"hello\"\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $s05\r\n");
+		expected.append("Var /GLOBAL s06\r\n");
+		expected.append("Push \"world!\"\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $s06\r\n");
+		assertEquals(expected.toString(), buffer.toString());
 
 	}
 
@@ -115,52 +132,114 @@ public class ParserTest {
 	public void testPlainNSIS() throws InvalidSyntaxException, ParserException,
 			EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("    ", parser.parseStatement(readerFor("    ")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("    ");
+		expected = new StringBuilder();
+		expected.append("    ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("\t", parser.parseStatement(readerFor("\t")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("\t");
+		expected = new StringBuilder();
+		expected.append("\t");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"InstallDir \"$PROGRAMFILES\\BridleNSIS Example\"",
-				parser.parseStatement(readerFor("InstallDir \"$PROGRAMFILES\\BridleNSIS Example\"")));
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("InstallDir \"$PROGRAMFILES\\BridleNSIS Example\"");
+		expected = new StringBuilder();
+		expected.append("InstallDir \"$PROGRAMFILES\\BridleNSIS Example\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example",
-				parser.parseStatement(readerFor("\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example")));
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example");
+		expected = new StringBuilder();
+		expected.append("\t\t  DeleteRegKey HKLM SOFTWARE\\BridleNSIS_Example");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"Delete $INSTDIR\\bridlensis.nsi",
-				parser.parseStatement(readerFor("Delete $INSTDIR\\bridlensis.nsi")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Delete $INSTDIR\\bridlensis.nsi");
+		expected = new StringBuilder();
+		expected.append("Delete $INSTDIR\\bridlensis.nsi");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testVarAssign() throws InvalidSyntaxException, ParserException,
 			EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("Var /GLOBAL a\r\nStrCpy $a \"Hello\"",
-				parser.parseStatement(readerFor("a = \"Hello\" ; wow!")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = \"Hello\" ; wow!");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("StrCpy $a \"Hello\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Var /GLOBAL b\r\nStrCpy $b $a",
-				parser.parseStatement(readerFor("B = a#it is \"same\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("B = a#it is \"same\"");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL b\r\n");
+		expected.append("StrCpy $b $a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("StrCpy $a \"wo$\\\"rl$\\\"d!'\"",
-				parser.parseStatement(readerFor("a=\"wo$\\\"rl$\\\"d!'\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a=\"wo$\\\"rl$\\\"d!'\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"wo$\\\"rl$\\\"d!'\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"StrCpy $instdir \"C:\\BridleNSIS\"",
-				parser.parseStatement(readerFor("INSTDIR = \"C:\\BridleNSIS\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("INSTDIR = \"C:\\BridleNSIS\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $instdir \"C:\\BridleNSIS\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("StrCpy $instdir $a",
-				parser.parseStatement(readerFor("INSTDIR = a")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("INSTDIR = a");
+		expected = new StringBuilder();
+		expected.append("StrCpy $instdir $a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		parser.parseStatement(readerFor("Function foo()"));
-		assertEquals("  Var /GLOBAL foo.a\r\n  StrCpy $foo.a $%TEMP%",
-				parser.parseStatement(readerFor("  a = $%TEMP%")));
-		assertEquals("  StrCpy $instdir $foo.a",
-				parser.parseStatement(readerFor("  global.instdir = a")));
-		assertEquals("  StrCpy $a $foo.a",
-				parser.parseStatement(readerFor("  global.a = a")));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  a = $%TEMP%");
+		expected = new StringBuilder();
+		expected.append("  Var /GLOBAL foo.a\r\n");
+		expected.append("  StrCpy $foo.a $%TEMP%");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  global.instdir = a");
+		expected = new StringBuilder();
+		expected.append("  StrCpy $instdir $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  global.a = a");
+		expected = new StringBuilder();
+		expected.append("  StrCpy $a $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 	}
 
@@ -168,18 +247,38 @@ public class ParserTest {
 	public void testVarDeclare() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
-		assertEquals("Var /GLOBAL a", parser.parseStatement(readerFor("Var A")));
-		assertEquals("Var /GLOBAL b\r\nStrCpy $b $a",
-				parser.parseStatement(readerFor("B = A")));
+		StringBuilder inputStatement;
+		StringBuilder expected;
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Var A");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("B = A");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL b\r\n");
+		expected.append("StrCpy $b $a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testFunctionBegin() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("Function oldschool",
-				parser.parseStatement(readerFor("Function OldSchool")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function OldSchool");
+		expected = new StringBuilder();
+		expected.append("Function oldschool");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		try {
 			parser.parseStatement(readerFor("Function Another ; Without FunctionEnd!"));
@@ -189,14 +288,26 @@ public class ParserTest {
 			System.err.println(e.getMessage());
 		}
 
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("functionend")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("functionend");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				" Function foo",
-				parser.parseStatement(readerFor(" Function foo() ; Yoyou mama!")));
-		assertEquals(" FunctionEnd",
-				parser.parseStatement(readerFor(" FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append(" Function foo() ; Yoyo mama!");
+		expected = new StringBuilder();
+		expected.append(" Function foo");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append(" FunctionEnd");
+		expected = new StringBuilder();
+		expected.append(" FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		try {
 			parser.parseStatement(readerFor("Function OldSchool() ; Yet again!"));
@@ -206,47 +317,117 @@ public class ParserTest {
 			System.err.println(e.getMessage());
 		}
 
-		assertEquals(
-				"Var /GLOBAL bar.a\r\nVar /GLOBAL bar.b\r\nFunction bar\r\n    Pop $bar.a\r\n    Pop $bar.b",
-				parser.parseStatement(readerFor("Function bar(a, b)")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function bar(a, b)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL bar.a\r\n");
+		expected.append("Var /GLOBAL bar.b\r\n");
+		expected.append("Function bar\r\n");
+		expected.append("    Pop $bar.a\r\n");
+		expected.append("    Pop $bar.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testCallable() throws InvalidSyntaxException, ParserException,
 			EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
 		// Function OldSchool define
-		assertEquals("Function oldschool",
-				parser.parseStatement(readerFor("Function OldSchool")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function OldSchool");
+		expected = new StringBuilder();
+		expected.append("Function oldschool");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		// Function OldSchool call
-		assertEquals(
-				"Call oldschool",
-				parser.parseStatement(readerFor("OldSchool() ; BridleNSIS style function call")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("OldSchool() ; BridleNSIS style function call");
+		expected = new StringBuilder();
+		expected.append("Call oldschool");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		// Function foo define
-		assertEquals(
-				"Var /GLOBAL foo.a\r\nVar /GLOBAL foo.b\r\nFunction foo\r\n    Pop $foo.a\r\n    Pop $foo.b",
-				parser.parseStatement(readerFor("Function foo(a, b)")));
-		assertEquals("    StrCpy $foo.a $foo.b",
-				parser.parseStatement(readerFor("    a = b")));
-		assertEquals("    Var /GLOBAL foo.c\r\n    StrCpy $foo.c $foo.a",
-				parser.parseStatement(readerFor("    c = a")));
-		assertEquals("    DetailPrint $r0 ",
-				parser.parseStatement(readerFor("    DetailPrint(global.R0)")));
-		assertEquals("    DetailPrint \"$c\" ",
-				parser.parseStatement(readerFor("    DetailPrint(\"$c\")")));
-		assertEquals("    DetailPrint $foo.c ",
-				parser.parseStatement(readerFor("    DetailPrint(c)")));
-		assertEquals("    StrCpy $r0 $foo.c",
-				parser.parseStatement(readerFor("    global.R0 = c")));
-		assertEquals("    Var /GLOBAL foo.foo\r\n    StrCpy $foo.foo $foo.c",
-				parser.parseStatement(readerFor("    foo = c")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo(a, b)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Var /GLOBAL foo.b\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a\r\n");
+		expected.append("    Pop $foo.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    a = b");
+		expected = new StringBuilder();
+		expected.append("    StrCpy $foo.a $foo.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    c = a");
+		expected = new StringBuilder();
+		expected.append("    Var /GLOBAL foo.c\r\n");
+		expected.append("    StrCpy $foo.c $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    DetailPrint(global.R0)");
+		expected = new StringBuilder();
+		expected.append("    DetailPrint $r0 ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    DetailPrint(\"$c\")");
+		expected = new StringBuilder();
+		expected.append("    DetailPrint \"$c\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    DetailPrint(c)");
+		expected = new StringBuilder();
+		expected.append("    DetailPrint $foo.c ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    global.R0 = c");
+		expected = new StringBuilder();
+		expected.append("    StrCpy $r0 $foo.c");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("    foo = c");
+		expected = new StringBuilder();
+		expected.append("    Var /GLOBAL foo.foo\r\n");
+		expected.append("    StrCpy $foo.foo $foo.c");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		try {
 			parser.parseStatement(readerFor("    r0 = f"));
@@ -256,13 +437,30 @@ public class ParserTest {
 			// We're good
 		}
 
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		// Function foo call
-		assertEquals("Var /GLOBAL a", parser.parseStatement(readerFor("Var a")));
-		assertEquals("Push \"hello world!\"\r\nPush $a\r\nCall foo",
-				parser.parseStatement(readerFor("foo(a, \"hello world!\")")));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Var a");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("foo(a, \"hello world!\")");
+		expected = new StringBuilder();
+		expected.append("Push \"hello world!\"\r\n");
+		expected.append("Push $a\r\n");
+		expected.append("Call foo");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		try {
 			parser.parseStatement(readerFor("foo()"));
@@ -309,158 +507,423 @@ public class ParserTest {
 	public void testFunctionReturn() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("Var /GLOBAL foo.a\r\nFunction foo\r\n    Pop $foo.a",
-				parser.parseStatement(readerFor("Function foo(a)")));
-		assertEquals("  Push $foo.a\r\n  Return",
-				parser.parseStatement(readerFor("  Return a")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo(a)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  Return a");
+		expected = new StringBuilder();
+		expected.append("  Push $foo.a\r\n");
+		expected.append("  Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		// Empty stack after function call
-		assertEquals(
-				"Var /GLOBAL bridlensis_nullvar\r\nPush 1\r\nCall foo\r\nPop $bridlensis_nullvar",
-				parser.parseStatement(readerFor("foo(1)")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("foo(1)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL bridlensis_nullvar\r\n");
+		expected.append("Push 1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $bridlensis_nullvar");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		// Reuse null variable to dump stack to
-		assertEquals("Push $r1\r\nCall foo\r\nPop $bridlensis_nullvar",
-				parser.parseStatement(readerFor("foo(R1)")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("foo(R1)");
+		expected = new StringBuilder();
+		expected.append("Push $r1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $bridlensis_nullvar");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Var /GLOBAL a\r\nPush $r1\r\nCall foo\r\nPop $a",
-				parser.parseStatement(readerFor("a = foo(r1)")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = foo(r1)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("Push $r1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Function bar",
-				parser.parseStatement(readerFor("Function bar()")));
-		assertEquals("  Push \"\"\r\n  Return",
-				parser.parseStatement(readerFor("  Return \"\"")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function bar()");
+		expected = new StringBuilder();
+		expected.append("Function bar");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Function empty",
-				parser.parseStatement(readerFor("Function empty()")));
-		assertEquals("  Return", parser.parseStatement(readerFor("  Return")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("  Return \"\"");
+		expected = new StringBuilder();
+		expected.append("  Push \"\"\r\n");
+		expected.append("  Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function empty()");
+		expected = new StringBuilder();
+		expected.append("Function empty");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  Return");
+		expected = new StringBuilder();
+		expected.append("  Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testFunctionAssign() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("Var /GLOBAL foo.a\r\nFunction foo\r\n    Pop $foo.a",
-				parser.parseStatement(readerFor("Function foo(a)")));
-		assertEquals("    Push $foo.a\r\n    Return",
-				parser.parseStatement(readerFor("    Return a")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo(a)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Var /GLOBAL a\r\nPush \"1\"\r\nCall foo\r\nPop $a",
-				parser.parseStatement(readerFor("a = foo(\"1\")")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("    Return a");
+		expected = new StringBuilder();
+		expected.append("    Push $foo.a\r\n");
+		expected.append("    Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"StrCpy $a \"$a world$R0\" \"\" \"\" ",
-				parser.parseStatement(readerFor("a = StrCpy(\"$a world$R0\", \"\", \"\") ; <-- \"hello world!\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("StrCpy $a \"foobar\" ",
-				parser.parseStatement(readerFor("a = StrCpy(\"foobar\")")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = foo(\"1\")");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("Push \"1\"\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Var /GLOBAL b\r\nIntOp $b $a \"+\" 1 ",
-				parser.parseStatement(readerFor("b = IntOp(a, \"+\", 1)")));
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("a = StrCpy(\"$a world$R0\", \"\", \"\") ; <-- \"hello world!\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"$a world$R0\" \"\" \"\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"Var /GLOBAL c\r\nGetTempFileName $c $%TEMP% \r\nVar /GLOBAL s01\r\nPush 1\r\nCall foo\r\nPop $s01\r\nStrCpy $c \"$c$b$s01$a\"",
-				parser.parseStatement(readerFor("c = GetTempFileName($%TEMP%) + b + foo(1) + a")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = StrCpy(\"foobar\")");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"foobar\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("b = IntOp(a, \"+\", 1)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL b\r\n");
+		expected.append("IntOp $b $a \"+\" 1 ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("c = GetTempFileName($%TEMP%) + b + foo(1) + a");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL c\r\n");
+		expected.append("GetTempFileName $c $%TEMP% \r\n");
+		expected.append("Var /GLOBAL s01\r\n");
+		expected.append("Push 1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $s01\r\n");
+		expected.append("StrCpy $c \"$c$b$s01$a\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testFunctionCallInsideFunction() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals(
-				"Var /GLOBAL join.a\r\nVar /GLOBAL join.b\r\nFunction join\r\n    Pop $join.a\r\n    Pop $join.b",
-				parser.parseStatement(readerFor("Function join(a, b)")));
-		assertEquals("  Push \"$join.a$join.b\"\r\n  Return",
-				parser.parseStatement(readerFor("  Return a + b")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function join(a, b)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL join.a\r\n");
+		expected.append("Var /GLOBAL join.b\r\n");
+		expected.append("Function join\r\n");
+		expected.append("    Pop $join.a\r\n");
+		expected.append("    Pop $join.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"Var /GLOBAL len.a\r\nVar /GLOBAL len.b\r\nFunction len\r\n    Pop $len.a\r\n    Pop $len.b",
-				parser.parseStatement(readerFor("Function len(a, b)")));
-		assertEquals(
-				"  Var /GLOBAL len.s01\r\n  Var /GLOBAL len.s02\r\n  Push $len.b\r\n  Push $len.a\r\n  Call join\r\n  Pop $len.s02\r\n  StrLen $len.s01 $len.s02 \r\n  Push $len.s01\r\n  Return",
-				parser.parseStatement(readerFor("  Return StrLen(join(a, b))")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("  Return a + b");
+		expected = new StringBuilder();
+		expected.append("  Push \"$join.a$join.b\"\r\n");
+		expected.append("  Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function len(a, b)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL len.a\r\n");
+		expected.append("Var /GLOBAL len.b\r\n");
+		expected.append("Function len\r\n");
+		expected.append("    Pop $len.a\r\n");
+		expected.append("    Pop $len.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("  Return StrLen(join(a, b))");
+		expected = new StringBuilder();
+		expected.append("  Var /GLOBAL len.s01\r\n");
+		expected.append("  Var /GLOBAL len.s02\r\n");
+		expected.append("  Push $len.b\r\n");
+		expected.append("  Push $len.a\r\n");
+		expected.append("  Call join\r\n");
+		expected.append("  Pop $len.s02\r\n");
+		expected.append("  StrLen $len.s01 $len.s02 \r\n");
+		expected.append("  Push $len.s01\r\n");
+		expected.append("  Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testInstructions() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
-		assertEquals(
-				"ExecShell \"open\" \"http://nsis.sf.net/\" ",
-				parser.parseStatement(readerFor("ExecShell(\"open\", \"http://nsis.sf.net/\")")));
-		assertEquals(
-				"ExecShell \"open\" \"http://nsis.sf.net/\" \"SW_SHOWNORMAL\" ",
-				parser.parseStatement(readerFor("ExecShell(\"open\", \"http://nsis.sf.net/\", \"SW_SHOWNORMAL\")")));
-		assertEquals(
-				"ExecShell \"open\" \"http://nsis.sf.net/\" ",
-				parser.parseStatement(readerFor("ExecShell(\"open\", \\\r\n    \"http://nsis.sf.net/\")")));
-		assertEquals(
-				"Var /GLOBAL ret\r\nExecWait '\"$INSTDIR\\someprogram.exe\"' $ret ",
-				parser.parseStatement(readerFor("ret = ExecWait('\"$INSTDIR\\someprogram.exe\"')")));
-		assertEquals(
-				"StrCpy $r0 \"hello world!\" 5 ",
-				parser.parseStatement(readerFor("r0 = StrCpy(\"hello world!\", 5)")));
-		assertEquals(
-				"FileOpen $r1 \"C:\\temp\\makensis.log\" \"r\" ",
-				parser.parseStatement(readerFor("R1 = FileOpen(\"C:\\temp\\makensis.log\", \"r\")")));
+		StringBuilder inputStatement;
+		StringBuilder expected;
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("ExecShell(\"open\", \"http://nsis.sf.net/\")");
+		expected = new StringBuilder();
+		expected.append("ExecShell \"open\" \"http://nsis.sf.net/\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("ExecShell(\"open\", \"http://nsis.sf.net/\", \"SW_SHOWNORMAL\")");
+		expected = new StringBuilder();
+		expected.append("ExecShell \"open\" \"http://nsis.sf.net/\" \"SW_SHOWNORMAL\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("ExecShell(\"open\", \\\r\n    \"http://nsis.sf.net/\")");
+		expected = new StringBuilder();
+		expected.append("ExecShell \"open\" \"http://nsis.sf.net/\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("ret = ExecWait('\"$INSTDIR\\someprogram.exe\"')");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL ret\r\n");
+		expected.append("ExecWait '\"$INSTDIR\\someprogram.exe\"' $ret ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("r0 = StrCpy(\"hello world!\", 5)");
+		expected = new StringBuilder();
+		expected.append("StrCpy $r0 \"hello world!\" 5 ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement
+				.append("R1 = FileOpen(\"C:\\temp\\makensis.log\", \"r\")");
+		expected = new StringBuilder();
+		expected.append("FileOpen $r1 \"C:\\temp\\makensis.log\" \"r\" ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testSringConcatenation() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
-		assertEquals("Var /GLOBAL a\r\nStrCpy $a \"hello\"",
-				parser.parseStatement(readerFor("a = \"hello\"")));
-		assertEquals(
-				"StrCpy $a \"$a world, oh my!\"",
-				parser.parseStatement(readerFor("a = a + \" world\" + \", oh my!\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = \"hello\"");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("StrCpy $a \"hello\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("Var /GLOBAL foo.a\r\nFunction foo\r\n    Pop $foo.a",
-				parser.parseStatement(readerFor("Function foo(a)")));
-		assertEquals("    Push \"$foo.a times\"\r\n    Return",
-				parser.parseStatement(readerFor("    Return a + \" times\"")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = a + \" world\" + \", oh my!\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"$a world, oh my!\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"Var /GLOBAL s01\r\nPush 1\r\nCall foo\r\nPop $s01\r\nStrCpy $a \"foo: $s01\"",
-				parser.parseStatement(readerFor("a = \"foo: \" + foo(1)")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo(a)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("StrCpy $a \"hello${HELLO}\"",
-				parser.parseStatement(readerFor("a = \"hello\" + ${HELLO}")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("    Return a + \" times\"");
+		expected = new StringBuilder();
+		expected.append("    Push \"$foo.a times\"\r\n");
+		expected.append("    Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = \"foo: \" + foo(1)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL s01\r\n");
+		expected.append("Push 1\r\n");
+		expected.append("Call foo\r\n");
+		expected.append("Pop $s01\r\n");
+		expected.append("StrCpy $a \"foo: $s01\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = \"hello\" + ${HELLO}");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"hello${HELLO}\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testVariableScope() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
-		assertEquals("Var /GLOBAL a", parser.parseStatement(readerFor("Var a")));
-		assertEquals("Var /GLOBAL foo.a\r\nFunction foo\r\n    Pop $foo.a",
-				parser.parseStatement(readerFor("Function foo(a)")));
-		assertEquals("DetailPrint $foo.a ",
-				parser.parseStatement(readerFor("DetailPrint(a)")));
-		assertEquals("DetailPrint $a ",
-				parser.parseStatement(readerFor("DetailPrint(global.a)")));
-		assertEquals("DetailPrint $r0 ",
-				parser.parseStatement(readerFor("DetailPrint(global.r0)")));
-		assertEquals("FunctionEnd",
-				parser.parseStatement(readerFor("FunctionEnd")));
+		StringBuilder inputStatement;
+		StringBuilder expected;
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Var a");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo(a)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("DetailPrint(a)");
+		expected = new StringBuilder();
+		expected.append("DetailPrint $foo.a ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("DetailPrint(global.a)");
+		expected = new StringBuilder();
+		expected.append("DetailPrint $a ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("DetailPrint(global.r0)");
+		expected = new StringBuilder();
+		expected.append("DetailPrint $r0 ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("FunctionEnd");
+		expected = new StringBuilder();
+		expected.append("FunctionEnd");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		try {
 			parser.parseStatement(readerFor("Var foo.a"));
@@ -475,88 +938,193 @@ public class ParserTest {
 	public void testBlockCommentsInStatement() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
 		Parser parser = createParser();
-		assertEquals(
-				"Var /GLOBAL a\r\nStrCpy $a \"hello... world!\"",
-				parser.parseStatement(readerFor("a = \"hello... \" /*world?*/ + \"world!\"")));
-		assertEquals(
-				"Var /GLOBAL foo.a\r\nVar /GLOBAL foo.b\r\nFunction foo\r\n    Pop $foo.a\r\n    Pop $foo.b",
-				parser.parseStatement(readerFor("Function foo( /*a?*/ a, /*b?*/ b)")));
-		assertEquals("DetailPrint $foo.a ",
-				parser.parseStatement(readerFor("DetailPrint(/*a?*/a/*a?*/)")));
-		assertEquals("Push $foo.a\r\nReturn",
-				parser.parseStatement(readerFor("Return /*a?*/a/*a?*/")));
+		StringBuilder inputStatement;
+		StringBuilder expected;
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("a = \"hello... \" /*world?*/ + \"world!\"");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("StrCpy $a \"hello... world!\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Function foo( /*a?*/ a, /*b?*/ b)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL foo.a\r\n");
+		expected.append("Var /GLOBAL foo.b\r\n");
+		expected.append("Function foo\r\n");
+		expected.append("    Pop $foo.a\r\n");
+		expected.append("    Pop $foo.b");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("DetailPrint(/*a?*/a/*a?*/)");
+		expected = new StringBuilder();
+		expected.append("DetailPrint $foo.a ");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Return /*a?*/a/*a?*/");
+		expected = new StringBuilder();
+		expected.append("Push $foo.a\r\n");
+		expected.append("Return");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testIf() throws InvalidSyntaxException, ParserException,
 			EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
+		// Something to refer to in test cases
 		parser.parseStatement(readerFor("world = \"world\""));
 		parser.parseStatement(readerFor("function hello()"));
 		parser.parseStatement(readerFor("  return \"hello \""));
 		parser.parseStatement(readerFor("functionend"));
 
-		assertEquals("${If} $world == \"hello world\"",
-				parser.parseStatement(readerFor("If world == \"hello world\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("If world == \"hello world\"");
+		expected = new StringBuilder();
+		expected.append("${If} $world == \"hello world\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"${IfNot} \"${FileExists}\" \"$instdir\\foo.txt\"",
-				parser.parseStatement(readerFor("If not \"${FileExists}\" \"$instdir\\foo.txt\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("If not \"${FileExists}\" \"$instdir\\foo.txt\"");
+		expected = new StringBuilder();
+		expected.append("${IfNot} \"${FileExists}\" \"$instdir\\foo.txt\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"${If} \"hello $world\" == \"hello world\"",
-				parser.parseStatement(readerFor("If \"hello \" + world == \"hello world\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("If \"hello \" + world == \"hello world\"");
+		expected = new StringBuilder();
+		expected.append("${If} \"hello $world\" == \"hello world\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"Var /GLOBAL s01\r\nCall hello\r\nPop $s01\r\n${If} $world == \"world\"\r\n${AndIf} $s01 != \"hello \"",
-				parser.parseStatement(readerFor("If world == \"world\" \\\r\n    And hello() != \"hello \"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("If world == \"world\" \\\r\n");
+		inputStatement.append("    And hello() != \"hello \"");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL s01\r\n");
+		expected.append("Call hello\r\n");
+		expected.append("Pop $s01\r\n");
+		expected.append("${If} $world == \"world\"\r\n");
+		expected.append("${AndIf} $s01 != \"hello \"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"${ElseIf} $world != \"hello world\"",
-				parser.parseStatement(readerFor("ElseIf world != \"hello world\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("ElseIf world != \"hello world\"");
+		expected = new StringBuilder();
+		expected.append("${ElseIf} $world != \"hello world\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"${ElseIf} $world > 1\r\n${andIf} \"${Errors}\"",
-				parser.parseStatement(readerFor("ElseIf world > 1 and \"${Errors}\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("ElseIf world > 1 and \"${Errors}\"");
+		expected = new StringBuilder();
+		expected.append("${ElseIf} $world > 1\r\n");
+		expected.append("${andIf} \"${Errors}\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${Else}", parser.parseStatement(readerFor("else")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("else");
+		expected = new StringBuilder();
+		expected.append("${Else}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${EndIf}", parser.parseStatement(readerFor("EndIf")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("EndIf");
+		expected = new StringBuilder();
+		expected.append("${EndIf}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 	}
 
 	@Test
 	public void testDo() throws InvalidSyntaxException, ParserException,
 			EnvironmentException {
 		Parser parser = createParser();
+		StringBuilder inputStatement;
+		StringBuilder expected;
 
+		// Something to refer to in test cases
 		parser.parseStatement(readerFor("a = 1"));
 		parser.parseStatement(readerFor("Function Inc(i)"));
 		parser.parseStatement(readerFor("  Return IntOp(i, \"+\", 1)"));
 		parser.parseStatement(readerFor("FunctionEnd"));
 
-		assertEquals("${Do}", parser.parseStatement(readerFor("do")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("do");
+		expected = new StringBuilder();
+		expected.append("${Do}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${DoUntil} $a < 10",
-				parser.parseStatement(readerFor("Do Until a < 10")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Do Until a < 10");
+		expected = new StringBuilder();
+		expected.append("${DoUntil} $a < 10");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals(
-				"${DoWhile} ${FileExists} \"$instdir\\foo.txt\"",
-				parser.parseStatement(readerFor("Do While ${FileExists} \"$instdir\\foo.txt\"")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Do While ${FileExists} \"$instdir\\foo.txt\"");
+		expected = new StringBuilder();
+		expected.append("${DoWhile} ${FileExists} \"$instdir\\foo.txt\"");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${Continue}",
-				parser.parseStatement(readerFor("Continue")));
-		assertEquals("${Break}", parser.parseStatement(readerFor("Break")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Continue");
+		expected = new StringBuilder();
+		expected.append("${Continue}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${Loop}", parser.parseStatement(readerFor("Loop")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Break");
+		expected = new StringBuilder();
+		expected.append("${Break}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		assertEquals("${LoopWhile} ${Errors}",
-				parser.parseStatement(readerFor("Loop While ${Errors}")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Loop");
+		expected = new StringBuilder();
+		expected.append("${Loop}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
-		// Function value
-		assertEquals(
-				"Var /GLOBAL s02\r\nPush $a\r\nCall inc\r\nPop $s02\r\n${LoopUntil} $a > $s02",
-				parser.parseStatement(readerFor("Loop Until a > Inc(a)")));
+		inputStatement = new StringBuilder();
+		inputStatement.append("Loop While ${Errors}");
+		expected = new StringBuilder();
+		expected.append("${LoopWhile} ${Errors}");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		// Function call in comparison statement
+		inputStatement = new StringBuilder();
+		inputStatement.append("Loop Until a > Inc(a)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL s02\r\n");
+		expected.append("Push $a\r\n");
+		expected.append("Call inc\r\n");
+		expected.append("Pop $s02\r\n");
+		expected.append("${LoopUntil} $a > $s02");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
 
 	}
 
