@@ -74,18 +74,9 @@ public class StatementFactory {
 
 	public String functionBegin(String indent, UserFunction function) {
 		StringBuilder sb = begin(indent);
-
-		Iterator<Variable> args = function.argumentsIterator();
-		while (args.hasNext()) {
-			sb.append(variableDeclare("", args.next()));
-			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(indent);
-		}
-
 		sb.append("Function ");
 		sb.append(function.getName());
-
-		args = function.argumentsIterator();
+		Iterator<Variable> args = function.argumentsIterator();
 		while (args.hasNext()) {
 			sb.append(Parser.NEWLINE_MARKER);
 			if (indent.length() != 0) {
@@ -97,7 +88,6 @@ public class StatementFactory {
 			sb.append("Pop $");
 			sb.append(args.next());
 		}
-
 		return sb.toString();
 	}
 

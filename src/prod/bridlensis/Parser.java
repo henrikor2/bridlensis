@@ -342,11 +342,8 @@ public class Parser {
 			variable = environment.getVariable(varName.asName(),
 					enclosingFunction);
 		} else {
-			variable = environment.registerVariable(varName.asName(),
-					enclosingFunction);
-			sb.append(statementFactory.variableDeclare(reader.getIndent(),
-					variable));
-			sb.append(Parser.NEWLINE_MARKER);
+			variable = registerAndDeclareVariable(varName.asName(),
+					reader.getIndent(), sb);
 		}
 
 		Word word = reader.nextWord();
@@ -382,12 +379,16 @@ public class Parser {
 		}
 		enclosingFunction = environment.registerUserFunction(reader.nextWord()
 				.asName());
+		StringBuilder sb = new StringBuilder();
 		while (reader.hasNextWord()) {
-			enclosingFunction.addArgument(environment.registerVariable(reader
-					.nextWord().asName(), enclosingFunction));
+			String argName = reader.nextWord().asName();
+			Variable argVariable = registerAndDeclareVariable(argName,
+					reader.getIndent(), sb);
+			enclosingFunction.addArgument(argVariable);
 		}
-		return statementFactory.functionBegin(reader.getIndent(),
-				enclosingFunction);
+		sb.append(statementFactory.functionBegin(reader.getIndent(),
+				enclosingFunction));
+		return sb.toString();
 	}
 
 	private String parseFunctionReturn(InputReader reader)
@@ -528,14 +529,23 @@ public class Parser {
 	private Variable parseInExpressionCall(TypeObject callableName,
 			StringBuilder buffer, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		Variable fReturn = environment.registerVariable(environment
-				.getNameGenerator().generate(), enclosingFunction);
-		buffer.append(statementFactory.variableDeclare(reader.getIndent(),
-				fReturn));
-		buffer.append(Parser.NEWLINE_MARKER);
+		Variable fReturn = registerAndDeclareVariable(environment
+				.getNameGenerator().generate(), reader.getIndent(), buffer);
 		buffer.append(parseCall(new Word(callableName.getValue()), fReturn,
 				reader));
 		buffer.append(Parser.NEWLINE_MARKER);
 		return fReturn;
 	}
+
+	private Variable registerAndDeclareVariable(String name, String indent,
+			StringBuilder buffer) throws EnvironmentException {
+		String varName = (name == null) ? environment.getNameGenerator()
+				.generate() : name;
+		Variable variable = environment.registerVariable(varName,
+				enclosingFunction);
+		buffer.append(statementFactory.variableDeclare(indent, variable));
+		buffer.append(Parser.NEWLINE_MARKER);
+		return variable;
+	}
+
 }

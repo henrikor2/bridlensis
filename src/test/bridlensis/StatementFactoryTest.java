@@ -64,7 +64,7 @@ public class StatementFactoryTest {
 		bar.addArgument(env.registerVariable("c", bar));
 		bar.setHasReturn(true);
 		assertEquals(
-				"  Var /GLOBAL bar.a\r\n  Var /GLOBAL bar.b\r\n  Var /GLOBAL bar.c\r\n  Function bar\r\n    Pop $bar.a\r\n    Pop $bar.b\r\n    Pop $bar.c",
+				"  Function bar\r\n    Pop $bar.a\r\n    Pop $bar.b\r\n    Pop $bar.c",
 				sf.functionBegin("  ", bar));
 	}
 
