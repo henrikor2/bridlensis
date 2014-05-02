@@ -34,7 +34,7 @@ class FunctionWordFind implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("${WordFind");
@@ -44,13 +44,13 @@ class FunctionWordFind implements Callable {
 				sb.append('S');
 			}
 			sb.append("} ");
-			sb.append(args.get(STRING_INDEX));
+			sb.append(args.get(STRING_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(DELIM1_INDEX));
+			sb.append(args.get(DELIM1_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(CENTER_INDEX));
+			sb.append(args.get(CENTER_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(DELIM2_INDEX));
+			sb.append(args.get(DELIM2_INDEX).getValue());
 			sb.append(' ');
 		} else if (!args.get(DELIM2_INDEX).equals(StatementFactory.NULL)) {
 			sb.append("2X");
@@ -58,25 +58,25 @@ class FunctionWordFind implements Callable {
 				sb.append('S');
 			}
 			sb.append("} ");
-			sb.append(args.get(STRING_INDEX));
+			sb.append(args.get(STRING_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(DELIM1_INDEX));
+			sb.append(args.get(DELIM1_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(DELIM2_INDEX));
+			sb.append(args.get(DELIM2_INDEX).getValue());
 			sb.append(' ');
 		} else {
 			if (caseSensitive) {
 				sb.append('S');
 			}
 			sb.append("} ");
-			sb.append(args.get(STRING_INDEX));
+			sb.append(args.get(STRING_INDEX).getValue());
 			sb.append(' ');
-			sb.append(args.get(DELIM1_INDEX));
+			sb.append(args.get(DELIM1_INDEX).getValue());
 			sb.append(' ');
 		}
-		sb.append(args.get(OPTIONS_INDEX));
+		sb.append(args.get(OPTIONS_INDEX).getValue());
 		sb.append(' ');
-		sb.append(returnVar.getNSISExpression());
+		sb.append(returnVar.getValue());
 		return sb.toString();
 	}
 

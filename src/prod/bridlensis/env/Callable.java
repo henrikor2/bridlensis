@@ -16,7 +16,7 @@ public interface Callable {
 
 	ReturnType getReturnType();
 
-	String statementFor(String indent, List<String> args, Variable returnVar)
+	String statementFor(String indent, List<TypeObject> args, Variable returnVar)
 			throws InvalidSyntaxException;
 
 }

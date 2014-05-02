@@ -51,18 +51,18 @@ class Instruction implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
-		ArrayList<String> cArgs = new ArrayList<>(args);
+		ArrayList<TypeObject> cArgs = new ArrayList<>(args);
 		if (getReturnType() != ReturnType.VOID) {
-			cArgs.add(returnArgIndex, returnVar.getNSISExpression());
+			cArgs.add(returnArgIndex, returnVar);
 		}
 		sb.append(displayName);
 		sb.append(' ');
-		for (String cArg : cArgs) {
+		for (TypeObject cArg : cArgs) {
 			if (!cArg.equals(StatementFactory.NULL)) {
-				sb.append(cArg);
+				sb.append(cArg.getValue());
 				sb.append(' ');
 			}
 		}

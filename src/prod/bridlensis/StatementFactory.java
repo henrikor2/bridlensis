@@ -8,12 +8,26 @@ import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.TypeObject;
+import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
 
 public class StatementFactory {
 
-	public static final String NULL = "${BRIDLE_NULL}";
+	public static final TypeObject NULL = new TypeObject() {
+
+		@Override
+		public Type getType() {
+			return Type.SPECIAL;
+		}
+
+		@Override
+		public String getValue() {
+			return "${BRIDLE_NULL}";
+		}
+	};
+
 	public static final String DEFAULT_INDENT = "    ";
 
 	private Environment environment;
@@ -49,12 +63,12 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String variableAssign(String indent, Variable var, String value) {
+	public String variableAssign(String indent, Variable var, TypeObject value) {
 		StringBuilder sb = begin(indent);
 		sb.append("StrCpy ");
-		sb.append(var.getNSISExpression());
+		sb.append(var.getValue());
 		sb.append(' ');
-		sb.append(value);
+		sb.append(value.getValue());
 		return sb.toString();
 	}
 
@@ -87,11 +101,12 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String functionReturn(String indent, Callable function, String value) {
+	public String functionReturn(String indent, Callable function,
+			TypeObject value) {
 		StringBuilder sb = begin(indent);
 		if (value != null) {
 			sb.append("Push ");
-			sb.append(value);
+			sb.append(value.getValue());
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
@@ -105,7 +120,7 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String call(String indent, Callable callable, List<String> args,
+	public String call(String indent, Callable callable, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException,
 			EnvironmentException {
 		StringBuilder sb = new StringBuilder();
@@ -121,7 +136,7 @@ public class StatementFactory {
 		} else if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append("StrCpy ");
-			sb.append(returnVar.getNSISExpression());
+			sb.append(returnVar.getValue());
 			sb.append(" 1");
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
@@ -139,18 +154,17 @@ public class StatementFactory {
 			sb.append(indent);
 			sb.append(DEFAULT_INDENT);
 			sb.append("StrCpy ");
-			sb.append(returnVar.getNSISExpression());
+			sb.append(returnVar.getValue());
 			sb.append(" 0");
 		}
 		return sb.toString();
 	}
 
-	public static String deString(String expr) {
-		if (expr.length() > 1
-				&& (expr.charAt(0) == '"' || expr.charAt(0) == '\'')) {
-			return expr.substring(1, expr.length() - 1);
+	public static String deString(TypeObject expr) {
+		if (expr.getType() == Type.STRING) {
+			return expr.getValue().substring(1, expr.getValue().length() - 1);
 		}
-		return expr;
+		return expr.getValue();
 	}
 
 	public String include(String indent, String filename) {
@@ -176,17 +190,17 @@ public class StatementFactory {
 			sb.append("Not");
 		}
 		sb.append('}');
-		for (String left : statement.getLeft()) {
+		for (TypeObject left : statement.getLeft()) {
 			sb.append(' ');
-			sb.append(left);
+			sb.append(left.getValue());
 		}
 		if (statement.getCompare() != null) {
 			sb.append(' ');
 			sb.append(statement.getCompare());
 		}
-		for (String right : statement.getRight()) {
+		for (TypeObject right : statement.getRight()) {
 			sb.append(' ');
-			sb.append(right);
+			sb.append(right.getValue());
 		}
 		return sb.toString();
 	}

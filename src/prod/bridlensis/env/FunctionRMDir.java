@@ -29,7 +29,7 @@ public class FunctionRMDir implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("RMDir ");
@@ -40,7 +40,7 @@ public class FunctionRMDir implements Callable {
 				sb.append(' ');
 			}
 		}
-		sb.append(args.get(DIR_INDEX));
+		sb.append(args.get(DIR_INDEX).getValue());
 		return sb.toString();
 	}
 

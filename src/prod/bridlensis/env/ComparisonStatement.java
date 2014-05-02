@@ -7,9 +7,9 @@ public class ComparisonStatement {
 
 	private String key;
 	private boolean not;
-	private Collection<String> left;
+	private Collection<TypeObject> left;
 	private String compare;
-	private Collection<String> right;
+	private Collection<TypeObject> right;
 
 	public ComparisonStatement(String key) {
 		this.key = key;
@@ -27,7 +27,7 @@ public class ComparisonStatement {
 		return not;
 	}
 
-	public Collection<String> getLeft() {
+	public Collection<TypeObject> getLeft() {
 		return left;
 	}
 
@@ -35,7 +35,7 @@ public class ComparisonStatement {
 		return compare;
 	}
 
-	public Collection<String> getRight() {
+	public Collection<TypeObject> getRight() {
 		return right;
 	}
 
@@ -43,7 +43,7 @@ public class ComparisonStatement {
 		not = value;
 	}
 
-	public void addLeft(String expr) {
+	public void addLeft(TypeObject expr) {
 		left.add(expr);
 	}
 
@@ -51,7 +51,7 @@ public class ComparisonStatement {
 		compare = value;
 	}
 
-	public void addRight(String expr) {
+	public void addRight(TypeObject expr) {
 		right.add(expr);
 	}
 

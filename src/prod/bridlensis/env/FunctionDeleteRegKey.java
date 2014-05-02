@@ -29,7 +29,7 @@ class FunctionDeleteRegKey implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("DeleteRegKey ");
@@ -40,9 +40,9 @@ class FunctionDeleteRegKey implements Callable {
 				sb.append(' ');
 			}
 		}
-		sb.append(args.get(ROOT_KEY_INDEX));
+		sb.append(args.get(ROOT_KEY_INDEX).getValue());
 		sb.append(' ');
-		sb.append(args.get(SUBKEY_INDEX));
+		sb.append(args.get(SUBKEY_INDEX).getValue());
 		return sb.toString();
 	}
 

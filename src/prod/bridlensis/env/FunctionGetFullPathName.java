@@ -28,7 +28,7 @@ class FunctionGetFullPathName implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("GetFullPathName ");
@@ -39,9 +39,9 @@ class FunctionGetFullPathName implements Callable {
 				sb.append(' ');
 			}
 		}
-		sb.append(returnVar.getNSISExpression());
+		sb.append(returnVar.getValue());
 		sb.append(' ');
-		sb.append(args.get(PATH_INDEX));
+		sb.append(args.get(PATH_INDEX).getValue());
 		return sb.toString();
 	}
 

@@ -2,6 +2,8 @@ package bridlensis;
 
 import java.util.Scanner;
 
+import bridlensis.env.TypeObject;
+
 public class InputReader {
 
 	private static final char LINE_CONTINUE = '\\';
@@ -19,23 +21,31 @@ public class InputReader {
 
 	private static final WordTail EMPTY_TAIL = new WordTail();
 
-	static class Word {
+	static class Word implements TypeObject {
 
 		private final String value;
+		private final Type type;
 
 		public Word(String value) {
 			this.value = value;
-		}
-
-		public boolean isString() {
-			return (STRING_MARKERS.indexOf(value.charAt(0)) != -1);
-		}
-
-		public boolean isUntouchable() {
-			if (value.charAt(0) == '$') {
-				return true; // It's NSIS constant or lang string
+			if (value.isEmpty()) {
+				type = Type.SPECIAL;
+			} else if (isString()) {
+				type = Type.STRING;
+			} else if (value.charAt(0) == '$' || value.charAt(0) == '{') {
+				type = Type.SPECIAL;
+			} else if (isNumeric()) {
+				type = Type.INTEGER;
+			} else {
+				type = Type.NAME;
 			}
-			// Check for numeric value
+		}
+
+		private boolean isString() {
+			return STRING_MARKERS.indexOf(value.charAt(0)) != -1;
+		}
+
+		private boolean isNumeric() {
 			char[] charArray = value.toCharArray();
 			for (int i = charArray[0] == '-' ? 1 : 0; i < charArray.length; i++) {
 				if (!Character.isDigit(charArray[i]))
@@ -55,9 +65,16 @@ public class InputReader {
 			return value;
 		}
 
+		@Override
+		public Type getType() {
+			return type;
+		}
+
+		@Override
 		public String getValue() {
 			return value;
 		}
+
 	}
 
 	static class WordTail {

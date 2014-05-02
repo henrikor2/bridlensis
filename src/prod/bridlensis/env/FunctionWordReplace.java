@@ -31,7 +31,7 @@ class FunctionWordReplace implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("${WordReplace");
@@ -39,15 +39,15 @@ class FunctionWordReplace implements Callable {
 			sb.append('S');
 		}
 		sb.append("} ");
-		sb.append(args.get(STRING_INDEX));
+		sb.append(args.get(STRING_INDEX).getValue());
 		sb.append(' ');
-		sb.append(args.get(WORD1_INDEX));
+		sb.append(args.get(WORD1_INDEX).getValue());
 		sb.append(' ');
-		sb.append(args.get(WORD2_INDEX));
+		sb.append(args.get(WORD2_INDEX).getValue());
 		sb.append(' ');
-		sb.append(args.get(OPTIONS_INDEX));
+		sb.append(args.get(OPTIONS_INDEX).getValue());
 		sb.append(' ');
-		sb.append(returnVar.getNSISExpression());
+		sb.append(returnVar.getValue());
 		return sb.toString();
 	}
 

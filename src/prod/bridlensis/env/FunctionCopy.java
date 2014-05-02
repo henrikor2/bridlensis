@@ -28,13 +28,13 @@ public class FunctionCopy implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("CopyFiles /SILENT ");
-		sb.append(args.get(SOURCE_INDEX));
+		sb.append(args.get(SOURCE_INDEX).getValue());
 		sb.append(" ");
-		sb.append(args.get(TARGET_INDEX));
+		sb.append(args.get(TARGET_INDEX).getValue());
 		return sb.toString();
 	}
 

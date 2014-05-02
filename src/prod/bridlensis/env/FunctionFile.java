@@ -31,12 +31,12 @@ public class FunctionFile implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException {
 		StringBuilder sb = new StringBuilder(indent);
 		if (!args.get(OUTPATH_INDEX).equals(StatementFactory.NULL)) {
 			sb.append("SetOutPath ");
-			sb.append(args.get(OUTPATH_INDEX));
+			sb.append(args.get(OUTPATH_INDEX).getValue());
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
@@ -48,7 +48,7 @@ public class FunctionFile implements Callable {
 				sb.append(' ');
 			}
 		}
-		sb.append(args.get(FILE_INDEX));
+		sb.append(args.get(FILE_INDEX).getValue());
 		return sb.toString();
 	}
 

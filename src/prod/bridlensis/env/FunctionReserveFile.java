@@ -28,7 +28,7 @@ class FunctionReserveFile implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("ReserveFile ");
@@ -39,7 +39,7 @@ class FunctionReserveFile implements Callable {
 				sb.append(' ');
 			}
 		}
-		sb.append(args.get(FILE_INDEX));
+		sb.append(args.get(FILE_INDEX).getValue());
 		return sb.toString();
 	}
 

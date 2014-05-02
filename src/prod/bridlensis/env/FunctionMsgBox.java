@@ -102,7 +102,7 @@ class FunctionMsgBox implements Callable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("MB_");
 		sb.append(buttons.toString());
-		if (!options.equals(StatementFactory.NULL)) {
+		if (options != null) {
 			for (String o : options.split("\\|")) {
 				if (o.length() > 0) {
 					sb.append("|MB_");
@@ -114,7 +114,7 @@ class FunctionMsgBox implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException {
 		ButtonGroup buttonGroup;
 		try {
@@ -128,9 +128,10 @@ class FunctionMsgBox implements Callable {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("MessageBox ");
 		sb.append(optionsList(buttonGroup,
-				StatementFactory.deString(args.get(OPTIONS_INDEX))));
+				args.get(OPTIONS_INDEX).equals(StatementFactory.NULL) ? null
+						: StatementFactory.deString(args.get(OPTIONS_INDEX))));
 		sb.append(' ');
-		sb.append(args.get(MESSAGE_INDEX));
+		sb.append(args.get(MESSAGE_INDEX).getValue());
 
 		if (!args.get(SDRETURN_INDEX).equals(StatementFactory.NULL)) {
 			String button = StatementFactory.deString(args.get(SDRETURN_INDEX));
@@ -160,7 +161,7 @@ class FunctionMsgBox implements Callable {
 				sbRet.append(indent);
 				sbRet.append(StatementFactory.DEFAULT_INDENT);
 				sbRet.append("StrCpy ");
-				sbRet.append(returnVar.getNSISExpression());
+				sbRet.append(returnVar.getValue());
 				sbRet.append(" \"");
 				sbRet.append(ro.getReturnValue());
 				sbRet.append('"');

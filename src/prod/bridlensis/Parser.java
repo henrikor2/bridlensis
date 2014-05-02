@@ -11,16 +11,20 @@ import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import bridlensis.InputReader.Word;
 import bridlensis.InputReader.WordTail;
 import bridlensis.env.Callable;
 import bridlensis.env.Callable.ReturnType;
+import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.SimpleTypeObject;
+import bridlensis.env.TypeObject;
+import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
-import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Variable;
 
 public class Parser {
@@ -162,18 +166,20 @@ public class Parser {
 
 	private String parseDoLoop(String keyword, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
+		String define = Character.toUpperCase(keyword.charAt(0))
+				+ keyword.substring(1);
 		if (!reader.hasNextWord()) {
-			return statementFactory.logicLibDefine(reader.getIndent(), keyword);
+			return statementFactory.logicLibDefine(reader.getIndent(), define);
 		}
 		StringBuilder sb = new StringBuilder();
 		ComparisonStatement statement = parseComparisonStatement(
 				reader.nextWord(), reader, sb);
 		if (statement.isNot()) {
 			throw new InvalidSyntaxException(String.format(
-					"Illegal modifier 'Not' in %s statement", keyword));
+					"Illegal modifier 'Not' in %s statement", define));
 		}
 		sb.append(statementFactory.logicLibComparisonStatement(
-				reader.getIndent(), keyword, statement));
+				reader.getIndent(), define, statement));
 		return sb.toString();
 	}
 
@@ -211,13 +217,13 @@ public class Parser {
 			statement.setNot(true);
 			left = reader.nextWord();
 		}
-		statement.addLeft(parseExpression(left, buffer, reader).getValue());
+		statement.addLeft(parseExpression(left, buffer, reader));
 
 		while (reader.hasNextWord()) {
 			String compare = reader.getWordTail().getComparison();
 			if (compare.isEmpty()) {
 				statement.addLeft(parseExpression(reader.nextWord(), buffer,
-						reader).getValue());
+						reader));
 			} else {
 				statement.setCompare(compare);
 				break;
@@ -226,7 +232,7 @@ public class Parser {
 
 		if (reader.hasNextWord()) {
 			statement.addRight(parseExpression(reader.nextWord(), buffer,
-					reader).getValue());
+					reader));
 		}
 
 		return statement;
@@ -343,25 +349,28 @@ public class Parser {
 			sb.append(Parser.NEWLINE_MARKER);
 		}
 
-		Word value = reader.nextWord();
+		Word word = reader.nextWord();
+		TypeObject value;
 		WordTail tail = reader.getWordTail();
 		if (tail.isConcatenation()) {
-			value = parseExpression(value, sb, reader);
+			value = parseExpression(word, sb, reader);
 		} else if (tail.isFunctionArgsOpen()) {
-			sb.append(parseCall(value, variable, reader));
+			// Direct function return assign to avoid declaring yet another
+			// dummy variable for function return
+			sb.append(parseCall(word, variable, reader));
 			if (reader.getWordTail().isConcatenation()) {
 				sb.append(Parser.NEWLINE_MARKER);
-				value = parseExpression(new Word(variable.getName()), sb,
-						reader);
+				value = parseExpression(variable, sb, reader);
 			} else {
 				return sb.toString();
 			}
-		} else if (!value.isString() && !value.isUntouchable()) {
-			value = new Word(environment.getVariable(value.asName(),
-					enclosingFunction).getNSISExpression());
+		} else if (word.getType() == Type.NAME) {
+			value = environment.getVariable(word.asName(), enclosingFunction);
+		} else {
+			value = word;
 		}
 		sb.append(statementFactory.variableAssign(reader.getIndent(), variable,
-				value.getValue()));
+				value));
 		return sb.toString();
 	}
 
@@ -388,20 +397,22 @@ public class Parser {
 					"Return is not allowed outside function");
 		}
 		StringBuilder sb = new StringBuilder();
-		Word value = null;
+		TypeObject value = null;
 		if (reader.hasNextWord()) {
 			enclosingFunction.setHasReturn(true);
-			value = reader.nextWord();
+			Word word = reader.nextWord();
 			WordTail tail = reader.getWordTail();
 			if (tail.isFunctionArgsOpen() || tail.isConcatenation()) {
-				value = parseExpression(value, sb, reader);
-			} else if (!value.isString() && !value.isUntouchable()) {
-				value = new Word(environment.getVariable(value.asName(),
-						enclosingFunction).getNSISExpression());
+				value = parseExpression(word, sb, reader);
+			} else if (word.getType() == Type.NAME) {
+				value = environment.getVariable(word.asName(),
+						enclosingFunction);
+			} else {
+				value = word;
 			}
 		}
 		sb.append(statementFactory.functionReturn(reader.getIndent(),
-				enclosingFunction, (value != null ? value.getValue() : null)));
+				enclosingFunction, value));
 		return sb.toString();
 	}
 
@@ -417,92 +428,104 @@ public class Parser {
 
 	private String parseCall(Word name, Variable returnVar, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		Callable callable = environment.getCallable(name.asName());
-		if (returnVar != null && callable.getReturnType() == ReturnType.VOID) {
-			throw new InvalidSyntaxException("Function doesn't return a value");
-		}
-
 		StringBuilder sb = new StringBuilder();
-		ArrayList<String> args = new ArrayList<String>();
-
-		// Parse arguments
-		WordTail tail = reader.getWordTail();
-		while (reader.hasNextWord() && !tail.containsFunctionArgsClose()) {
-			Word arg = reader.nextWord();
-			tail = reader.getWordTail();
-			if (!tail.isFunctionArgsClose()
-					&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
-				arg = parseExpression(arg, sb, reader);
-			} else if (!arg.isString() && !arg.isUntouchable()) {
-				arg = new Word(environment.getVariable(arg.asName(),
-						enclosingFunction).getNSISExpression());
-			}
-			args.add(arg.getValue());
-		}
-		if (args.size() > callable.getArgsCount()) {
-			throw new InvalidSyntaxException(
-					String.format(
-							"Too many function arguments (expected at most %d, provided %d)",
-							callable.getArgsCount(), args.size()));
-		} else if (args.size() < callable.getMandatoryArgsCount()) {
-			throw new InvalidSyntaxException(
-					String.format(
-							"Too few function arguments provided (expected at minimum %d, provided %d)",
-							callable.getMandatoryArgsCount(), args.size()));
-		}
-
-		// Push empty arguments for function if they're not defined
-		for (int i = args.size(); i < callable.getArgsCount(); i++) {
-			args.add(StatementFactory.NULL);
-		}
-
+		Callable callable = environment.getCallable(name.asName());
+		List<TypeObject> args = parseAndValidateFunctionArguments(callable,
+				returnVar, reader, sb);
 		sb.append(statementFactory.call(reader.getIndent(), callable, args,
 				returnVar));
 		return sb.toString();
 	}
 
-	protected Word parseExpression(Word expr, StringBuilder buffer,
+	private List<TypeObject> parseAndValidateFunctionArguments(
+			Callable function, Variable returnVar, InputReader reader,
+			StringBuilder buffer) throws InvalidSyntaxException,
+			EnvironmentException {
+		if (function.getReturnType() == ReturnType.VOID && returnVar != null) {
+			throw new InvalidSyntaxException("Function doesn't return a value");
+		}
+		ArrayList<TypeObject> args = new ArrayList<>();
+		WordTail tail = reader.getWordTail();
+		while (reader.hasNextWord() && !tail.containsFunctionArgsClose()) {
+			TypeObject arg;
+			Word word = reader.nextWord();
+			tail = reader.getWordTail();
+			if (!tail.isFunctionArgsClose()
+					&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
+				arg = parseExpression(word, buffer, reader);
+			} else if (word.getType() == Type.NAME) {
+				Variable variable = environment.getVariable(word.asName(),
+						enclosingFunction);
+				arg = variable;
+			} else {
+				arg = word;
+			}
+			args.add(arg);
+		}
+		if (function.getArgsCount() > -1
+				&& args.size() > function.getArgsCount()) {
+			throw new InvalidSyntaxException(
+					String.format(
+							"Too many function arguments (expected at most %d, provided %d)",
+							function.getArgsCount(), args.size()));
+		} else {
+			if (args.size() < function.getMandatoryArgsCount()) {
+				throw new InvalidSyntaxException(
+						String.format(
+								"Too few function arguments provided (expected at minimum %d, provided %d)",
+								function.getMandatoryArgsCount(), args.size()));
+			}
+		}
+		// Push empty arguments for function if they're not defined
+		for (int i = args.size(); i < function.getArgsCount(); i++) {
+			args.add(StatementFactory.NULL);
+		}
+		return args;
+	}
+
+	protected TypeObject parseExpression(TypeObject expr, StringBuilder buffer,
 			InputReader reader) throws InvalidSyntaxException,
 			EnvironmentException {
+		TypeObject object;
 		WordTail tail = reader.getWordTail();
 		if (tail.isFunctionArgsOpen()) {
 			Variable fReturn = parseInExpressionCall(expr, buffer, reader);
 			if (tail.isComparison()) {
-				expr = new Word(fReturn.getNSISExpression());
+				object = fReturn;
 			} else {
-				expr = parseExpression(new Word(fReturn.getNSISExpression()),
-						buffer, reader);
+				object = parseExpression(fReturn, buffer, reader);
 			}
 		} else if (tail.isConcatenation()) {
-			Word right = reader.nextWord();
-			if (reader.getWordTail().isFunctionArgsOpen()) {
-				right = parseExpression(right, buffer, reader);
-			}
-			expr = parseExpression(concatenate(expr, right), buffer, reader);
+			TypeObject concat = concatenateWithNext(expr, buffer, reader);
+			object = parseExpression(concat, buffer, reader);
+		} else if (expr.getType() == Type.NAME) {
+			object = environment
+					.getVariable(expr.getValue(), enclosingFunction);
+		} else {
+			object = expr;
 		}
-		if (!expr.isString() && !expr.isUntouchable()) {
-			expr = new Word(environment.getVariable(expr.asName(),
-					enclosingFunction).getNSISExpression());
-		}
-		return expr;
+		return object;
 	}
 
-	private Word concatenate(Word left, Word right) throws EnvironmentException {
-		return new Word(String.format("\"%s%s\"", convertToString(left),
-				convertToString(right)));
-	}
-
-	private String convertToString(Word expr) throws EnvironmentException {
-		if (expr.isString()) {
-			expr = new Word(expr.asBareString());
-		} else if (!expr.isUntouchable()) {
-			expr = new Word(environment.getVariable(expr.asName(),
-					enclosingFunction).getNSISExpression());
+	private TypeObject concatenateWithNext(TypeObject left,
+			StringBuilder buffer, InputReader reader)
+			throws EnvironmentException, InvalidSyntaxException {
+		String leftValue;
+		if (left.getType() == Type.NAME) {
+			leftValue = environment.getVariable(left.getValue().toLowerCase(),
+					enclosingFunction).getValue();
+		} else {
+			leftValue = StatementFactory.deString(left);
 		}
-		return expr.getValue();
+
+		String rightValue = StatementFactory.deString(parseExpression(
+				reader.nextWord(), buffer, reader));
+
+		return new SimpleTypeObject(Type.STRING, String.format("%s%s",
+				leftValue, rightValue));
 	}
 
-	private Variable parseInExpressionCall(Word callableName,
+	private Variable parseInExpressionCall(TypeObject callableName,
 			StringBuilder buffer, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
 		Variable fReturn = environment.registerVariable(environment
@@ -510,7 +533,8 @@ public class Parser {
 		buffer.append(statementFactory.variableDeclare(reader.getIndent(),
 				fReturn));
 		buffer.append(Parser.NEWLINE_MARKER);
-		buffer.append(parseCall(callableName, fReturn, reader));
+		buffer.append(parseCall(new Word(callableName.getValue()), fReturn,
+				reader));
 		buffer.append(Parser.NEWLINE_MARKER);
 		return fReturn;
 	}

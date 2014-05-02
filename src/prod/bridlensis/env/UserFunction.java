@@ -49,12 +49,12 @@ public class UserFunction implements Callable {
 	}
 
 	@Override
-	public String statementFor(String indent, List<String> args,
+	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		for (int i = args.size() - 1; i >= 0; i--) {
 			sb.append("Push ");
-			sb.append(args.get(i));
+			sb.append(args.get(i).getValue());
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
@@ -64,7 +64,7 @@ public class UserFunction implements Callable {
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("Pop ");
-			sb.append(returnVar.getNSISExpression());
+			sb.append(returnVar.getValue());
 		}
 		return sb.toString();
 	}
