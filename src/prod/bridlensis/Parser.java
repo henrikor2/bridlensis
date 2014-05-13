@@ -68,20 +68,9 @@ public class Parser {
 			throws IOException, ParserException {
 		File inputFile = new File(baseDir, inputFileName);
 		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
-		BufferedWriter writer = null;
-		try {
-			writer = getOutputWriter(outputFileName);
+		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
 			writer.write(statementFactory.nullDefine());
 			parseFile(inputFile, writer);
-		} finally {
-			if (writer != null) {
-				try {
-					writer.flush();
-					writer.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
 		}
 	}
 
@@ -245,46 +234,29 @@ public class Parser {
 		String statement;
 		if (excludeFiles.contains(inputFileName)
 				|| excludeFiles.contains(inputFile.getAbsolutePath())) {
-			System.out.println(String.format(
-					"Include file '%s' omitted being marked as excluded.",
-					inputFileName));
+			// Handle excluded file
+			System.out.println("Include file '" + inputFileName
+					+ "' omitted being marked as excluded.");
 			String outputFileName = MakeBridleNSIS
 					.getBridleNSISFileName(inputFileName);
 			File outputFile = new File(outDir, outputFileName);
-			// Copy include file to outdir
-			System.out.println(String.format(
-					"Copy file '%s' to directory '%s'",
-					inputFile.getAbsolutePath(), outDir.getAbsolutePath()));
 			copyFile(inputFile, outputFile, reader.getLinesRead());
 			statement = statementFactory.include(reader.getIndent(),
 					outputFileName);
 		} else if (!inputFile.exists()) {
-			System.out
-					.println(String
-							.format("Include file '%s' not found, assuming it's found by NSIS.",
-									inputFileName));
+			// Include file not found
+			System.out.println("Include file '" + inputFileName
+					+ "' not found, assuming it's found by NSIS.");
 			statement = reader.getCurrentStatement();
 		} else {
+			// Parse include file
 			System.out
 					.println("Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
 					.getBridleNSISFileName(inputFileName);
-			try {
-				BufferedWriter writer = null;
-				try {
-					writer = getOutputWriter(outputFileName);
-					parseFile(inputFile, writer);
-				} finally {
-					if (writer != null) {
-						try {
-							writer.flush();
-							writer.close();
-						} catch (IOException e) {
-							// Ignore
-						}
-					}
-				}
-			} catch (ParserException | IOException e) {
+			try (BufferedWriter writer = getOutputWriter(outputFileName)) {
+				parseFile(inputFile, writer);
+			} catch (IOException e) {
 				throw new InvalidSyntaxException(e.getMessage(), e);
 			}
 			statement = statementFactory.include(reader.getIndent(),
@@ -295,33 +267,19 @@ public class Parser {
 
 	private void copyFile(File sourceFile, File destFile, int lineNumber)
 			throws ParserException {
-		FileChannel source = null;
-		FileChannel destination = null;
-		try {
+		System.out.println(String.format("Copy file '%s' to directory '%s'",
+				sourceFile.getAbsolutePath(), outDir.getAbsolutePath()));
+		try (FileInputStream input = new FileInputStream(sourceFile);
+				FileOutputStream output = new FileOutputStream(destFile)) {
 			if (!destFile.exists()) {
 				destFile.createNewFile();
 			}
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
+			FileChannel destination = output.getChannel();
+			FileChannel source = input.getChannel();
 			destination.transferFrom(source, 0, source.size());
 		} catch (IOException e) {
 			throw new ParserException(sourceFile.getAbsolutePath(), lineNumber,
 					e);
-		} finally {
-			if (source != null) {
-				try {
-					source.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-			if (destination != null) {
-				try {
-					destination.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
 		}
 	}
 
