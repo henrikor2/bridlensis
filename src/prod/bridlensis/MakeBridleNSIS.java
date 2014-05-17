@@ -216,7 +216,10 @@ public class MakeBridleNSIS {
 		Environment environment = new Environment(nameGenerator);
 		environment.loadBuiltinVariables();
 		environment.loadBuiltinFunctions();
-		Parser parser = new Parser(environment, baseDir, outDir, encoding,
+
+		StatementParser statementParser = new StatementParser(environment);
+
+		Parser parser = new Parser(statementParser, baseDir, outDir, encoding,
 				excludeFiles);
 
 		long time = System.currentTimeMillis();
