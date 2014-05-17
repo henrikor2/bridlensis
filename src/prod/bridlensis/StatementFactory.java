@@ -1,13 +1,9 @@
 package bridlensis;
 
 import java.util.Iterator;
-import java.util.List;
 
 import bridlensis.env.Callable;
-import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.ComparisonStatement;
-import bridlensis.env.Environment;
-import bridlensis.env.EnvironmentException;
 import bridlensis.env.TypeObject;
 import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
@@ -30,20 +26,13 @@ public class StatementFactory {
 
 	public static final String DEFAULT_INDENT = "    ";
 
-	private Environment environment;
-	private Variable functionNullReturn = null;
-
-	StatementFactory(Environment environment) {
-		this.environment = environment;
-	}
-
 	private static StringBuilder begin(String indent) {
 		StringBuilder sb = new StringBuilder(80);
 		sb.append(indent);
 		return sb;
 	}
 
-	public String nullDefine() {
+	public static String nullDefine() {
 		StringBuilder sb = new StringBuilder(80);
 		sb.append("!ifndef BRIDLE_NULL");
 		sb.append(Parser.NEWLINE_MARKER);
@@ -56,14 +45,15 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String variableDeclare(String indent, Variable var) {
+	public static String variableDeclare(String indent, Variable var) {
 		StringBuilder sb = begin(indent);
 		sb.append("Var /GLOBAL ");
 		sb.append(var.getName());
 		return sb.toString();
 	}
 
-	public String variableAssign(String indent, Variable var, TypeObject value) {
+	public static String variableAssign(String indent, Variable var,
+			TypeObject value) {
 		StringBuilder sb = begin(indent);
 		sb.append("StrCpy ");
 		sb.append(var.getValue());
@@ -72,7 +62,7 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String functionBegin(String indent, UserFunction function) {
+	public static String functionBegin(String indent, UserFunction function) {
 		StringBuilder sb = begin(indent);
 		sb.append("Function ");
 		sb.append(function.getName());
@@ -91,7 +81,7 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String functionReturn(String indent, Callable function,
+	public static String functionReturn(String indent, Callable function,
 			TypeObject value) {
 		StringBuilder sb = begin(indent);
 		if (value != null) {
@@ -104,49 +94,9 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String functionEnd(String indent) {
+	public static String functionEnd(String indent) {
 		StringBuilder sb = begin(indent);
 		sb.append("FunctionEnd");
-		return sb.toString();
-	}
-
-	public String call(String indent, Callable callable, List<TypeObject> args,
-			Variable returnVar) throws InvalidSyntaxException,
-			EnvironmentException {
-		StringBuilder sb = new StringBuilder();
-		if (returnVar == null
-				&& callable.getReturnType() == ReturnType.REQUIRED) {
-			if (functionNullReturn == null) {
-				functionNullReturn = environment.registerVariable(
-						"bridlensis_nullvar", null);
-				sb.append(variableDeclare(indent, functionNullReturn));
-				sb.append(Parser.NEWLINE_MARKER);
-			}
-			returnVar = functionNullReturn;
-		} else if (returnVar != null
-				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append("StrCpy ");
-			sb.append(returnVar.getValue());
-			sb.append(" 1");
-			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append("ClearErrors");
-			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(indent);
-		}
-		sb.append(callable.statementFor(indent, args, returnVar));
-		if (returnVar != null
-				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append("IfErrors +2");
-			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append(DEFAULT_INDENT);
-			sb.append("StrCpy ");
-			sb.append(returnVar.getValue());
-			sb.append(" 0");
-		}
 		return sb.toString();
 	}
 
@@ -157,7 +107,7 @@ public class StatementFactory {
 		return expr.getValue();
 	}
 
-	public String include(String indent, String filename) {
+	public static String include(String indent, String filename) {
 		StringBuilder sb = begin(indent);
 		sb.append("!include \"");
 		sb.append(filename);
@@ -165,12 +115,12 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String logicLibComparisonStatement(String indent,
+	public static String logicLibComparisonStatement(String indent,
 			ComparisonStatement statement) {
 		return logicLibComparisonStatement(indent, "", statement);
 	}
 
-	public String logicLibComparisonStatement(String indent,
+	public static String logicLibComparisonStatement(String indent,
 			String startPrefix, ComparisonStatement statement) {
 		StringBuilder sb = begin(indent);
 		sb.append("${");
@@ -195,7 +145,7 @@ public class StatementFactory {
 		return sb.toString();
 	}
 
-	public String logicLibDefine(String indent, String def) {
+	public static String logicLibDefine(String indent, String def) {
 		StringBuilder sb = begin(indent);
 		sb.append("${");
 		sb.append(def);

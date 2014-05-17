@@ -38,8 +38,8 @@ public class Parser {
 	private String encoding;
 	private Collection<String> excludeFiles;
 	private Environment environment;
-	private StatementFactory statementFactory;
 	private UserFunction enclosingFunction = null;
+	private Variable functionNullReturn = null;
 	private int fileCount = 0;
 	private int inputLines = 0;
 
@@ -49,7 +49,6 @@ public class Parser {
 		this.outDir = outDir;
 		this.encoding = encoding;
 		this.environment = environment;
-		this.statementFactory = new StatementFactory(environment);
 		this.excludeFiles = new ArrayList<String>();
 		if (excludeFiles != null) {
 			this.excludeFiles.addAll(excludeFiles);
@@ -69,7 +68,7 @@ public class Parser {
 		File inputFile = new File(baseDir, inputFileName);
 		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
 		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
-			writer.write(statementFactory.nullDefine());
+			writer.write(StatementFactory.nullDefine());
 			parseFile(inputFile, writer);
 		}
 	}
@@ -134,16 +133,16 @@ public class Parser {
 		} else if (keyword.equals("if") || keyword.equals("elseif")) {
 			return parseIf(word, reader);
 		} else if (keyword.equals("else")) {
-			return statementFactory.logicLibDefine(reader.getIndent(), "Else");
+			return StatementFactory.logicLibDefine(reader.getIndent(), "Else");
 		} else if (keyword.equals("endif")) {
-			return statementFactory.logicLibDefine(reader.getIndent(), "EndIf");
+			return StatementFactory.logicLibDefine(reader.getIndent(), "EndIf");
 		} else if (keyword.equals("do")) {
 			return parseDoLoop("Do", reader);
 		} else if (keyword.equals("continue")) {
-			return statementFactory.logicLibDefine(reader.getIndent(),
+			return StatementFactory.logicLibDefine(reader.getIndent(),
 					"Continue");
 		} else if (keyword.equals("break")) {
-			return statementFactory.logicLibDefine(reader.getIndent(), "Break");
+			return StatementFactory.logicLibDefine(reader.getIndent(), "Break");
 		} else if (keyword.equals("loop")) {
 			return parseDoLoop("Loop", reader);
 		} else if (reader.getWordTail().isCompilerCommand()
@@ -158,7 +157,7 @@ public class Parser {
 		String define = Character.toUpperCase(keyword.charAt(0))
 				+ keyword.substring(1);
 		if (!reader.hasNextWord()) {
-			return statementFactory.logicLibDefine(reader.getIndent(), define);
+			return StatementFactory.logicLibDefine(reader.getIndent(), define);
 		}
 		StringBuilder sb = new StringBuilder();
 		ComparisonStatement statement = parseComparisonStatement(
@@ -167,7 +166,7 @@ public class Parser {
 			throw new InvalidSyntaxException(String.format(
 					"Illegal modifier 'Not' in %s statement", define));
 		}
-		sb.append(statementFactory.logicLibComparisonStatement(
+		sb.append(StatementFactory.logicLibComparisonStatement(
 				reader.getIndent(), define, statement));
 		return sb.toString();
 	}
@@ -178,11 +177,11 @@ public class Parser {
 		StringBuilder buffer = new StringBuilder();
 		ComparisonStatement ifStatement = parseComparisonStatement(keyword,
 				reader, buffer);
-		sb.append(statementFactory.logicLibComparisonStatement(
+		sb.append(StatementFactory.logicLibComparisonStatement(
 				reader.getIndent(), ifStatement));
 		while (reader.hasNextWord()) {
 			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(statementFactory.logicLibComparisonStatement(
+			sb.append(StatementFactory.logicLibComparisonStatement(
 					reader.getIndent(),
 					parseComparisonStatement(reader.nextWord(), reader, buffer)));
 		}
@@ -241,7 +240,7 @@ public class Parser {
 					.getBridleNSISFileName(inputFileName);
 			File outputFile = new File(outDir, outputFileName);
 			copyFile(inputFile, outputFile, reader.getLinesRead());
-			statement = statementFactory.include(reader.getIndent(),
+			statement = StatementFactory.include(reader.getIndent(),
 					outputFileName);
 		} else if (!inputFile.exists()) {
 			// Include file not found
@@ -259,7 +258,7 @@ public class Parser {
 			} catch (IOException e) {
 				throw new InvalidSyntaxException(e.getMessage(), e);
 			}
-			statement = statementFactory.include(reader.getIndent(),
+			statement = StatementFactory.include(reader.getIndent(),
 					outputFileName);
 		}
 		return statement;
@@ -288,7 +287,7 @@ public class Parser {
 		Word name = reader.nextWord();
 		Variable variable = environment.registerVariable(name.asName(),
 				enclosingFunction);
-		return statementFactory.variableDeclare(reader.getIndent(), variable);
+		return StatementFactory.variableDeclare(reader.getIndent(), variable);
 	}
 
 	private String parseVarAssign(Word varName, InputReader reader)
@@ -324,7 +323,7 @@ public class Parser {
 		} else {
 			value = word;
 		}
-		sb.append(statementFactory.variableAssign(reader.getIndent(), variable,
+		sb.append(StatementFactory.variableAssign(reader.getIndent(), variable,
 				value));
 		return sb.toString();
 	}
@@ -344,7 +343,7 @@ public class Parser {
 					reader.getIndent(), sb);
 			enclosingFunction.addArgument(argVariable);
 		}
-		sb.append(statementFactory.functionBegin(reader.getIndent(),
+		sb.append(StatementFactory.functionBegin(reader.getIndent(),
 				enclosingFunction));
 		return sb.toString();
 	}
@@ -370,7 +369,7 @@ public class Parser {
 				value = word;
 			}
 		}
-		sb.append(statementFactory.functionReturn(reader.getIndent(),
+		sb.append(StatementFactory.functionReturn(reader.getIndent(),
 				enclosingFunction, value));
 		return sb.toString();
 	}
@@ -382,7 +381,7 @@ public class Parser {
 					"FunctionEnd is not allowed outside function");
 		}
 		enclosingFunction = null;
-		return statementFactory.functionEnd(reader.getIndent());
+		return StatementFactory.functionEnd(reader.getIndent());
 	}
 
 	private String parseCall(Word name, Variable returnVar, InputReader reader)
@@ -391,8 +390,7 @@ public class Parser {
 		Callable callable = environment.getCallable(name.asName());
 		List<TypeObject> args = parseAndValidateFunctionArguments(callable,
 				returnVar, reader, sb);
-		sb.append(statementFactory.call(reader.getIndent(), callable, args,
-				returnVar));
+		sb.append(call(reader.getIndent(), callable, args, returnVar));
 		return sb.toString();
 	}
 
@@ -440,6 +438,47 @@ public class Parser {
 			args.add(StatementFactory.NULL);
 		}
 		return args;
+	}
+
+	protected String call(String indent, Callable callable,
+			List<TypeObject> args, Variable returnVar)
+			throws InvalidSyntaxException, EnvironmentException {
+		StringBuilder sb = new StringBuilder();
+		if (returnVar == null
+				&& callable.getReturnType() == ReturnType.REQUIRED) {
+			if (functionNullReturn == null) {
+				functionNullReturn = environment.registerVariable(
+						"bridlensis_nullvar", null);
+				sb.append(StatementFactory.variableDeclare(indent,
+						functionNullReturn));
+				sb.append(Parser.NEWLINE_MARKER);
+			}
+			returnVar = functionNullReturn;
+		} else if (returnVar != null
+				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
+			sb.append("StrCpy ");
+			sb.append(returnVar.getValue());
+			sb.append(" 1");
+			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(indent);
+			sb.append("ClearErrors");
+			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(indent);
+		}
+		sb.append(callable.statementFor(indent, args, returnVar));
+		if (returnVar != null
+				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
+			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(indent);
+			sb.append("IfErrors +2");
+			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(indent);
+			sb.append(StatementFactory.DEFAULT_INDENT);
+			sb.append("StrCpy ");
+			sb.append(returnVar.getValue());
+			sb.append(" 0");
+		}
+		return sb.toString();
 	}
 
 	protected TypeObject parseExpression(TypeObject expr, StringBuilder buffer,
@@ -501,9 +540,13 @@ public class Parser {
 				.generate() : name;
 		Variable variable = environment.registerVariable(varName,
 				enclosingFunction);
-		buffer.append(statementFactory.variableDeclare(indent, variable));
+		buffer.append(StatementFactory.variableDeclare(indent, variable));
 		buffer.append(Parser.NEWLINE_MARKER);
 		return variable;
+	}
+
+	protected Environment getEnvironment() {
+		return environment;
 	}
 
 }
