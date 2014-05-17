@@ -206,7 +206,7 @@ class StatementParser {
 		} else if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append(environment.getCallable("strcpy").statementFor(indent,
-					Arrays.asList(new SimpleTypeObject(1)), returnVar));
+					Arrays.asList(SimpleTypeObject.integer(1)), returnVar));
 			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.clearErrors(indent));
 			sb.append(NSISStatements.NEWLINE_MARKER);
@@ -217,7 +217,7 @@ class StatementParser {
 			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.callOnError(indent,
 					environment.getCallable("strcpy"),
-					Arrays.asList(new SimpleTypeObject(0)), returnVar));
+					Arrays.asList(SimpleTypeObject.integer(0)), returnVar));
 		}
 		return sb.toString();
 	}
@@ -334,8 +334,7 @@ class StatementParser {
 		String rightValue = NSISStatements.deString(parseExpression(
 				reader.nextWord(), buffer, reader));
 
-		return new SimpleTypeObject(Type.STRING, String.format("%s%s",
-				leftValue, rightValue));
+		return SimpleTypeObject.string(leftValue + rightValue);
 	}
 
 	private Variable parseInExpressionCall(TypeObject callableName,

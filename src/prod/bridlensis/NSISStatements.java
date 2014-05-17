@@ -13,8 +13,8 @@ import bridlensis.env.Variable;
 
 public class NSISStatements {
 
-	public static final TypeObject NULL = new SimpleTypeObject(Type.SPECIAL,
-			"${BRIDLE_NULL}");
+	public static final TypeObject NULL = SimpleTypeObject
+			.special("${BRIDLE_NULL}");
 	public static final String DEFAULT_INDENT = "    ";
 	public static final String NEWLINE_MARKER = "\r\n";
 
