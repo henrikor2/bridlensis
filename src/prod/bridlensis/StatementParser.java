@@ -1,6 +1,7 @@
 package bridlensis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import bridlensis.InputReader.Word;
@@ -204,26 +205,19 @@ class StatementParser {
 			returnVar = functionNullReturn;
 		} else if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append("StrCpy ");
-			sb.append(returnVar.getValue());
-			sb.append(" 1");
+			sb.append(environment.getCallable("strcpy").statementFor(indent,
+					Arrays.asList(new SimpleTypeObject(1)), returnVar));
 			sb.append(NSISStatements.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append("ClearErrors");
+			sb.append(NSISStatements.clearErrors(indent));
 			sb.append(NSISStatements.NEWLINE_MARKER);
 		}
 		sb.append(callable.statementFor(indent, args, returnVar));
 		if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append(NSISStatements.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append("IfErrors +2");
-			sb.append(NSISStatements.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append(NSISStatements.DEFAULT_INDENT);
-			sb.append("StrCpy ");
-			sb.append(returnVar.getValue());
-			sb.append(" 0");
+			sb.append(NSISStatements.callOnError(indent,
+					environment.getCallable("strcpy"),
+					Arrays.asList(new SimpleTypeObject(0)), returnVar));
 		}
 		return sb.toString();
 	}

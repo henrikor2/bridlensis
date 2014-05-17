@@ -10,6 +10,11 @@ public class SimpleTypeObject implements TypeObject {
 		this.value = value;
 	}
 
+	public SimpleTypeObject(int intValue) {
+		this.type = Type.INTEGER;
+		this.value = Integer.toString(intValue);
+	}
+
 	@Override
 	public Type getType() {
 		return type;

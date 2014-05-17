@@ -195,11 +195,11 @@ public class StatementParserTest {
 
 		// Function CopyFiles
 		expected = new StringBuilder();
-		expected.append("StrCpy $s01 1\r\n");
+		expected.append("StrCpy $s01 1 \r\n");
 		expected.append("ClearErrors\r\n");
 		expected.append("CopyFiles /SILENT \"C:\\autoexec.bat\" $%TEMP%\r\n");
 		expected.append("IfErrors +2\r\n");
-		expected.append("    StrCpy $s01 0");
+		expected.append("    StrCpy $s01 0 ");
 		assertEquals(expected.toString(), parser.call(
 				"",
 				env.getCallable("FileCopy"),
@@ -218,11 +218,11 @@ public class StatementParserTest {
 
 		// Function Delete
 		expected = new StringBuilder();
-		expected.append("StrCpy $s02 1\r\n");
+		expected.append("StrCpy $s02 1 \r\n");
 		expected.append("ClearErrors\r\n");
 		expected.append("Delete \"C:\\autoexec.bat\"\r\n");
 		expected.append("IfErrors +2\r\n");
-		expected.append("    StrCpy $s02 0");
+		expected.append("    StrCpy $s02 0 ");
 		assertEquals(expected.toString(), parser.call(
 				"",
 				env.getCallable("Delete"),
@@ -231,11 +231,11 @@ public class StatementParserTest {
 						.registerVariable("s02", null)));
 
 		expected = new StringBuilder();
-		expected.append("StrCpy $s03 1\r\n");
+		expected.append("StrCpy $s03 1 \r\n");
 		expected.append("ClearErrors\r\n");
 		expected.append("Delete /REBOOTOK \"C:\\autoexec.bat\"\r\n");
 		expected.append("IfErrors +2\r\n");
-		expected.append("    StrCpy $s03 0");
+		expected.append("    StrCpy $s03 0 ");
 		assertEquals(expected.toString(), parser.call(
 				"",
 				env.getCallable("Delete"),

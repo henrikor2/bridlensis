@@ -1,6 +1,7 @@
 package bridlensis;
 
 import java.util.Iterator;
+import java.util.List;
 
 import bridlensis.env.Callable;
 import bridlensis.env.ComparisonStatement;
@@ -141,6 +142,23 @@ public class NSISStatements {
 		sb.append("${");
 		sb.append(def);
 		sb.append("}");
+		return sb.toString();
+	}
+
+	public static String clearErrors(String indent) {
+		StringBuilder sb = begin(indent);
+		sb.append("ClearErrors");
+		return sb.toString();
+	}
+
+	public static String callOnError(String indent, Callable callable,
+			List<TypeObject> args, Variable returnVar)
+			throws InvalidSyntaxException {
+		StringBuilder sb = begin(indent);
+		sb.append("IfErrors +2");
+		sb.append(NEWLINE_MARKER);
+		sb.append(indent);
+		sb.append(callable.statementFor(DEFAULT_INDENT, args, returnVar));
 		return sb.toString();
 	}
 }
