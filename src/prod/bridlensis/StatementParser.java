@@ -211,7 +211,6 @@ class StatementParser {
 			sb.append(indent);
 			sb.append("ClearErrors");
 			sb.append(NSISStatements.NEWLINE_MARKER);
-			sb.append(indent);
 		}
 		sb.append(callable.statementFor(indent, args, returnVar));
 		if (returnVar != null
