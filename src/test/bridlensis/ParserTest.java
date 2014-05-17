@@ -566,7 +566,7 @@ public class ParserTest {
 		assertEquals(expected.toString(), parser.call("", env
 				.getCallable("MsgBox"), Arrays.asList(new SimpleTypeObject(
 				Type.STRING, "OKCANCEL"), new SimpleTypeObject(Type.STRING,
-				"hello"), StatementFactory.NULL, new SimpleTypeObject(
+				"hello"), NSISStatements.NULL, new SimpleTypeObject(
 				Type.STRING, "CANCEL")), null));
 
 		// Function CopyFiles
@@ -603,7 +603,7 @@ public class ParserTest {
 				"",
 				env.getCallable("Delete"),
 				asFunctionArgumentList(new SimpleTypeObject(Type.STRING,
-						"C:\\autoexec.bat"), StatementFactory.NULL), env
+						"C:\\autoexec.bat"), NSISStatements.NULL), env
 						.registerVariable("s02", null)));
 
 		expected = new StringBuilder();

@@ -11,11 +11,11 @@ import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 
-public class StatementFactoryTest {
+public class NSISStatementsTest {
 
 	private Environment env;
 
-	public StatementFactoryTest() {
+	public NSISStatementsTest() {
 		env = new Environment(new SimpleNameGenerator());
 		env.loadBuiltinVariables();
 		env.loadBuiltinFunctions();
@@ -26,21 +26,21 @@ public class StatementFactoryTest {
 			EnvironmentException {
 		assertEquals(
 				"Var /GLOBAL a",
-				StatementFactory.variableDeclare("",
+				NSISStatements.variableDeclare("",
 						env.registerVariable("a", null)));
 		assertEquals(
 				"  Var /GLOBAL foo",
-				StatementFactory.variableDeclare("  ",
+				NSISStatements.variableDeclare("  ",
 						env.registerVariable("Foo", null)));
 	}
 
 	@Test
 	public void testVariableAssign() throws InvalidSyntaxException,
 			EnvironmentException {
-		assertEquals("  StrCpy $a 1", StatementFactory.variableAssign("  ", env
+		assertEquals("  StrCpy $a 1", NSISStatements.variableAssign("  ", env
 				.registerVariable("a", null), new SimpleTypeObject(
 				Type.INTEGER, "1")));
-		assertEquals("StrCpy $foo $a", StatementFactory.variableAssign("", env
+		assertEquals("StrCpy $foo $a", NSISStatements.variableAssign("", env
 				.registerVariable("foo", null), new SimpleTypeObject(
 				Type.SPECIAL, "$a")));
 	}
@@ -50,7 +50,7 @@ public class StatementFactoryTest {
 			EnvironmentException {
 		UserFunction foo = env.registerUserFunction("Foo");
 		assertEquals("    Function foo",
-				StatementFactory.functionBegin("    ", foo));
+				NSISStatements.functionBegin("    ", foo));
 
 		UserFunction bar = env.registerUserFunction("bar");
 		bar.addArgument(env.registerVariable("a", bar));
@@ -59,7 +59,7 @@ public class StatementFactoryTest {
 		bar.setHasReturn(true);
 		assertEquals(
 				"  Function bar\r\n    Pop $bar.a\r\n    Pop $bar.b\r\n    Pop $bar.c",
-				StatementFactory.functionBegin("  ", bar));
+				NSISStatements.functionBegin("  ", bar));
 	}
 
 	@Test
@@ -67,12 +67,12 @@ public class StatementFactoryTest {
 			EnvironmentException {
 		UserFunction foo = env.registerUserFunction("Foo");
 		assertEquals("    Return",
-				StatementFactory.functionReturn("    ", foo, null));
+				NSISStatements.functionReturn("    ", foo, null));
 
 		UserFunction bar = env.registerUserFunction("bar");
 		bar.setHasReturn(true);
 		assertEquals("Push \"hello world!\"\r\nReturn",
-				StatementFactory.functionReturn("", bar, new SimpleTypeObject(
+				NSISStatements.functionReturn("", bar, new SimpleTypeObject(
 						Type.STRING, "hello world!")));
 	}
 }

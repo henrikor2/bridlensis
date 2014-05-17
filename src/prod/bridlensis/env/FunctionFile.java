@@ -4,7 +4,7 @@ import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 import bridlensis.Parser;
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 public class FunctionFile implements Callable {
 
@@ -34,15 +34,15 @@ public class FunctionFile implements Callable {
 	public String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException {
 		StringBuilder sb = new StringBuilder(indent);
-		if (!args.get(OUTPATH_INDEX).equals(StatementFactory.NULL)) {
+		if (!args.get(OUTPATH_INDEX).equals(NSISStatements.NULL)) {
 			sb.append("SetOutPath ");
 			sb.append(args.get(OUTPATH_INDEX).getValue());
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("File ");
-		if (!args.get(OPTIONS_INDEX).equals(StatementFactory.NULL)) {
-			String options = StatementFactory.deString(args.get(OPTIONS_INDEX));
+		if (!args.get(OPTIONS_INDEX).equals(NSISStatements.NULL)) {
+			String options = NSISStatements.deString(args.get(OPTIONS_INDEX));
 			if (!options.isEmpty()) {
 				sb.append(options);
 				sb.append(' ');

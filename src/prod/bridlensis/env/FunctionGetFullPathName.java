@@ -2,7 +2,7 @@ package bridlensis.env;
 
 import java.util.List;
 
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 class FunctionGetFullPathName implements Callable {
 
@@ -32,8 +32,8 @@ class FunctionGetFullPathName implements Callable {
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("GetFullPathName ");
-		if (!args.get(OPTIONS_INDEX).equals(StatementFactory.NULL)) {
-			String options = StatementFactory.deString(args.get(OPTIONS_INDEX));
+		if (!args.get(OPTIONS_INDEX).equals(NSISStatements.NULL)) {
+			String options = NSISStatements.deString(args.get(OPTIONS_INDEX));
 			if (!options.isEmpty()) {
 				sb.append(options);
 				sb.append(' ');

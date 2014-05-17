@@ -68,7 +68,7 @@ public class Parser {
 		File inputFile = new File(baseDir, inputFileName);
 		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
 		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
-			writer.write(StatementFactory.nullDefine());
+			writer.write(NSISStatements.nullDefine());
 			parseFile(inputFile, writer);
 		}
 	}
@@ -133,16 +133,16 @@ public class Parser {
 		} else if (keyword.equals("if") || keyword.equals("elseif")) {
 			return parseIf(word, reader);
 		} else if (keyword.equals("else")) {
-			return StatementFactory.logicLibDefine(reader.getIndent(), "Else");
+			return NSISStatements.logicLibDefine(reader.getIndent(), "Else");
 		} else if (keyword.equals("endif")) {
-			return StatementFactory.logicLibDefine(reader.getIndent(), "EndIf");
+			return NSISStatements.logicLibDefine(reader.getIndent(), "EndIf");
 		} else if (keyword.equals("do")) {
 			return parseDoLoop("Do", reader);
 		} else if (keyword.equals("continue")) {
-			return StatementFactory.logicLibDefine(reader.getIndent(),
-					"Continue");
+			return NSISStatements
+					.logicLibDefine(reader.getIndent(), "Continue");
 		} else if (keyword.equals("break")) {
-			return StatementFactory.logicLibDefine(reader.getIndent(), "Break");
+			return NSISStatements.logicLibDefine(reader.getIndent(), "Break");
 		} else if (keyword.equals("loop")) {
 			return parseDoLoop("Loop", reader);
 		} else if (reader.getWordTail().isCompilerCommand()
@@ -157,7 +157,7 @@ public class Parser {
 		String define = Character.toUpperCase(keyword.charAt(0))
 				+ keyword.substring(1);
 		if (!reader.hasNextWord()) {
-			return StatementFactory.logicLibDefine(reader.getIndent(), define);
+			return NSISStatements.logicLibDefine(reader.getIndent(), define);
 		}
 		StringBuilder sb = new StringBuilder();
 		ComparisonStatement statement = parseComparisonStatement(
@@ -166,7 +166,7 @@ public class Parser {
 			throw new InvalidSyntaxException(String.format(
 					"Illegal modifier 'Not' in %s statement", define));
 		}
-		sb.append(StatementFactory.logicLibComparisonStatement(
+		sb.append(NSISStatements.logicLibComparisonStatement(
 				reader.getIndent(), define, statement));
 		return sb.toString();
 	}
@@ -177,11 +177,11 @@ public class Parser {
 		StringBuilder buffer = new StringBuilder();
 		ComparisonStatement ifStatement = parseComparisonStatement(keyword,
 				reader, buffer);
-		sb.append(StatementFactory.logicLibComparisonStatement(
+		sb.append(NSISStatements.logicLibComparisonStatement(
 				reader.getIndent(), ifStatement));
 		while (reader.hasNextWord()) {
 			sb.append(Parser.NEWLINE_MARKER);
-			sb.append(StatementFactory.logicLibComparisonStatement(
+			sb.append(NSISStatements.logicLibComparisonStatement(
 					reader.getIndent(),
 					parseComparisonStatement(reader.nextWord(), reader, buffer)));
 		}
@@ -240,7 +240,7 @@ public class Parser {
 					.getBridleNSISFileName(inputFileName);
 			File outputFile = new File(outDir, outputFileName);
 			copyFile(inputFile, outputFile, reader.getLinesRead());
-			statement = StatementFactory.include(reader.getIndent(),
+			statement = NSISStatements.include(reader.getIndent(),
 					outputFileName);
 		} else if (!inputFile.exists()) {
 			// Include file not found
@@ -258,7 +258,7 @@ public class Parser {
 			} catch (IOException e) {
 				throw new InvalidSyntaxException(e.getMessage(), e);
 			}
-			statement = StatementFactory.include(reader.getIndent(),
+			statement = NSISStatements.include(reader.getIndent(),
 					outputFileName);
 		}
 		return statement;
@@ -287,7 +287,7 @@ public class Parser {
 		Word name = reader.nextWord();
 		Variable variable = environment.registerVariable(name.asName(),
 				enclosingFunction);
-		return StatementFactory.variableDeclare(reader.getIndent(), variable);
+		return NSISStatements.variableDeclare(reader.getIndent(), variable);
 	}
 
 	private String parseVarAssign(Word varName, InputReader reader)
@@ -323,7 +323,7 @@ public class Parser {
 		} else {
 			value = word;
 		}
-		sb.append(StatementFactory.variableAssign(reader.getIndent(), variable,
+		sb.append(NSISStatements.variableAssign(reader.getIndent(), variable,
 				value));
 		return sb.toString();
 	}
@@ -343,7 +343,7 @@ public class Parser {
 					reader.getIndent(), sb);
 			enclosingFunction.addArgument(argVariable);
 		}
-		sb.append(StatementFactory.functionBegin(reader.getIndent(),
+		sb.append(NSISStatements.functionBegin(reader.getIndent(),
 				enclosingFunction));
 		return sb.toString();
 	}
@@ -369,7 +369,7 @@ public class Parser {
 				value = word;
 			}
 		}
-		sb.append(StatementFactory.functionReturn(reader.getIndent(),
+		sb.append(NSISStatements.functionReturn(reader.getIndent(),
 				enclosingFunction, value));
 		return sb.toString();
 	}
@@ -381,7 +381,7 @@ public class Parser {
 					"FunctionEnd is not allowed outside function");
 		}
 		enclosingFunction = null;
-		return StatementFactory.functionEnd(reader.getIndent());
+		return NSISStatements.functionEnd(reader.getIndent());
 	}
 
 	private String parseCall(Word name, Variable returnVar, InputReader reader)
@@ -435,7 +435,7 @@ public class Parser {
 		}
 		// Push empty arguments for function if they're not defined
 		for (int i = args.size(); i < function.getArgsCount(); i++) {
-			args.add(StatementFactory.NULL);
+			args.add(NSISStatements.NULL);
 		}
 		return args;
 	}
@@ -449,7 +449,7 @@ public class Parser {
 			if (functionNullReturn == null) {
 				functionNullReturn = environment.registerVariable(
 						"bridlensis_nullvar", null);
-				sb.append(StatementFactory.variableDeclare(indent,
+				sb.append(NSISStatements.variableDeclare(indent,
 						functionNullReturn));
 				sb.append(Parser.NEWLINE_MARKER);
 			}
@@ -473,7 +473,7 @@ public class Parser {
 			sb.append("IfErrors +2");
 			sb.append(Parser.NEWLINE_MARKER);
 			sb.append(indent);
-			sb.append(StatementFactory.DEFAULT_INDENT);
+			sb.append(NSISStatements.DEFAULT_INDENT);
 			sb.append("StrCpy ");
 			sb.append(returnVar.getValue());
 			sb.append(" 0");
@@ -513,10 +513,10 @@ public class Parser {
 			leftValue = environment.getVariable(left.getValue().toLowerCase(),
 					enclosingFunction).getValue();
 		} else {
-			leftValue = StatementFactory.deString(left);
+			leftValue = NSISStatements.deString(left);
 		}
 
-		String rightValue = StatementFactory.deString(parseExpression(
+		String rightValue = NSISStatements.deString(parseExpression(
 				reader.nextWord(), buffer, reader));
 
 		return new SimpleTypeObject(Type.STRING, String.format("%s%s",
@@ -540,7 +540,7 @@ public class Parser {
 				.generate() : name;
 		Variable variable = environment.registerVariable(varName,
 				enclosingFunction);
-		buffer.append(StatementFactory.variableDeclare(indent, variable));
+		buffer.append(NSISStatements.variableDeclare(indent, variable));
 		buffer.append(Parser.NEWLINE_MARKER);
 		return variable;
 	}

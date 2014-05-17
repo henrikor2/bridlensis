@@ -6,7 +6,7 @@ import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 import bridlensis.Parser;
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 class FunctionMsgBox implements Callable {
 
@@ -118,7 +118,7 @@ class FunctionMsgBox implements Callable {
 			Variable returnVar) throws InvalidSyntaxException {
 		ButtonGroup buttonGroup;
 		try {
-			buttonGroup = ButtonGroup.valueOf(StatementFactory.deString(args
+			buttonGroup = ButtonGroup.valueOf(NSISStatements.deString(args
 					.get(BUTTONGROUP_INDEX)));
 		} catch (IllegalArgumentException e) {
 			throw new InvalidSyntaxException(String.format(
@@ -128,13 +128,13 @@ class FunctionMsgBox implements Callable {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("MessageBox ");
 		sb.append(optionsList(buttonGroup,
-				args.get(OPTIONS_INDEX).equals(StatementFactory.NULL) ? null
-						: StatementFactory.deString(args.get(OPTIONS_INDEX))));
+				args.get(OPTIONS_INDEX).equals(NSISStatements.NULL) ? null
+						: NSISStatements.deString(args.get(OPTIONS_INDEX))));
 		sb.append(' ');
 		sb.append(args.get(MESSAGE_INDEX).getValue());
 
-		if (!args.get(SDRETURN_INDEX).equals(StatementFactory.NULL)) {
-			String button = StatementFactory.deString(args.get(SDRETURN_INDEX));
+		if (!args.get(SDRETURN_INDEX).equals(NSISStatements.NULL)) {
+			String button = NSISStatements.deString(args.get(SDRETURN_INDEX));
 			if (!buttons.contains(button.toUpperCase())) {
 				throw new InvalidSyntaxException(
 						"Unsupported MsgBox SD return " + button);
@@ -145,7 +145,7 @@ class FunctionMsgBox implements Callable {
 
 		if (returnVar != null) {
 			String exit_jump = GOTO_PREFIX + nameGenerator.generate();
-			indent += StatementFactory.DEFAULT_INDENT;
+			indent += NSISStatements.DEFAULT_INDENT;
 			StringBuilder sbRet = new StringBuilder();
 			for (ReturnOption ro : returnOptions(buttonGroup)) {
 				sb.append(" ID");
@@ -159,7 +159,7 @@ class FunctionMsgBox implements Callable {
 				sbRet.append(':');
 				sbRet.append(Parser.NEWLINE_MARKER);
 				sbRet.append(indent);
-				sbRet.append(StatementFactory.DEFAULT_INDENT);
+				sbRet.append(NSISStatements.DEFAULT_INDENT);
 				sbRet.append("StrCpy ");
 				sbRet.append(returnVar.getValue());
 				sbRet.append(" \"");
@@ -167,7 +167,7 @@ class FunctionMsgBox implements Callable {
 				sbRet.append('"');
 				sbRet.append(Parser.NEWLINE_MARKER);
 				sbRet.append(indent);
-				sbRet.append(StatementFactory.DEFAULT_INDENT);
+				sbRet.append(NSISStatements.DEFAULT_INDENT);
 				sbRet.append("GoTo ");
 				sbRet.append(exit_jump);
 			}

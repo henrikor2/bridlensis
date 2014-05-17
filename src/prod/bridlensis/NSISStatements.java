@@ -9,7 +9,7 @@ import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
 
-public class StatementFactory {
+public class NSISStatements {
 
 	public static final TypeObject NULL = new TypeObject() {
 

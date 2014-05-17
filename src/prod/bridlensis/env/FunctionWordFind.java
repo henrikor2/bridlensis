@@ -2,7 +2,7 @@ package bridlensis.env;
 
 import java.util.List;
 
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 class FunctionWordFind implements Callable {
 
@@ -38,7 +38,7 @@ class FunctionWordFind implements Callable {
 			Variable returnVar) {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("${WordFind");
-		if (!args.get(CENTER_INDEX).equals(StatementFactory.NULL)) {
+		if (!args.get(CENTER_INDEX).equals(NSISStatements.NULL)) {
 			sb.append("3X");
 			if (caseSensitive) {
 				sb.append('S');
@@ -52,7 +52,7 @@ class FunctionWordFind implements Callable {
 			sb.append(' ');
 			sb.append(args.get(DELIM2_INDEX).getValue());
 			sb.append(' ');
-		} else if (!args.get(DELIM2_INDEX).equals(StatementFactory.NULL)) {
+		} else if (!args.get(DELIM2_INDEX).equals(NSISStatements.NULL)) {
 			sb.append("2X");
 			if (caseSensitive) {
 				sb.append('S');

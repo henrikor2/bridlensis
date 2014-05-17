@@ -3,7 +3,7 @@ package bridlensis.env;
 import java.util.ArrayList;
 import java.util.List;
 
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 class Instruction implements Callable {
 
@@ -61,7 +61,7 @@ class Instruction implements Callable {
 		sb.append(displayName);
 		sb.append(' ');
 		for (TypeObject cArg : cArgs) {
-			if (!cArg.equals(StatementFactory.NULL)) {
+			if (!cArg.equals(NSISStatements.NULL)) {
 				sb.append(cArg.getValue());
 				sb.append(' ');
 			}

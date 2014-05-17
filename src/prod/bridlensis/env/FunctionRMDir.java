@@ -3,7 +3,7 @@ package bridlensis.env;
 import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
-import bridlensis.StatementFactory;
+import bridlensis.NSISStatements;
 
 public class FunctionRMDir implements Callable {
 
@@ -33,8 +33,8 @@ public class FunctionRMDir implements Callable {
 			Variable returnVar) throws InvalidSyntaxException {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("RMDir ");
-		if (!args.get(OPTIONS_INDEX).equals(StatementFactory.NULL)) {
-			String options = StatementFactory.deString(args.get(OPTIONS_INDEX));
+		if (!args.get(OPTIONS_INDEX).equals(NSISStatements.NULL)) {
+			String options = NSISStatements.deString(args.get(OPTIONS_INDEX));
 			if (!options.isEmpty()) {
 				sb.append(options);
 				sb.append(' ');
