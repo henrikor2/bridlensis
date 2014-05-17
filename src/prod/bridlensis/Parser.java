@@ -20,7 +20,6 @@ public class Parser {
 
 	public static final char UTF16BE_BOM = '\uFFFE';
 	public static final char UTF16LE_BOM = '\uFEFF';
-	public static final String NEWLINE_MARKER = "\r\n";
 
 	private File baseDir;
 	private File outDir;
@@ -83,7 +82,7 @@ public class Parser {
 		try {
 			while (reader.goToNextStatement()) {
 				writer.write(parseStatement(reader));
-				writer.write(Parser.NEWLINE_MARKER);
+				writer.write(NSISStatements.NEWLINE_MARKER);
 			}
 			System.out.println(String.format(
 					"End parsing %d lines in file %s.", reader.getLinesRead(),

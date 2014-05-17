@@ -61,7 +61,7 @@ class StatementParser {
 			// dummy variable for function return
 			sb.append(parseCall(word, variable, reader));
 			if (reader.getWordTail().isConcatenation()) {
-				sb.append(Parser.NEWLINE_MARKER);
+				sb.append(NSISStatements.NEWLINE_MARKER);
 				value = parseExpression(variable, sb, reader);
 			} else {
 				return sb.toString();
@@ -199,7 +199,7 @@ class StatementParser {
 						"bridlensis_nullvar", null);
 				sb.append(NSISStatements.variableDeclare(indent,
 						functionNullReturn));
-				sb.append(Parser.NEWLINE_MARKER);
+				sb.append(NSISStatements.NEWLINE_MARKER);
 			}
 			returnVar = functionNullReturn;
 		} else if (returnVar != null
@@ -207,19 +207,19 @@ class StatementParser {
 			sb.append("StrCpy ");
 			sb.append(returnVar.getValue());
 			sb.append(" 1");
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("ClearErrors");
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append(callable.statementFor(indent, args, returnVar));
 		if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append("IfErrors +2");
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(indent);
 			sb.append(NSISStatements.DEFAULT_INDENT);
 			sb.append("StrCpy ");
@@ -257,7 +257,7 @@ class StatementParser {
 		sb.append(NSISStatements.logicLibComparisonStatement(
 				reader.getIndent(), ifStatement));
 		while (reader.hasNextWord()) {
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.logicLibComparisonStatement(
 					reader.getIndent(),
 					parseComparisonStatement(reader.nextWord(), reader, buffer)));
@@ -352,7 +352,7 @@ class StatementParser {
 				.getNameGenerator().generate(), reader.getIndent(), buffer);
 		buffer.append(parseCall(new Word(callableName.getValue()), fReturn,
 				reader));
-		buffer.append(Parser.NEWLINE_MARKER);
+		buffer.append(NSISStatements.NEWLINE_MARKER);
 		return fReturn;
 	}
 
@@ -363,7 +363,7 @@ class StatementParser {
 		Variable variable = environment.registerVariable(varName,
 				enclosingFunction);
 		buffer.append(NSISStatements.variableDeclare(indent, variable));
-		buffer.append(Parser.NEWLINE_MARKER);
+		buffer.append(NSISStatements.NEWLINE_MARKER);
 		return variable;
 	}
 

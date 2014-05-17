@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import bridlensis.env.Callable;
 import bridlensis.env.ComparisonStatement;
+import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
 import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
@@ -11,20 +12,10 @@ import bridlensis.env.Variable;
 
 public class NSISStatements {
 
-	public static final TypeObject NULL = new TypeObject() {
-
-		@Override
-		public Type getType() {
-			return Type.SPECIAL;
-		}
-
-		@Override
-		public String getValue() {
-			return "${BRIDLE_NULL}";
-		}
-	};
-
+	public static final TypeObject NULL = new SimpleTypeObject(Type.SPECIAL,
+			"${BRIDLE_NULL}");
 	public static final String DEFAULT_INDENT = "    ";
+	public static final String NEWLINE_MARKER = "\r\n";
 
 	private static StringBuilder begin(String indent) {
 		StringBuilder sb = new StringBuilder(80);
@@ -35,13 +26,13 @@ public class NSISStatements {
 	public static String nullDefine() {
 		StringBuilder sb = new StringBuilder(80);
 		sb.append("!ifndef BRIDLE_NULL");
-		sb.append(Parser.NEWLINE_MARKER);
+		sb.append(NEWLINE_MARKER);
 		sb.append(DEFAULT_INDENT);
 		sb.append("!define BRIDLE_NULL \"BridleNSIS_NULL\"");
-		sb.append(Parser.NEWLINE_MARKER);
+		sb.append(NEWLINE_MARKER);
 		sb.append("!endif");
-		sb.append(Parser.NEWLINE_MARKER);
-		sb.append(Parser.NEWLINE_MARKER);
+		sb.append(NEWLINE_MARKER);
+		sb.append(NEWLINE_MARKER);
 		return sb.toString();
 	}
 
@@ -68,7 +59,7 @@ public class NSISStatements {
 		sb.append(function.getName());
 		Iterator<Variable> args = function.argumentsIterator();
 		while (args.hasNext()) {
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NEWLINE_MARKER);
 			if (indent.length() != 0) {
 				sb.append(indent);
 				sb.append(indent);
@@ -87,7 +78,7 @@ public class NSISStatements {
 		if (value != null) {
 			sb.append("Push ");
 			sb.append(value.getValue());
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("Return");
@@ -152,5 +143,4 @@ public class NSISStatements {
 		sb.append("}");
 		return sb.toString();
 	}
-
 }

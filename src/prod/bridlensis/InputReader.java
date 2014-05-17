@@ -166,7 +166,7 @@ public class InputReader {
 			text.set(statement, startPos);
 			while (text.endsWith(LINE_CONTINUE, SPACE_MARKERS)) {
 				// Ensure line continuation
-				text.append(Parser.NEWLINE_MARKER + pullNextLine());
+				text.append(NSISStatements.NEWLINE_MARKER + pullNextLine());
 			}
 			skipCommentsAtCursor();
 			return true;
@@ -278,8 +278,8 @@ public class InputReader {
 		while (!text.seekString(COMMENTBLOCK_END)) {
 			text.goToEnd();
 			String nextLine = pullNextLine();
-			text.append(Parser.NEWLINE_MARKER + nextLine);
-			text.cursorForward(Parser.NEWLINE_MARKER.length()
+			text.append(NSISStatements.NEWLINE_MARKER + nextLine);
+			text.cursorForward(NSISStatements.NEWLINE_MARKER.length()
 					+ indexOfNextNonSpace(nextLine));
 		}
 

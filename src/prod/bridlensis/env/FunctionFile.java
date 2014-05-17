@@ -3,7 +3,6 @@ package bridlensis.env;
 import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
-import bridlensis.Parser;
 import bridlensis.NSISStatements;
 
 public class FunctionFile implements Callable {
@@ -37,7 +36,7 @@ public class FunctionFile implements Callable {
 		if (!args.get(OUTPATH_INDEX).equals(NSISStatements.NULL)) {
 			sb.append("SetOutPath ");
 			sb.append(args.get(OUTPATH_INDEX).getValue());
-			sb.append(Parser.NEWLINE_MARKER);
+			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(indent);
 		}
 		sb.append("File ");
