@@ -117,7 +117,7 @@ class FunctionMsgBox implements Callable {
 			Variable returnVar) throws InvalidSyntaxException {
 		ButtonGroup buttonGroup;
 		try {
-			buttonGroup = ButtonGroup.valueOf(NSISStatements.deString(args
+			buttonGroup = ButtonGroup.valueOf(SimpleTypeObject.stripString(args
 					.get(BUTTONGROUP_INDEX)));
 		} catch (IllegalArgumentException e) {
 			throw new InvalidSyntaxException(String.format(
@@ -128,12 +128,13 @@ class FunctionMsgBox implements Callable {
 		sb.append("MessageBox ");
 		sb.append(optionsList(buttonGroup,
 				args.get(OPTIONS_INDEX).equals(NSISStatements.NULL) ? null
-						: NSISStatements.deString(args.get(OPTIONS_INDEX))));
+						: SimpleTypeObject.stripString(args.get(OPTIONS_INDEX))));
 		sb.append(' ');
 		sb.append(args.get(MESSAGE_INDEX).getValue());
 
 		if (!args.get(SDRETURN_INDEX).equals(NSISStatements.NULL)) {
-			String button = NSISStatements.deString(args.get(SDRETURN_INDEX));
+			String button = SimpleTypeObject.stripString(args
+					.get(SDRETURN_INDEX));
 			if (!buttons.contains(button.toUpperCase())) {
 				throw new InvalidSyntaxException(
 						"Unsupported MsgBox SD return " + button);

@@ -33,7 +33,8 @@ class FunctionGetFullPathName implements Callable {
 		StringBuilder sb = new StringBuilder(indent);
 		sb.append("GetFullPathName ");
 		if (!args.get(OPTIONS_INDEX).equals(NSISStatements.NULL)) {
-			String options = NSISStatements.deString(args.get(OPTIONS_INDEX));
+			String options = SimpleTypeObject.stripString(args
+					.get(OPTIONS_INDEX));
 			if (!options.isEmpty()) {
 				sb.append(options);
 				sb.append(' ');

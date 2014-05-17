@@ -328,10 +328,10 @@ class StatementParser {
 			leftValue = environment.getVariable(left.getValue().toLowerCase(),
 					enclosingFunction).getValue();
 		} else {
-			leftValue = NSISStatements.deString(left);
+			leftValue = SimpleTypeObject.stripString(left);
 		}
 
-		String rightValue = NSISStatements.deString(parseExpression(
+		String rightValue = SimpleTypeObject.stripString(parseExpression(
 				reader.nextWord(), buffer, reader));
 
 		return SimpleTypeObject.string(leftValue + rightValue);

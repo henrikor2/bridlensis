@@ -7,7 +7,6 @@ import bridlensis.env.Callable;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
-import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
 
@@ -90,13 +89,6 @@ public class NSISStatements {
 		StringBuilder sb = begin(indent);
 		sb.append("FunctionEnd");
 		return sb.toString();
-	}
-
-	public static String deString(TypeObject expr) {
-		if (expr.getType() == Type.STRING) {
-			return expr.getValue().substring(1, expr.getValue().length() - 1);
-		}
-		return expr.getValue();
 	}
 
 	public static String include(String indent, String filename) {
