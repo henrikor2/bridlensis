@@ -1,10 +1,8 @@
 package bridlensis.env;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Environment {
 
@@ -17,79 +15,13 @@ public class Environment {
 			"elseif", "else", "endif", "do", "while", "until", "continue",
 			"break", "loop");
 
-	public static Scanner getBuiltinInstructionsDef() {
-		return new Scanner(
-				Environment.class
-						.getResourceAsStream("builtin_instructions.conf"));
-	}
-
-	public static Scanner getBuiltinVariablesDef() {
-		return new Scanner(
-				Environment.class.getResourceAsStream("builtin_variables.conf"));
-	}
-
 	private Map<String, Callable> callables;
 	private Map<String, Variable> vars;
 
-	public Environment() {
-		this.vars = new HashMap<>();
-		this.callables = new HashMap<String, Callable>();
-	}
-
-	public void loadBuiltinFunctions(NameGenerator nameGenerator) {
-		// NSIS instructions as functions
-		Scanner scanner = getBuiltinInstructionsDef();
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.length() > 0 && line.charAt(0) != '#') {
-				Instruction instruction = Instruction.parse(line);
-				add(instruction, instruction.getDisplayName().toLowerCase());
-			}
-		}
-		scanner.close();
-
-		// Built-in Bridle functions
-		add(new FunctionMsgBox(nameGenerator, callables.get("strcpy")),
-				"msgbox");
-		add(new FunctionFile(), "file");
-		add(new FunctionReserveFile(), "reservefile");
-		add(new FunctionCopy(), "filecopy", "copy");
-		add(new FunctionDelete(), "filedelete", "delete");
-		add(new FunctionRename(), "filerename", "rename");
-		add(new FunctionRMDir(), "rmdir");
-		add(new FunctionDeleteRegKey(), "deleteregkey");
-		add(new FunctionGetFullPathName(), "getfullpathname");
-		add(new FunctionWordFind(false), "wordfind");
-		add(new FunctionWordFind(true), "wordfinds");
-		add(new FunctionWordReplace(false), "wordreplace");
-		add(new FunctionWordReplace(true), "wordreplaces");
-	}
-
-	public void loadBuiltinVariables() {
-		Scanner scanner = getBuiltinVariablesDef();
-		while (scanner.hasNext()) {
-			Variable variable = new Variable(scanner.next().toLowerCase());
-			add(variable);
-		}
-		scanner.close();
-	}
-
-	private void add(Callable function, String... aliases) {
-		for (String name : aliases) {
-			if (callables.containsKey(name)) {
-				throw new java.lang.AssertionError("Function " + name
-						+ " already defined.");
-			}
-			callables.put(name, function);
-		}
-	}
-
-	private void add(Variable variable) throws AssertionError {
-		if (vars.containsKey(variable.getName())) {
-			throw new java.lang.AssertionError("Variable " + variable.getName()
-					+ " already defined.");
-		}
-		vars.put(variable.getName(), variable);
+	public Environment(Map<String, Variable> vars,
+			Map<String, Callable> callables) {
+		this.vars = vars;
+		this.callables = callables;
 	}
 
 	public Variable registerVariable(String name, UserFunction enclosingFunction)

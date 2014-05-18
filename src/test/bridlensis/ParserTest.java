@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import bridlensis.env.BuiltinElements;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.SimpleNameGenerator;
@@ -21,9 +22,9 @@ public class ParserTest {
 
 	private Parser createParser() {
 		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
-		Environment environment = new Environment();
-		environment.loadBuiltinVariables();
-		environment.loadBuiltinFunctions(nameGenerator);
+		Environment environment = new Environment(
+				BuiltinElements.loadBuiltinVariables(),
+				BuiltinElements.loadBuiltinFunctions(nameGenerator));
 		return new Parser(new StatementParser(environment, nameGenerator),
 				null, null, null, null);
 	}

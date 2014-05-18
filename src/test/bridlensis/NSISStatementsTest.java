@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import bridlensis.env.BuiltinElements;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.SimpleTypeObject;
@@ -14,9 +15,8 @@ public class NSISStatementsTest {
 	private Environment env;
 
 	public NSISStatementsTest() {
-		env = new Environment();
-		env.loadBuiltinVariables();
-		env.loadBuiltinFunctions(null);
+		env = new Environment(BuiltinElements.loadBuiltinVariables(),
+				BuiltinElements.loadBuiltinFunctions(null));
 	}
 
 	@Test

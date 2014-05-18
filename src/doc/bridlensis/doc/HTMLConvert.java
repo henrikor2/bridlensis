@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 import org.markdown4j.Markdown4jProcessor;
 
-import bridlensis.env.Environment;
+import bridlensis.env.BuiltinElements;
 
 public class HTMLConvert {
 
@@ -67,7 +67,7 @@ public class HTMLConvert {
 	private static void writeManual(BufferedWriter output,
 			InputStreamReader input) throws IOException {
 		output.write(new Markdown4jProcessor().process(input));
-		Scanner scanner = Environment.getBuiltinInstructionsDef();
+		Scanner scanner = new Scanner(BuiltinElements.getBuiltinFunctionsDef());
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.startsWith("#")) {

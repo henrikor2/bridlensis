@@ -22,8 +22,9 @@ public class FunctionMsgBoxTest {
 
 	private FunctionMsgBox msgBox() {
 		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
-		Environment env = new Environment();
-		env.loadBuiltinFunctions(nameGenerator);
+		Environment env = new Environment(
+				BuiltinElements.loadBuiltinVariables(),
+				BuiltinElements.loadBuiltinFunctions(nameGenerator));
 		try {
 			return new FunctionMsgBox(nameGenerator, env.getCallable("strcpy"));
 		} catch (EnvironmentException e) {
