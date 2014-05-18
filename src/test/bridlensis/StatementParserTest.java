@@ -163,10 +163,10 @@ public class StatementParserTest {
 		expected = new StringBuilder();
 		expected.append("MessageBox MB_OKCANCEL|MB_ICONINFORMATION \"hello\" /SD IDOK IDOK msgbox_s02 IDCANCEL msgbox_s03\r\n");
 		expected.append("    msgbox_s02:\r\n");
-		expected.append("        StrCpy $foo.ret \"OK\"\r\n");
+		expected.append("        StrCpy $foo.ret \"OK\" \r\n");
 		expected.append("        GoTo msgbox_s01\r\n");
 		expected.append("    msgbox_s03:\r\n");
-		expected.append("        StrCpy $foo.ret \"CANCEL\"\r\n");
+		expected.append("        StrCpy $foo.ret \"CANCEL\" \r\n");
 		expected.append("        GoTo msgbox_s01\r\n");
 		expected.append("    msgbox_s01:");
 		assertEquals(expected.toString(), parser.call("", env

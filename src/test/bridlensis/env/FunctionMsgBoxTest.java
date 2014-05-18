@@ -16,13 +16,24 @@ public class FunctionMsgBoxTest {
 
 	@Test
 	public void testGetArgsCount() {
-		FunctionMsgBox mb = new FunctionMsgBox(null);
+		FunctionMsgBox mb = msgBox();
 		assertEquals(4, mb.getArgsCount());
+	}
+
+	private FunctionMsgBox msgBox() {
+		Environment env = new Environment(new SimpleNameGenerator());
+		env.loadBuiltinFunctions();
+		try {
+			return new FunctionMsgBox(env.getNameGenerator(),
+					env.getCallable("strcpy"));
+		} catch (EnvironmentException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test
 	public void testGetReturnType() {
-		FunctionMsgBox mb = new FunctionMsgBox(null);
+		FunctionMsgBox mb = msgBox();
 		assertEquals(ReturnType.OPTIONAL, mb.getReturnType());
 	}
 
@@ -39,23 +50,22 @@ public class FunctionMsgBoxTest {
 
 	@Test
 	public void testReturnOptions() throws InvalidSyntaxException {
-		FunctionMsgBox mb = new FunctionMsgBox(new SimpleNameGenerator());
+		FunctionMsgBox mb = msgBox();
 		Iterator<ReturnOption> iterator;
 
 		iterator = mb.returnOptions(ButtonGroup.OK).iterator();
-		assertReturnOption("OK", "msgbox_s01", iterator.next());
+		assertReturnOption("IDOK", "msgbox_s01", iterator.next());
 		assertFalse(iterator.hasNext());
 
 		iterator = mb.returnOptions(ButtonGroup.ABORTRETRYIGNORE).iterator();
-		assertReturnOption("ABORT", "msgbox_s02", iterator.next());
-		assertReturnOption("RETRY", "msgbox_s03", iterator.next());
-		assertReturnOption("IGNORE", "msgbox_s04", iterator.next());
+		assertReturnOption("IDABORT", "msgbox_s02", iterator.next());
+		assertReturnOption("IDRETRY", "msgbox_s03", iterator.next());
+		assertReturnOption("IDIGNORE", "msgbox_s04", iterator.next());
 		assertFalse(iterator.hasNext());
 	}
 
-	private void assertReturnOption(String retVal, String jumpTo,
-			ReturnOption ro) {
-		assertEquals(retVal, ro.getReturnValue());
+	private void assertReturnOption(String id, String jumpTo, ReturnOption ro) {
+		assertEquals(id, ro.getID());
 		assertEquals(jumpTo, ro.getGoTo());
 	}
 

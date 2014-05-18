@@ -43,7 +43,20 @@ public class Environment {
 	}
 
 	public void loadBuiltinFunctions() {
-		add(new FunctionMsgBox(nameGenerator), "msgbox");
+		// NSIS instructions as functions
+		Scanner scanner = getBuiltinInstructionsDef();
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (line.length() > 0 && line.charAt(0) != '#') {
+				Instruction instruction = Instruction.parse(line);
+				add(instruction, instruction.getDisplayName().toLowerCase());
+			}
+		}
+		scanner.close();
+
+		// Built-in Bridle functions
+		add(new FunctionMsgBox(nameGenerator, callables.get("strcpy")),
+				"msgbox");
 		add(new FunctionFile(), "file");
 		add(new FunctionReserveFile(), "reservefile");
 		add(new FunctionCopy(), "filecopy", "copy");
@@ -56,16 +69,6 @@ public class Environment {
 		add(new FunctionWordFind(true), "wordfinds");
 		add(new FunctionWordReplace(false), "wordreplace");
 		add(new FunctionWordReplace(true), "wordreplaces");
-
-		Scanner scanner = getBuiltinInstructionsDef();
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.length() > 0 && line.charAt(0) != '#') {
-				Instruction instruction = Instruction.parse(line);
-				add(instruction, instruction.getDisplayName().toLowerCase());
-			}
-		}
-		scanner.close();
 	}
 
 	public void loadBuiltinVariables() {

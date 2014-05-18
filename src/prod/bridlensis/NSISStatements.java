@@ -153,4 +153,20 @@ public class NSISStatements {
 		sb.append(callable.statementFor(DEFAULT_INDENT, args, returnVar));
 		return sb.toString();
 	}
+
+	public static String label(String indent, String label) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(indent);
+		sb.append(label);
+		sb.append(':');
+		return sb.toString();
+	}
+
+	public static String goTo(String indent, String label) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(indent);
+		sb.append("GoTo ");
+		sb.append(label);
+		return sb.toString();
+	}
 }

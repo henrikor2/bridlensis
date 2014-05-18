@@ -23,7 +23,7 @@ class FunctionMsgBox implements Callable {
 		OK, OKCANCEL, ABORTRETRYIGNORE, RETRYCANCEL, YESNO, YESNOCANCEL
 	};
 
-	protected static class ReturnOption {
+	protected static class ReturnOption implements TypeObject {
 
 		private final String returnValue;
 		private final String goTo;
@@ -33,20 +33,32 @@ class FunctionMsgBox implements Callable {
 			this.goTo = GOTO_PREFIX + goToId;
 		}
 
-		public String getReturnValue() {
-			return returnValue;
-		}
-
 		public String getGoTo() {
 			return goTo;
+		}
+
+		@Override
+		public Type getType() {
+			return Type.STRING;
+		}
+
+		@Override
+		public String getValue() {
+			return '"' + returnValue + '"';
+		}
+
+		public String getID() {
+			return "ID" + returnValue;
 		}
 
 	}
 
 	private NameGenerator nameGenerator;
+	private Callable strcpy;
 
-	FunctionMsgBox(NameGenerator nameGenerator) {
+	FunctionMsgBox(NameGenerator nameGenerator, Callable strcpy) {
 		this.nameGenerator = nameGenerator;
+		this.strcpy = strcpy;
 	}
 
 	@Override
@@ -148,34 +160,24 @@ class FunctionMsgBox implements Callable {
 			indent += NSISStatements.DEFAULT_INDENT;
 			StringBuilder sbRet = new StringBuilder();
 			for (ReturnOption ro : returnOptions(buttonGroup)) {
-				sb.append(" ID");
-				sb.append(ro.getReturnValue());
+				sb.append(' ');
+				sb.append(ro.getID());
 				sb.append(' ');
 				sb.append(ro.getGoTo());
-
+				sbRet.append(NSISStatements.NEWLINE_MARKER);
+				sbRet.append(NSISStatements.label(indent, ro.getGoTo()));
 				sbRet.append(NSISStatements.NEWLINE_MARKER);
 				sbRet.append(indent);
-				sbRet.append(ro.getGoTo());
-				sbRet.append(':');
+				sbRet.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
+						Arrays.asList(ro), returnVar));
 				sbRet.append(NSISStatements.NEWLINE_MARKER);
 				sbRet.append(indent);
-				sbRet.append(NSISStatements.DEFAULT_INDENT);
-				sbRet.append("StrCpy ");
-				sbRet.append(returnVar.getValue());
-				sbRet.append(" \"");
-				sbRet.append(ro.getReturnValue());
-				sbRet.append('"');
-				sbRet.append(NSISStatements.NEWLINE_MARKER);
-				sbRet.append(indent);
-				sbRet.append(NSISStatements.DEFAULT_INDENT);
-				sbRet.append("GoTo ");
-				sbRet.append(exit_jump);
+				sbRet.append(NSISStatements.goTo(NSISStatements.DEFAULT_INDENT,
+						exit_jump));
 			}
 			sb.append(sbRet);
 			sb.append(NSISStatements.NEWLINE_MARKER);
-			sb.append(indent);
-			sb.append(exit_jump);
-			sb.append(':');
+			sb.append(NSISStatements.label(indent, exit_jump));
 		}
 
 		return sb.toString();
