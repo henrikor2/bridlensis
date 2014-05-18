@@ -20,6 +20,8 @@ import bridlensis.env.TypeObject.Type;
 
 class StatementParser {
 
+	private static final String NULLVAR = "bridlensis_nullvar";
+
 	private Environment environment;
 	private NameGenerator nameGenerator;
 	private UserFunction enclosingFunction = null;
@@ -199,8 +201,8 @@ class StatementParser {
 		if (returnVar == null
 				&& callable.getReturnType() == ReturnType.REQUIRED) {
 			if (functionNullReturn == null) {
-				functionNullReturn = environment.registerVariable(
-						"bridlensis_nullvar", null);
+				functionNullReturn = environment
+						.registerVariable(NULLVAR, null);
 				sb.append(NSISStatements.variableDeclare(indent,
 						functionNullReturn));
 				sb.append(NSISStatements.NEWLINE_MARKER);
