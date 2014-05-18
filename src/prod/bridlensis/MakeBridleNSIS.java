@@ -213,11 +213,12 @@ public class MakeBridleNSIS {
 		stdout.println("Encoding: " + encoding);
 		stdout.println();
 
-		Environment environment = new Environment(nameGenerator);
+		Environment environment = new Environment();
 		environment.loadBuiltinVariables();
-		environment.loadBuiltinFunctions();
+		environment.loadBuiltinFunctions(nameGenerator);
 
-		StatementParser statementParser = new StatementParser(environment);
+		StatementParser statementParser = new StatementParser(environment,
+				nameGenerator);
 
 		Parser parser = new Parser(statementParser, baseDir, outDir, encoding,
 				excludeFiles);

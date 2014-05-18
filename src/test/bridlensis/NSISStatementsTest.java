@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
-import bridlensis.env.SimpleNameGenerator;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.UserFunction;
 
@@ -15,9 +14,9 @@ public class NSISStatementsTest {
 	private Environment env;
 
 	public NSISStatementsTest() {
-		env = new Environment(new SimpleNameGenerator());
+		env = new Environment();
 		env.loadBuiltinVariables();
-		env.loadBuiltinFunctions();
+		env.loadBuiltinFunctions(null);
 	}
 
 	@Test

@@ -10,6 +10,7 @@ import bridlensis.env.Callable;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.NameGenerator;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
 import bridlensis.env.UserFunction;
@@ -20,11 +21,13 @@ import bridlensis.env.TypeObject.Type;
 class StatementParser {
 
 	private Environment environment;
+	private NameGenerator nameGenerator;
 	private UserFunction enclosingFunction = null;
 	private Variable functionNullReturn = null;
 
-	public StatementParser(Environment environment) {
+	public StatementParser(Environment environment, NameGenerator nameGenerator) {
 		this.environment = environment;
+		this.nameGenerator = nameGenerator;
 	}
 
 	public Environment getEnvironment() {
@@ -340,8 +343,8 @@ class StatementParser {
 	private Variable parseInExpressionCall(TypeObject callableName,
 			StringBuilder buffer, InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
-		Variable fReturn = registerAndDeclareVariable(environment
-				.getNameGenerator().generate(), reader.getIndent(), buffer);
+		Variable fReturn = registerAndDeclareVariable(nameGenerator.generate(),
+				reader.getIndent(), buffer);
 		buffer.append(parseCall(new Word(callableName.getValue()), fReturn,
 				reader));
 		buffer.append(NSISStatements.NEWLINE_MARKER);
@@ -350,8 +353,7 @@ class StatementParser {
 
 	private Variable registerAndDeclareVariable(String name, String indent,
 			StringBuilder buffer) throws EnvironmentException {
-		String varName = (name == null) ? environment.getNameGenerator()
-				.generate() : name;
+		String varName = (name == null) ? nameGenerator.generate() : name;
 		Variable variable = environment.registerVariable(varName,
 				enclosingFunction);
 		buffer.append(NSISStatements.variableDeclare(indent, variable));

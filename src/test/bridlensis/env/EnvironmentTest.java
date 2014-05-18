@@ -11,8 +11,9 @@ public class EnvironmentTest {
 
 	@Test
 	public void testLoadBuiltinFunctions() {
-		Environment env = new Environment(new SimpleNameGenerator());
-		env.loadBuiltinFunctions();
+		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
+		Environment env = new Environment();
+		env.loadBuiltinFunctions(nameGenerator);
 		try {
 			env.registerUserFunction("DetailPrint");
 			fail();
@@ -23,7 +24,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testLoadBuiltinVariables() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		assertFalse(env.containsVariable("r9", null));
 		env.loadBuiltinVariables();
 		assertTrue(env.containsVariable("r2", null));
@@ -33,7 +34,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testRegisterVariable() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		env.loadBuiltinVariables();
 		assertEquals("a", env.registerVariable("a", null).getName());
 		try {
@@ -68,7 +69,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testContainsVariable() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		assertFalse(env.containsVariable("a", null));
 		assertEquals("a", env.registerVariable("a", null).getName());
 		assertTrue(env.containsVariable("a", null));
@@ -78,7 +79,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testGetVariable() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		try {
 			env.getVariable("a", null);
 			fail();
@@ -100,7 +101,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testGetCallable() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		try {
 			env.getCallable("a");
 			fail();
@@ -113,7 +114,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testRegisterFunction() throws EnvironmentException {
-		Environment env = new Environment(new SimpleNameGenerator());
+		Environment env = new Environment();
 		try {
 			env.registerUserFunction("global");
 			fail();

@@ -30,19 +30,13 @@ public class Environment {
 
 	private Map<String, Callable> callables;
 	private Map<String, Variable> vars;
-	private NameGenerator nameGenerator;
 
-	public Environment(NameGenerator nameGenerator) {
+	public Environment() {
 		this.vars = new HashMap<>();
 		this.callables = new HashMap<String, Callable>();
-		this.nameGenerator = nameGenerator;
 	}
 
-	public NameGenerator getNameGenerator() {
-		return nameGenerator;
-	}
-
-	public void loadBuiltinFunctions() {
+	public void loadBuiltinFunctions(NameGenerator nameGenerator) {
 		// NSIS instructions as functions
 		Scanner scanner = getBuiltinInstructionsDef();
 		while (scanner.hasNextLine()) {

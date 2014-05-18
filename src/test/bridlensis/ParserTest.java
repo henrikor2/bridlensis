@@ -20,11 +20,12 @@ public class ParserTest {
 	}
 
 	private Parser createParser() {
-		Environment environment = new Environment(new SimpleNameGenerator());
+		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
+		Environment environment = new Environment();
 		environment.loadBuiltinVariables();
-		environment.loadBuiltinFunctions();
-		return new Parser(new StatementParser(environment), null, null, null,
-				null);
+		environment.loadBuiltinFunctions(nameGenerator);
+		return new Parser(new StatementParser(environment, nameGenerator),
+				null, null, null, null);
 	}
 
 	@Test
