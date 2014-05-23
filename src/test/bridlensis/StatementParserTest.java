@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -13,6 +14,7 @@ import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.SimpleNameGenerator;
 import bridlensis.env.SimpleTypeObject;
+import bridlensis.env.TypeObject;
 import bridlensis.env.UserFunction;
 
 public class StatementParserTest {
@@ -149,8 +151,10 @@ public class StatementParserTest {
 
 		expected = new StringBuilder();
 		expected.append("\tCall foo");
-		assertEquals(expected.toString(), parser.call("\t",
-				env.getCallable("foo"), Arrays.asList(), null));
+		assertEquals(
+				expected.toString(),
+				parser.call("\t", env.getCallable("foo"),
+						Collections.<TypeObject> emptyList(), null));
 
 		expected = new StringBuilder();
 		expected.append("");

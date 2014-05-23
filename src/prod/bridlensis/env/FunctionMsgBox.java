@@ -169,7 +169,7 @@ class FunctionMsgBox implements Callable {
 				sbRet.append(NSISStatements.NEWLINE_MARKER);
 				sbRet.append(indent);
 				sbRet.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
-						Arrays.asList(ro), returnVar));
+						Arrays.asList((TypeObject) ro), returnVar));
 				sbRet.append(NSISStatements.NEWLINE_MARKER);
 				sbRet.append(indent);
 				sbRet.append(NSISStatements.goTo(NSISStatements.DEFAULT_INDENT,
