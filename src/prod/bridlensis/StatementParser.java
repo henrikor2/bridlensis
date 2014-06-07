@@ -7,16 +7,16 @@ import java.util.List;
 import bridlensis.InputReader.Word;
 import bridlensis.InputReader.WordTail;
 import bridlensis.env.Callable;
+import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
 import bridlensis.env.NameGenerator;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
+import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
-import bridlensis.env.Callable.ReturnType;
-import bridlensis.env.TypeObject.Type;
 
 class StatementParser {
 
@@ -235,14 +235,17 @@ class StatementParser {
 			return NSISStatements.logicLibDefine(reader.getIndent(), define);
 		}
 		StringBuilder sb = new StringBuilder();
-		ComparisonStatement statement = parseComparisonStatement(
+		List<ComparisonStatement> statements = parseComparisonStatement(
 				reader.nextWord(), reader, sb);
-		if (statement.isNot()) {
+		if (statements.size() != 1) {
+			throw new InvalidSyntaxException("Illegal loop syntax");
+		}
+		if (statements.get(0).isNot()) {
 			throw new InvalidSyntaxException(String.format(
 					"Illegal modifier 'Not' in %s statement", define));
 		}
 		sb.append(NSISStatements.logicLibComparisonStatement(
-				reader.getIndent(), define, statement));
+				reader.getIndent(), define, statements.get(0)));
 		return sb.toString();
 	}
 
@@ -250,15 +253,23 @@ class StatementParser {
 			throws InvalidSyntaxException, EnvironmentException {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder buffer = new StringBuilder();
-		ComparisonStatement ifStatement = parseComparisonStatement(keyword,
-				reader, buffer);
-		sb.append(NSISStatements.logicLibComparisonStatement(
-				reader.getIndent(), ifStatement));
-		while (reader.hasNextWord()) {
-			sb.append(NSISStatements.NEWLINE_MARKER);
+		List<ComparisonStatement> statements = parseComparisonStatement(
+				keyword, reader, buffer);
+		for (int i = 0; i < statements.size(); i++) {
+			if (i > 0) {
+				sb.append(NSISStatements.NEWLINE_MARKER);
+			}
 			sb.append(NSISStatements.logicLibComparisonStatement(
-					reader.getIndent(),
-					parseComparisonStatement(reader.nextWord(), reader, buffer)));
+					reader.getIndent(), statements.get(i)));
+		}
+		while (reader.hasNextWord()) {
+			statements = parseComparisonStatement(reader.nextWord(), reader,
+					buffer);
+			for (ComparisonStatement statement : statements) {
+				sb.append(NSISStatements.NEWLINE_MARKER);
+				sb.append(NSISStatements.logicLibComparisonStatement(
+						reader.getIndent(), statement));
+			}
 		}
 		if (buffer.length() > 0) {
 			sb.insert(0, buffer.toString());
@@ -266,9 +277,10 @@ class StatementParser {
 		return sb.toString();
 	}
 
-	private ComparisonStatement parseComparisonStatement(Word keyword,
+	private List<ComparisonStatement> parseComparisonStatement(Word keyword,
 			InputReader reader, StringBuilder buffer)
 			throws InvalidSyntaxException, EnvironmentException {
+		List<ComparisonStatement> statements = new ArrayList<>();
 		String key = keyword.getValue();
 		if (key.equalsIgnoreCase("and") || key.equalsIgnoreCase("or")) {
 			key += "If";
@@ -285,8 +297,15 @@ class StatementParser {
 		while (reader.hasNextWord()) {
 			String compare = reader.getWordTail().getComparison();
 			if (compare.isEmpty()) {
-				statement.addLeft(parseExpression(reader.nextWord(), buffer,
-						reader));
+				Word nextWord = reader.nextWord();
+				String asName = nextWord.asName();
+				if (asName.equals("and") || asName.equals("or")) {
+					statements.addAll(parseComparisonStatement(nextWord,
+							reader, buffer));
+				} else {
+					statement
+							.addLeft(parseExpression(nextWord, buffer, reader));
+				}
 			} else {
 				statement.setCompare(compare);
 				break;
@@ -298,7 +317,8 @@ class StatementParser {
 					reader));
 		}
 
-		return statement;
+		statements.add(0, statement);
+		return statements;
 	}
 
 	protected TypeObject parseExpression(TypeObject expr, StringBuilder buffer,

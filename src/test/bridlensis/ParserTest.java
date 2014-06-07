@@ -924,6 +924,14 @@ public class ParserTest {
 				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		inputStatement = new StringBuilder();
+		inputStatement.append("If ${Errors} Or world > 1");
+		expected = new StringBuilder();
+		expected.append("${If} ${Errors}\r\n");
+		expected.append("${OrIf} $world > 1");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
 		inputStatement.append("ElseIf world != \"hello world\"");
 		expected = new StringBuilder();
 		expected.append("${ElseIf} $world != \"hello world\"");
