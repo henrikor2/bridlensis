@@ -91,6 +91,10 @@ class StatementParser {
 		} else {
 			value = word;
 		}
+		if (reader.hasNextWord()) {
+			throw new InvalidSyntaxException(
+					"Unexpected word at the end of statement");
+		}
 		sb.append(NSISStatements.variableAssign(reader.getIndent(), variable,
 				value));
 		return sb.toString();

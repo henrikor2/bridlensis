@@ -142,6 +142,25 @@ public class ParserTest {
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
 
+		try {
+			inputStatement = new StringBuilder();
+			inputStatement.append("a = 1 2");
+			parser.parseStatement(readerFor(inputStatement.toString()));
+			fail();
+		} catch (InvalidSyntaxException | EnvironmentException
+				| ParserException e) {
+			// All ok
+		}
+
+		try {
+			inputStatement = new StringBuilder();
+			inputStatement.append("a = 1 + 2 3");
+			parser.parseStatement(readerFor(inputStatement.toString()));
+			fail();
+		} catch (InvalidSyntaxException | EnvironmentException
+				| ParserException e) {
+			// All ok
+		}
 	}
 
 	@Test
