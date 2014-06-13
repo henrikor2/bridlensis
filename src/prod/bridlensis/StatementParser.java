@@ -38,10 +38,24 @@ class StatementParser {
 
 	public String parseVarDeclare(InputReader reader)
 			throws InvalidSyntaxException, EnvironmentException {
+		StringBuilder sb = new StringBuilder();
 		Word name = reader.nextWord();
-		Variable variable = environment.registerVariable(name.asName(),
-				enclosingFunction);
-		return NSISStatements.variableDeclare(reader.getIndent(), variable);
+		if (name.getType() == Type.SPECIAL) {
+			name = reader.nextWord();
+		}
+		do {
+			Variable variable = environment.registerVariable(name.asName(),
+					enclosingFunction);
+			sb.append(NSISStatements.variableDeclare(reader.getIndent(),
+					variable));
+			if (reader.hasNextWord()) {
+				sb.append(NSISStatements.NEWLINE_MARKER);
+				name = reader.nextWord();
+			} else {
+				break;
+			}
+		} while (true);
+		return sb.toString();
 	}
 
 	public String parseVarAssign(Word varName, InputReader reader)

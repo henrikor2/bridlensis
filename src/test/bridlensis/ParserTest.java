@@ -165,6 +165,16 @@ public class ParserTest {
 		expected.append("StrCpy $b $a");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		inputStatement = new StringBuilder();
+		inputStatement.append("Var /GLOBAL c, d, e");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL c\r\n");
+		expected.append("Var /GLOBAL d\r\n");
+		expected.append("Var /GLOBAL e");
+		assertEquals(expected.toString(),
+				parser.parseStatement(readerFor(inputStatement.toString())));
+
 	}
 
 	@Test
