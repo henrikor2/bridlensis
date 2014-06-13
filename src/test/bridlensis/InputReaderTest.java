@@ -7,7 +7,9 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import bridlensis.InputReader;
+import bridlensis.InputReader.Word;
 import bridlensis.InvalidSyntaxException;
+import bridlensis.env.TypeObject;
 
 public class InputReaderTest {
 
@@ -82,6 +84,21 @@ public class InputReaderTest {
 		assertEquals("a", reader.nextWord().getValue());
 		assertEquals("b", reader.nextWord().getValue());
 		assertFalse(reader.hasNextWord());
+
+		reader = readerFor("Var /GLOBAL a");
+		assertTrue(reader.goToNextStatement());
+		assertEquals("", reader.getIndent());
+		Word word = reader.nextWord();
+		assertEquals("Var", word.getValue());
+		assertEquals(TypeObject.Type.NAME, word.getType());
+		word = reader.nextWord();
+		assertEquals("/GLOBAL", word.getValue());
+		assertEquals(TypeObject.Type.SPECIAL, word.getType());
+		word = reader.nextWord();
+		assertEquals("a", word.getValue());
+		assertEquals(TypeObject.Type.NAME, word.getType());
+		assertFalse(reader.hasNextWord());
+
 	}
 
 	@Test

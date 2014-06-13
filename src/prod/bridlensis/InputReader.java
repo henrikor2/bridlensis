@@ -7,15 +7,28 @@ import bridlensis.env.TypeObject;
 public class InputReader {
 
 	private static final char LINE_CONTINUE = '\\';
-	private static final String SPACE_MARKERS = " \t\r\n" + LINE_CONTINUE;
+
 	private static final String COMMENT_MARKERS = ";#";
 	private static final String COMMENTBLOCK_START = "/*";
 	private static final String COMMENTBLOCK_END = "*/";
-	private static final String TAIL_MARKERS = "=+(,)!<>";
-	private static final String WORD_MARKERS = TAIL_MARKERS + SPACE_MARKERS
-			+ COMMENT_MARKERS + COMMENTBLOCK_START.charAt(0);
 	private static final String STRING_MARKERS = "\"'";
-	private static final String CHAR_MASK = "$\\";
+	private static final String STRING_CHARMASK = "$\\";
+
+	// Ignored characters
+	private static final String SPACE_MARKERS = " \t\r\n" + LINE_CONTINUE;
+
+	// Collect these characters between the words
+	private static final String TAIL_MARKERS = "=+(,)!<>";
+
+	// Word begins when cursor is not at any of these
+	private static final String WORD_START_MARKERS = TAIL_MARKERS
+			+ SPACE_MARKERS + COMMENT_MARKERS;
+
+	// Word ends when cursor is at any of these
+	private static final String WORD_END_MARKERS = WORD_START_MARKERS
+			+ COMMENTBLOCK_START.charAt(0);
+
+	// Special case words that must be checked separately
 	private static final String LANGSTRING_START = "$(";
 	private static final String LANGSTRING_END = ")";
 
@@ -32,7 +45,8 @@ public class InputReader {
 				type = Type.SPECIAL;
 			} else if (isString()) {
 				type = Type.STRING;
-			} else if (value.charAt(0) == '$' || value.charAt(0) == '{') {
+			} else if (value.charAt(0) == '$' || value.charAt(0) == '{'
+					|| value.charAt(0) == '/') {
 				type = Type.SPECIAL;
 			} else if (isNumeric()) {
 				type = Type.INTEGER;
@@ -49,9 +63,9 @@ public class InputReader {
 			char[] charArray = value.toCharArray();
 			for (int i = charArray[0] == '-' ? 1 : 0; i < charArray.length; i++) {
 				if (!Character.isDigit(charArray[i]))
-					return false; // It's not numeric
+					return false;
 			}
-			return true;// It's numeric
+			return true;
 		}
 
 		public String asName() {
@@ -227,7 +241,7 @@ public class InputReader {
 			if (text.charAtCursorIn(TAIL_MARKERS)) {
 				// Collect tail characters
 				tail.add(text.charAtCursor());
-			} else if (!text.charAtCursorIn(WORD_MARKERS)) {
+			} else if (!text.charAtCursorIn(WORD_START_MARKERS)) {
 				break;
 			}
 			text.cursorForward(1);
@@ -243,22 +257,24 @@ public class InputReader {
 				if (!text.seekString(strOpenChar)) {
 					throw new InvalidSyntaxException("Unterminated string");
 				}
-			} while (text.cursorPrecededBy(CHAR_MASK));
+			} while (text.cursorPrecededBy(STRING_CHARMASK));
 			text.cursorForward(1);
-		} else if (text.seekChars(WORD_MARKERS) && isCursorAtLangString()) {
-			// Parse LangString
+		} else if (text.cursorFollowedBy(LANGSTRING_START)) {
 			if (!text.seekString(LANGSTRING_END)) {
 				throw new InvalidSyntaxException("Unterminated LangString");
 			}
 			text.cursorForward(1);
+		} else {
+			text.seekChars(WORD_END_MARKERS);
+			// Continue search if cursor is at "/"
+			// without being block comment start "/*"
+			while (!text.isAtEnd()
+					&& text.charAtCursor() == COMMENTBLOCK_START.charAt(0)
+					&& !text.cursorFollowedBy(COMMENTBLOCK_START)) {
+				text.cursorForward(1);
+				text.seekChars(WORD_END_MARKERS);
+			}
 		}
-	}
-
-	private boolean isCursorAtLangString() {
-		return text.charAtCursor() == LANGSTRING_START.charAt(LANGSTRING_START
-				.length() - 1)
-				&& text.cursorPrecededBy(LANGSTRING_START.substring(0,
-						LANGSTRING_START.length() - 1));
 	}
 
 	private void skipCommentsAtCursor() throws InvalidSyntaxException {
