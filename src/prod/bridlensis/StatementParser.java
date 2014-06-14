@@ -327,9 +327,15 @@ class StatementParser {
 		statement.addLeft(parseExpression(left, buffer, reader));
 
 		while (reader.hasNextWord()) {
-			String compare = reader.getWordTail().getComparison();
+			WordTail tail = reader.getWordTail();
+			String compare = tail.getComparison();
 			if (compare.isEmpty()) {
 				Word nextWord = reader.nextWord();
+				if (statement.getLastLeftType() != Type.SPECIAL
+						&& tail.isEmpty()) {
+					throw new InvalidSyntaxException(
+							"Unexpected word in comparison statement");
+				}
 				String asName = nextWord.asName();
 				if (asName.equals("and") || asName.equals("or")) {
 					statements.addAll(parseComparisonStatement(nextWord,

@@ -943,9 +943,9 @@ public class ParserTest {
 				parser.parseStatement(readerFor(inputStatement.toString())));
 
 		inputStatement = new StringBuilder();
-		inputStatement.append("If not \"${FileExists}\" \"$instdir\\foo.txt\"");
+		inputStatement.append("If not ${FileExists} \"$instdir\\foo.txt\"");
 		expected = new StringBuilder();
-		expected.append("${IfNot} \"${FileExists}\" \"$instdir\\foo.txt\"");
+		expected.append("${IfNot} ${FileExists} \"$instdir\\foo.txt\"");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
 
@@ -1004,6 +1004,15 @@ public class ParserTest {
 		expected.append("${EndIf}");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		try {
+			inputStatement = new StringBuilder();
+			inputStatement.append("If 1 2");
+			parser.parseStatement(readerFor(inputStatement.toString()));
+			fail();
+		} catch (InvalidSyntaxException e) {
+			// all good
+		}
 	}
 
 	@Test
@@ -1080,6 +1089,14 @@ public class ParserTest {
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
 
+		try {
+			inputStatement = new StringBuilder();
+			inputStatement.append("Loop Until 1 2");
+			parser.parseStatement(readerFor(inputStatement.toString()));
+			fail();
+		} catch (InvalidSyntaxException e) {
+			// all good
+		}
 	}
 
 }
