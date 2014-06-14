@@ -66,3 +66,7 @@ WordReplaceS("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "", "+")
 ; WordInsert(S)
 r1 = WordInsert("C:\io.sys C:\WINDOWS", " ", "C:\logo.sys", "-2")
 WordInsertS("C:\io.sys", " ", "C:\WINDOWS", "+2")
+
+; ConfigRead(S)
+r0 = ConfigRead("C:\AUTOEXEC.BAT", "SET winbootdir=")
+ConfigReadS("C:\apache\conf\httpd.conf", "Timeout ")

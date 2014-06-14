@@ -90,3 +90,7 @@ ${WordReplaceS} "C:\io.sys C:\logo.sys C:\WINDOWS" "SYS" "" "+" $bridlensis_null
 ; WordInsert(S)
 ${WordInsert} "C:\io.sys C:\WINDOWS" " " "C:\logo.sys" "-2" $r1
 ${WordInsertS} "C:\io.sys" " " "C:\WINDOWS" "+2" $bridlensis_nullvar
+
+; ConfigRead(S)
+${ConfigRead} "C:\AUTOEXEC.BAT" "SET winbootdir=" $r0
+${ConfigReadS} "C:\apache\conf\httpd.conf" "Timeout " $bridlensis_nullvar

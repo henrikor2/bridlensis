@@ -46,6 +46,8 @@ public class BuiltinElements {
 		add(functions, new FunctionWordReplace(true), "wordreplaces");
 		add(functions, new FunctionWordInsert(false), "wordinsert");
 		add(functions, new FunctionWordInsert(true), "wordinserts");
+		add(functions, new FunctionConfigRead(false), "configread");
+		add(functions, new FunctionConfigRead(true), "configreads");
 
 		return functions;
 	}
