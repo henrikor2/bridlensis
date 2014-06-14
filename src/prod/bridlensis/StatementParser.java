@@ -108,13 +108,24 @@ class StatementParser {
 		}
 		enclosingFunction = environment.registerUserFunction(reader.nextWord()
 				.asName());
+
 		StringBuilder sb = new StringBuilder();
-		while (reader.hasNextWord()) {
-			String argName = reader.nextWord().asName();
-			Variable argVariable = registerAndDeclareVariable(argName,
-					reader.getIndent(), sb);
-			enclosingFunction.addArgument(argVariable);
+
+		if (!reader.getWordTail().isEmpty()
+				&& !reader.getWordTail().containsFunctionArgsClose()) {
+			do {
+				String argName = reader.nextWord().asName();
+				Variable argVariable = registerAndDeclareVariable(argName,
+						reader.getIndent(), sb);
+				enclosingFunction.addArgument(argVariable);
+			} while (reader.getWordTail().isFunctionArgSeparator());
 		}
+
+		if (reader.hasNextWord()) {
+			throw new InvalidSyntaxException(
+					"Unexpected word in function argument");
+		}
+
 		sb.append(NSISStatements.functionBegin(reader.getIndent(),
 				enclosingFunction));
 		return sb.toString();
@@ -174,23 +185,26 @@ class StatementParser {
 			throw new InvalidSyntaxException("Function doesn't return a value");
 		}
 		ArrayList<TypeObject> args = new ArrayList<>();
-		WordTail tail = reader.getWordTail();
-		while (reader.hasNextWord() && !tail.containsFunctionArgsClose()) {
-			TypeObject arg;
-			Word word = reader.nextWord();
-			tail = reader.getWordTail();
-			if (!tail.isFunctionArgsClose()
-					&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
-				arg = parseExpression(word, buffer, reader);
-			} else if (word.getType() == Type.NAME) {
-				Variable variable = environment.getVariable(word.asName(),
-						enclosingFunction);
-				arg = variable;
-			} else {
-				arg = word;
-			}
-			args.add(arg);
+
+		if (!reader.getWordTail().containsFunctionArgsClose()) {
+			do {
+				TypeObject arg;
+				Word word = reader.nextWord();
+				WordTail tail = reader.getWordTail();
+				if (!tail.containsFunctionArgsClose()
+						&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
+					arg = parseExpression(word, buffer, reader);
+				} else if (word.getType() == Type.NAME) {
+					Variable variable = environment.getVariable(word.asName(),
+							enclosingFunction);
+					arg = variable;
+				} else {
+					arg = word;
+				}
+				args.add(arg);
+			} while (reader.getWordTail().isFunctionArgSeparator());
 		}
+
 		if (function.getArgsCount() > -1
 				&& args.size() > function.getArgsCount()) {
 			throw new InvalidSyntaxException(

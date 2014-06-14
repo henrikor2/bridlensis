@@ -264,6 +264,14 @@ public class ParserTest {
 		expected.append("FunctionEnd");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
+
+		try {
+			parser.parseStatement(readerFor("Function nsafu(a b)"));
+			fail();
+		} catch (InvalidSyntaxException e) {
+			// All good!
+			System.err.println(e.getMessage());
+		}
 	}
 
 	@Test
@@ -402,6 +410,14 @@ public class ParserTest {
 
 		try {
 			parser.parseStatement(readerFor("foo(1, 2, 3)"));
+			fail();
+		} catch (InvalidSyntaxException e) {
+			// all good
+			System.err.println(e.getMessage());
+		}
+
+		try {
+			parser.parseStatement(readerFor("foo(1 2)"));
 			fail();
 		} catch (InvalidSyntaxException e) {
 			// all good

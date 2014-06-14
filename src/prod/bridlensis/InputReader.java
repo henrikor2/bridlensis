@@ -125,16 +125,16 @@ public class InputReader {
 			return pattern.startsWith("(");
 		}
 
-		public boolean isConcatenation() {
-			return pattern.endsWith("+");
+		public boolean isFunctionArgSeparator() {
+			return pattern.equals(",");
 		}
 
 		public boolean containsFunctionArgsClose() {
 			return pattern.matches(".*\\).*");
 		}
 
-		public boolean isFunctionArgsClose() {
-			return pattern.startsWith(")");
+		public boolean isConcatenation() {
+			return pattern.endsWith("+");
 		}
 
 		public boolean isComparison() {
@@ -144,6 +144,11 @@ public class InputReader {
 		public String getComparison() {
 			return pattern.replaceAll("[^=!\\<\\>]", "");
 		}
+
+		public boolean isEmpty() {
+			return pattern.isEmpty();
+		}
+
 	}
 
 	private Scanner input;
