@@ -94,3 +94,7 @@ ${WordInsertS} "C:\io.sys" " " "C:\WINDOWS" "+2" $bridlensis_nullvar
 ; ConfigRead(S)
 ${ConfigRead} "C:\AUTOEXEC.BAT" "SET winbootdir=" $r0
 ${ConfigReadS} "C:\apache\conf\httpd.conf" "Timeout " $bridlensis_nullvar
+
+; ConfigWrite(S)
+${ConfigWrite} "C:\AUTOEXEC.BAT" "SET winbootdir=" "D:\WINDOWS" $r0
+${ConfigWriteS} "C:\apache\conf\httpd.conf" "Timeout " "30" $bridlensis_nullvar

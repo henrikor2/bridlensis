@@ -48,6 +48,8 @@ public class BuiltinElements {
 		add(functions, new FunctionWordInsert(true), "wordinserts");
 		add(functions, new FunctionConfigRead(false), "configread");
 		add(functions, new FunctionConfigRead(true), "configreads");
+		add(functions, new FunctionConfigWrite(false), "configwrite");
+		add(functions, new FunctionConfigWrite(true), "configwrites");
 
 		return functions;
 	}

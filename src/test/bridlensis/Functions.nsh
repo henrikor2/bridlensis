@@ -70,3 +70,7 @@ WordInsertS("C:\io.sys", " ", "C:\WINDOWS", "+2")
 ; ConfigRead(S)
 r0 = ConfigRead("C:\AUTOEXEC.BAT", "SET winbootdir=")
 ConfigReadS("C:\apache\conf\httpd.conf", "Timeout ")
+
+; ConfigWrite(S)
+r0 = ConfigWrite( "C:\AUTOEXEC.BAT", "SET winbootdir=", "D:\WINDOWS")
+ConfigWriteS("C:\apache\conf\httpd.conf", "Timeout ", "30")
