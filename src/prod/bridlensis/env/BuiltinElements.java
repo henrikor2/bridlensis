@@ -7,9 +7,14 @@ import java.util.Scanner;
 
 public class BuiltinElements {
 
-	public static InputStream getBuiltinFunctionsDef() {
+	public static InputStream getBuiltinInstructionsDef() {
 		return BuiltinElements.class
 				.getResourceAsStream("builtin_instructions.conf");
+	}
+
+	public static InputStream getBuiltinHeaderFunctionsDef() {
+		return BuiltinElements.class
+				.getResourceAsStream("builtin_functionheaders.conf");
 	}
 
 	public static Map<String, Callable> loadBuiltinFunctions(
@@ -17,16 +22,10 @@ public class BuiltinElements {
 		Map<String, Callable> functions = new HashMap<>();
 
 		// NSIS instructions as functions
-		Scanner scanner = new Scanner(getBuiltinFunctionsDef());
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.length() > 0 && line.charAt(0) != '#') {
-				Instruction instruction = Instruction.parse(line);
-				add(functions, instruction, instruction.getDisplayName()
-						.toLowerCase());
-			}
-		}
-		scanner.close();
+		add(functions, getBuiltinInstructionsDef(), Instruction.class);
+
+		// NSIS function headers as functions
+		add(functions, getBuiltinHeaderFunctionsDef(), HeaderFunction.class);
 
 		// Built-in Bridle functions
 		add(functions,
@@ -42,16 +41,24 @@ public class BuiltinElements {
 		add(functions, new FunctionGetFullPathName(), "getfullpathname");
 		add(functions, new FunctionWordFind(false), "wordfind");
 		add(functions, new FunctionWordFind(true), "wordfinds");
-		add(functions, new FunctionWordReplace(false), "wordreplace");
-		add(functions, new FunctionWordReplace(true), "wordreplaces");
-		add(functions, new FunctionWordInsert(false), "wordinsert");
-		add(functions, new FunctionWordInsert(true), "wordinserts");
-		add(functions, new FunctionConfigRead(false), "configread");
-		add(functions, new FunctionConfigRead(true), "configreads");
-		add(functions, new FunctionConfigWrite(false), "configwrite");
-		add(functions, new FunctionConfigWrite(true), "configwrites");
 
 		return functions;
+	}
+
+	private static void add(Map<String, Callable> functions,
+			InputStream definitions,
+			Class<? extends BuiltinFunction> instanceClass) {
+		Scanner scanner = new Scanner(definitions);
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (line.length() > 0 && line.charAt(0) != '#') {
+				BuiltinFunction function = BuiltinFunction.parse(line,
+						instanceClass);
+				add(functions, function, function.getDisplayName()
+						.toLowerCase());
+			}
+		}
+		scanner.close();
 	}
 
 	private static void add(Map<String, Callable> functions, Callable function,

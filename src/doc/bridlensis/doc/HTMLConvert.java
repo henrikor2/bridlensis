@@ -67,7 +67,8 @@ public class HTMLConvert {
 	private static void writeManual(BufferedWriter output,
 			InputStreamReader input) throws IOException {
 		output.write(new Markdown4jProcessor().process(input));
-		Scanner scanner = new Scanner(BuiltinElements.getBuiltinFunctionsDef());
+		Scanner scanner = new Scanner(
+				BuiltinElements.getBuiltinInstructionsDef());
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.startsWith("#")) {

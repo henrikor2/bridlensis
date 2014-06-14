@@ -5,9 +5,9 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class Instruction extends BuiltinFunction {
+class HeaderFunction extends BuiltinFunction {
 
-	public Instruction(String displayName, int argsCount, int returnArgIndex) {
+	public HeaderFunction(String displayName, int argsCount, int returnArgIndex) {
 		super(displayName, argsCount, returnArgIndex);
 	}
 
@@ -19,8 +19,9 @@ class Instruction extends BuiltinFunction {
 		if (getReturnType() != ReturnType.VOID) {
 			cArgs.add(getReturnArgIndex(), returnVar);
 		}
+		sb.append("${");
 		sb.append(getDisplayName());
-		sb.append(' ');
+		sb.append("} ");
 		for (TypeObject cArg : cArgs) {
 			if (!cArg.equals(NSISStatements.NULL)) {
 				sb.append(cArg.getValue());
