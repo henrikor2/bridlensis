@@ -62,3 +62,7 @@ r3 = WordFind("[1.AAB];[2.BAA];[3.BBB];", "+1", "[", "];", "AA")
 ; WordReplace(S)
 r1 = WordReplace("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "bmp", "+2")
 WordReplaceS("C:\io.sys C:\logo.sys C:\WINDOWS", "SYS", "", "+")
+
+; WordInsert(S)
+r1 = WordInsert("C:\io.sys C:\WINDOWS", " ", "C:\logo.sys", "-2")
+WordInsertS("C:\io.sys", " ", "C:\WINDOWS", "+2")

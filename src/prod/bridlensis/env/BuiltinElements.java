@@ -44,6 +44,8 @@ public class BuiltinElements {
 		add(functions, new FunctionWordFind(true), "wordfinds");
 		add(functions, new FunctionWordReplace(false), "wordreplace");
 		add(functions, new FunctionWordReplace(true), "wordreplaces");
+		add(functions, new FunctionWordInsert(false), "wordinsert");
+		add(functions, new FunctionWordInsert(true), "wordinserts");
 
 		return functions;
 	}

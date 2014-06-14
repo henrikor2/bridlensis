@@ -86,3 +86,7 @@ ${WordFind3X} "[1.AAB];[2.BAA];[3.BBB];" "[" "AA" "];" "+1" $r3
 ; WordReplace(S)
 ${WordReplace} "C:\io.sys C:\logo.sys C:\WINDOWS" "SYS" "bmp" "+2" $r1
 ${WordReplaceS} "C:\io.sys C:\logo.sys C:\WINDOWS" "SYS" "" "+" $bridlensis_nullvar
+
+; WordInsert(S)
+${WordInsert} "C:\io.sys C:\WINDOWS" " " "C:\logo.sys" "-2" $r1
+${WordInsertS} "C:\io.sys" " " "C:\WINDOWS" "+2" $bridlensis_nullvar
