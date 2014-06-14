@@ -47,7 +47,7 @@ class FunctionConfigRead implements Callable {
 
 	@Override
 	public String toString() {
-		return "Function[wordinsert]";
+		return "Function[configread]";
 	}
 
 }
