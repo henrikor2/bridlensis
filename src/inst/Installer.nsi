@@ -139,7 +139,7 @@ Section "Main"
     File /r "${BRIDLE_HOME}\Example\*.nsh"
     File    "${BRIDLE_HOME}\Example\MakeInstaller.bat"
     
-    WriteRegStr("HKLM",   ${VERSION_REG_PATH}     "InstallDir",      instdir)
+    WriteRegStr("HKLM",   ${VERSION_REG_PATH},    "InstallDir",      instdir)
     
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayName",     ${PRODUCT_NAME})
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayVersion",  ${BRIDLE_VERSION})

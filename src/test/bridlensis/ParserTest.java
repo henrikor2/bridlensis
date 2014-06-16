@@ -423,7 +423,15 @@ public class ParserTest {
 			// all good
 			System.err.println(e.getMessage());
 		}
-
+		
+		try {
+			parser.parseStatement(readerFor("WriteRegStr(\"HKLM\",   ${VERSION_REG_PATH}     \"InstallDir\",      instdir)"));
+			fail();
+		} catch (InvalidSyntaxException e) {
+			// all good
+			System.err.println(e.getMessage());
+		}
+		
 		try {
 			parser.parseStatement(readerFor("bar()"));
 			fail();

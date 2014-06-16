@@ -119,6 +119,10 @@ class StatementParser {
 						reader.getIndent(), sb);
 				enclosingFunction.addArgument(argVariable);
 			} while (reader.getWordTail().isFunctionArgSeparator());
+			if (!reader.getWordTail().containsFunctionArgsClose()) {
+				throw new InvalidSyntaxException(
+						"Unterminated function definition");
+			}
 		}
 
 		if (reader.hasNextWord()) {
@@ -203,6 +207,9 @@ class StatementParser {
 				}
 				args.add(arg);
 			} while (reader.getWordTail().isFunctionArgSeparator());
+			if (!reader.getWordTail().containsFunctionArgsClose()) {
+				throw new InvalidSyntaxException("Unterminated function call");
+			}
 		}
 
 		if (function.getArgsCount() > -1
