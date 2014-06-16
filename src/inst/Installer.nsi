@@ -127,7 +127,7 @@ Section "Main"
         ; Some other version is in instdir already
         UninstallOldVersion(replace_version, instdir)
     EndIf
-
+    
     SetOutPath "$INSTDIR"
     File "${BRIDLE_HOME}\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar"
     File "${BRIDLE_HOME}\LICENSE"
@@ -140,6 +140,8 @@ Section "Main"
     File    "${BRIDLE_HOME}\Example\MakeInstaller.bat"
     
     WriteRegStr("HKLM",   ${VERSION_REG_PATH},    "InstallDir",      instdir)
+    
+    WriteRegStr("HKLM",   ${PRODUCT_REG_PATH},    "",                "$INSTDIR\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar")
     
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayName",     ${PRODUCT_NAME})
     WriteRegStr("HKLM",   ${WIN_UNINST_REG_PATH}, "DisplayVersion",  ${BRIDLE_VERSION})
@@ -162,6 +164,7 @@ Section "Uninstall"
 
     DeleteRegKey          HKLM "${WIN_UNINST_REG_PATH}"
     DeleteRegKey          HKLM "${VERSION_REG_PATH}"
+    DeleteRegValue        HKLM "${PRODUCT_REG_PATH}" ""
     DeleteRegKey /ifempty HKLM "${PRODUCT_REG_PATH}"
 
     Delete "$INSTDIR\${PRODUCT_NAME}-${BRIDLE_VERSION}.jar"
