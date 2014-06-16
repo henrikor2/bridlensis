@@ -1,5 +1,21 @@
 ﻿# BridleNSIS Release Notes
 
+## Version 0.3.0
+
+Release date: TBD
+
+### What's New
+
+*   New convenience functions for all text and word function headers as defined in NSIS 3.0a2
+*   Add support for defining several variables at once (`Var a, b, c`)
+*   Improved syntax checks for function arguments and comparison statements
+*   Improved integration with Sublime Text plugin
+
+### Fixes
+
+*   Fix parsing LogicLib flag tests if followed by another comparison statement (`If ${Errors} Or ...`)
+*   Fix parsing instruction options starting with slash character (e.g. `Var /GLOBAL a`)
+
 ## Version 0.2.0
 
 Release date: 2014-04-19
