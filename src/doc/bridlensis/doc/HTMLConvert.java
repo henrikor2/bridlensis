@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
@@ -18,7 +19,12 @@ public class HTMLConvert {
 
 	private static final String UTF_8 = "UTF-8";
 
-	private static final String MANUAL_MD = "manual.md";
+	private static final String MANUAL_INTRO = "manual_intro.md";
+	private static final String MANUAL_USAGE = "manual_usage.md";
+	private static final String MANUAL_LANGREF = "manual_langref.md";
+	private static final String MANUAL_FUNCREF = "manual_funcref.md";
+	private static final String MANUAL_FUNCREF_INSTRUCTIONS = "manual_funcref_instructions.md";
+	private static final String MANUAL_FUNCREF_HEADERS = "manual_funcref_headers.md";
 	private static final String MANUAL_CSS = "manual.css";
 	private static final String MANUAL_HTML = "Manual.html";
 
@@ -28,82 +34,80 @@ public class HTMLConvert {
 
 	public static void main(String[] args) {
 		int exitCode = 0;
-
-		BufferedWriter output = null;
-		InputStreamReader input = null;
 		try {
-			input = getInputUTF8(MANUAL_MD);
-			output = beginHTMLFile(new File(MANUAL_HTML), new Scanner(new File(
-					MANUAL_CSS), UTF_8));
-			writeManual(output, input);
-
-			input = getInputUTF8(RELNOTES_MD);
-			output = beginHTMLFile(new File(RELNOTES_HTML), new Scanner(
-					new File(RELNOTES_CSS), UTF_8));
-			writeReleaseNotes(output, input);
+			writeReleaseNotes();
+			writeManual();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			exitCode = 1;
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-			if (output != null) {
-				try {
-					output.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
 		}
-
 		System.exit(exitCode);
 	}
 
-	private static void writeManual(BufferedWriter output,
-			InputStreamReader input) throws IOException {
-		output.write(new Markdown4jProcessor().process(input));
-		Scanner scanner = new Scanner(
-				BuiltinElements.getBuiltinInstructionsDef());
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.startsWith("#")) {
-				output.write("<h4>");
-				output.write(line.substring(1).trim());
-				output.write(":</h4>");
-			} else if (line.length() > 0) {
-				output.write("<p class=\"func\">");
-				if (line.indexOf(" output") != -1) {
-					output.write("val = ");
-					line = line.replaceFirst(" output", "");
-				}
-				String[] parts = line.split("\\s+");
-				output.write(parts[0]);
-				output.write("(");
-				for (int i = 1; i < parts.length; i++) {
-					output.write(parts[i]);
-					if (i + 1 < parts.length) {
-						output.write(", ");
-					}
-				}
-				output.write(")</p>");
-			}
+	private static void writeReleaseNotes() throws IOException {
+		try (BufferedWriter output = beginHTMLFile(new File(RELNOTES_HTML),
+				new Scanner(new File(RELNOTES_CSS), UTF_8))) {
+			markdownToHtml(RELNOTES_MD, output);
+			endHTMLFile(output);
 		}
-		scanner.close();
-		output.write("<p style=\"color: #CCCCCC; margin-top: 24px;\">;eof BridleNSIS Manual</p>");
-		endHTMLFile(output);
+		System.out.println("Release Notes done");
+	}
+
+	private static void writeManual() throws IOException {
+		try (BufferedWriter output = beginHTMLFile(new File(MANUAL_HTML),
+				new Scanner(new File(MANUAL_CSS), UTF_8))) {
+			markdownToHtml(MANUAL_INTRO, output);
+			markdownToHtml(MANUAL_USAGE, output);
+			markdownToHtml(MANUAL_LANGREF, output);
+			markdownToHtml(MANUAL_FUNCREF, output);
+			markdownToHtml(MANUAL_FUNCREF_HEADERS, output);
+			writeFunctionsReferences(
+					BuiltinElements.getBuiltinHeaderFunctionsDef(), output);
+			markdownToHtml(MANUAL_FUNCREF_INSTRUCTIONS, output);
+			writeFunctionsReferences(
+					BuiltinElements.getBuiltinInstructionsDef(), output);
+			output.write("<p style=\"color: #CCCCCC; margin-top: 24px;\">;eof BridleNSIS Manual</p>");
+			endHTMLFile(output);
+		}
 		System.out.println("Manual done");
 	}
 
-	private static void writeReleaseNotes(BufferedWriter output,
-			InputStreamReader input) throws IOException {
-		output.write(new Markdown4jProcessor().process(input));
-		endHTMLFile(output);
-		System.out.println("Release Notes done");
+	private static void writeFunctionsReferences(InputStream input,
+			BufferedWriter output) throws IOException {
+		try (Scanner scanner = new Scanner(input)) {
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.startsWith("#")) {
+					output.write("<h4>");
+					output.write(line.substring(1).trim());
+					output.write(":</h4>");
+				} else if (line.length() > 0) {
+					output.write("<p class=\"func\">");
+					if (line.indexOf(" output") != -1) {
+						output.write("ret = ");
+						line = line.replaceFirst(" output", "");
+					}
+					String[] parts = line.split("\\s+");
+					output.write(parts[0]);
+					output.write("(");
+					for (int i = 1; i < parts.length; i++) {
+						output.write(parts[i]);
+						if (i + 1 < parts.length) {
+							output.write(", ");
+						}
+					}
+					output.write(")</p>");
+				}
+			}
+		}
+	}
+
+	private static void markdownToHtml(String markdownFile,
+			BufferedWriter output) throws IOException,
+			UnsupportedEncodingException, FileNotFoundException, AssertionError {
+		try (InputStreamReader inputUTF8 = getInputUTF8(markdownFile)) {
+			output.write(new Markdown4jProcessor().process(inputUTF8));
+		}
 	}
 
 	private static InputStreamReader getInputUTF8(String fileName)
