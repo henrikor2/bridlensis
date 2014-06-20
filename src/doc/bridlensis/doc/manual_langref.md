@@ -38,6 +38,12 @@ Variables can be introduced via `Var a` statement or via direct assignment `b = 
     instdir = programfiles + "\BridleNSIS" ; Bare NSIS equivalent would be: \
                                              StrCpy $INSTDIR "$PROGRAMFILES\BridleNSIS"
 
+Supported built-in variables include: 
+
+%%% builtinvars
+<!-- built-in variables -->
+%%%
+
 Note that NSIS doesn't support writing some of the variables and consider them as constants, e.g. `programfiles` (`$PROGRAMFILES` in NSIS).
 
 

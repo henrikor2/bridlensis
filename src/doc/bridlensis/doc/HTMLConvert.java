@@ -104,7 +104,9 @@ public class HTMLConvert {
 			BufferedWriter output) throws IOException,
 			UnsupportedEncodingException, FileNotFoundException, AssertionError {
 		try (InputStreamReader input = openMarkdownSourceFile(markdownFile)) {
-			output.write(new Markdown4jProcessor().process(input));
+			Markdown4jProcessor processor = new Markdown4jProcessor()
+					.registerPlugins(new BuiltinVariablesPlugin());
+			output.write(processor.process(input));
 		}
 	}
 

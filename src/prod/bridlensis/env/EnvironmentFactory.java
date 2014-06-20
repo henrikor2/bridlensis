@@ -5,13 +5,26 @@ import java.util.Scanner;
 
 public class EnvironmentFactory {
 
+	public static InputStream getBuiltinVariablesDef() {
+		return EnvironmentFactory.class
+				.getResourceAsStream("builtin_variables.conf");
+	}
+
+	public static InputStream getBuiltinInstructionsDef() {
+		return EnvironmentFactory.class
+				.getResourceAsStream("builtin_instructions.conf");
+	}
+
+	public static InputStream getBuiltinHeaderFunctionsDef() {
+		return EnvironmentFactory.class
+				.getResourceAsStream("builtin_functionheaders.conf");
+	}
+
 	public static Environment build(NameGenerator nameGenerator) {
 		Environment environment = new Environment();
 
 		// Built-in variables
-		try (Scanner scanner = new Scanner(
-				EnvironmentFactory.class
-						.getResourceAsStream("builtin_variables.conf"))) {
+		try (Scanner scanner = new Scanner(getBuiltinVariablesDef())) {
 			while (scanner.hasNext()) {
 				environment.add(new Variable(scanner.next().toLowerCase()));
 			}
@@ -42,16 +55,6 @@ public class EnvironmentFactory {
 		environment.add(new FunctionWordFind(true));
 
 		return environment;
-	}
-
-	public static InputStream getBuiltinInstructionsDef() {
-		return EnvironmentFactory.class
-				.getResourceAsStream("builtin_instructions.conf");
-	}
-
-	public static InputStream getBuiltinHeaderFunctionsDef() {
-		return EnvironmentFactory.class
-				.getResourceAsStream("builtin_functionheaders.conf");
 	}
 
 	private static void add(Environment environment,
