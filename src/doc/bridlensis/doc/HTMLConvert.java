@@ -59,7 +59,8 @@ public class HTMLConvert {
 		try (InputStreamReader input = openMarkdownSourceFile(markdownFile)) {
 			Markdown4jProcessor processor = new Markdown4jProcessor()
 					.registerPlugins(new BuiltinVariablesPlugin(),
-							new ReservedWordsPlugin(), new FunctionsPlugin());
+							new ReservedWordsPlugin(), new FunctionsPlugin(),
+							new VersionPlugin());
 			output.write(processor.process(input));
 		}
 	}

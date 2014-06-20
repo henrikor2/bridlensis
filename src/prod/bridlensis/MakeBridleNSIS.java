@@ -28,13 +28,13 @@ public class MakeBridleNSIS {
 	private static final String MAKENSIS_PROGRAMS86_PATH = "C:\\Program Files (x86)\\NSIS\\"
 			+ MAKENSIS_EXE;
 
-	private static final String VERSION;
+	public static final String VERSION;
 
 	static {
-		Scanner versionFileScanner = new Scanner(MakeBridleNSIS.class
-				.getClassLoader().getResourceAsStream("bridlensis/VERSION"));
-		VERSION = versionFileScanner.nextLine();
-		versionFileScanner.close();
+		try (Scanner versionFileScanner = new Scanner(MakeBridleNSIS.class
+				.getClassLoader().getResourceAsStream("bridlensis/VERSION"))) {
+			VERSION = versionFileScanner.nextLine();
+		}
 	}
 
 	private static PrintStream stdout = System.out;
