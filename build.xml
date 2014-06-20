@@ -93,6 +93,9 @@
 
     <target name="doc::compile">
         <mkdir dir="${bridle.doc.bin}" />
+        <copy todir="${bridle.doc.bin}" overwrite="true">
+            <fileset dir="${bridle.doc.src}" excludes="**/*.java" />
+        </copy>
         <javac destdir="${bridle.doc.bin}"
                source="${bridle.java.version}"
                target="${bridle.java.version}"
