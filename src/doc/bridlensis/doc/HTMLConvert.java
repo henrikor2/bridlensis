@@ -60,7 +60,7 @@ public class HTMLConvert {
 			Markdown4jProcessor processor = new Markdown4jProcessor()
 					.registerPlugins(new BuiltinVariablesPlugin(),
 							new ReservedWordsPlugin(), new FunctionsPlugin(),
-							new VersionPlugin());
+							new VersionPlugin(), new UsagePlugin());
 			output.write(processor.process(input));
 		}
 	}

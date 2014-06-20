@@ -71,6 +71,18 @@ public class MakeBridleNSIS {
 
 	}
 
+	public static String usage() {
+		StringBuilder sb = new StringBuilder();
+		try (Scanner scanner = new Scanner(MakeBridleNSIS.class
+				.getClassLoader().getResourceAsStream("bridlensis/USAGE"))) {
+			while (scanner.hasNextLine()) {
+				sb.append(scanner.nextLine().replaceFirst("%VERSION%", VERSION));
+				sb.append("\r\n");
+			}
+		}
+		return sb.toString();
+	}
+
 	public static void main(String[] args) {
 		stdout.print("BridleNSIS v");
 		stdout.print(VERSION);
@@ -78,15 +90,11 @@ public class MakeBridleNSIS {
 		stdout.println("See the User Manual for license details and credits.");
 		stdout.println();
 
-		if (args.length == 0) {
-			usage();
-			System.exit(0);
-		}
-
 		Arguments arguments = Arguments.parse(args);
 
 		if (arguments.inputFile == null) {
-			usage();
+			System.out.println("Usage: ");
+			System.out.println("  " + usage());
 			System.exit(0);
 			return;
 		}
@@ -189,13 +197,6 @@ public class MakeBridleNSIS {
 			outputFileName = inputFileName + ".bnsi";
 		}
 		return outputFileName;
-	}
-
-	private static void usage() {
-		stdout.println("Usage:");
-		stdout.println("  java -jar bridlensis-"
-				+ VERSION
-				+ ".jar [-n <NSIS home>] [-o <outdir>] [-e <encoding>] [-x <file1:file2:..>] <script file> [<NSIS options>]");
 	}
 
 	protected static void makeBridleNSIS(NameGenerator nameGenerator,

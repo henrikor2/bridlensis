@@ -25,29 +25,9 @@ BridleNSIS compiler will parse the input file(s) and convert them to pure NSIS. 
 
 Use Java 1.7 or newer to run BridleNSIS compiler:
 
-    java -jar bridlensis.jar [-n <NSIS home>] [-o <outdir>] [-e <encoding>] [-x <file1:file2:..>] <script file> [<NSIS options>]
-
-Arguments:
-
-*   __-n &lt;NSIS home&gt;__: NSIS home directory (tried to detect automatically if not specified)
-*   __-o &lt;output&gt;__: Output directory for converted script files (.snsi or .snsh)
-*   __-e &lt;encoding&gt;__: File encoding (defaults to Windows system encoding)
-*   __-x &lt;files&gt;__: Colon-separated list of files to exclude (or not to follow when found in !include)
-*   __&lt;script file&gt;__: BridleNSIS script file to compile
-*   __&lt;NSIS options&gt;__: Options passed to NSIS compiler, e.g. /Dname=value
-
-Error codes:
-
-*   __10__: Unable to create or resolve output directory
-*   __11__: Errors in BridleNSIS script
-*   __12__: NSIS home directory not found
-*   __13__: Unexpected error when executing makensis.exe
-
-Otherwise BridleNSIS returns whatever makensis.exe returns.
-
-Example:
-
-    java -jar bridlensis.jar -n "C:\Program Files(x86)\NSIS" example.nsi
+%%% usage 
+<!-- usage --> 
+%%%
 
 
 ### Multilingual Installers
