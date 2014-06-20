@@ -1,22 +1,45 @@
 package bridlensis.env;
 
+import java.util.Arrays;
 import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 
-public interface Callable {
+public abstract class Callable {
 
 	public static enum ReturnType {
 		VOID, OPTIONAL, REQUIRED, ERRORFLAG
 	}
 
-	int getMandatoryArgsCount();
+	private final List<String> aliases;
 
-	int getArgsCount();
+	protected Callable(String... aliases) {
+		if (aliases.length == 0) {
+			throw new AssertionError("Function name not defined");
+		}
+		this.aliases = Arrays.asList(aliases);
+	}
 
-	ReturnType getReturnType();
+	public String getName() {
+		return aliases.get(0);
+	}
 
-	String statementFor(String indent, List<TypeObject> args, Variable returnVar)
-			throws InvalidSyntaxException;
+	public Iterable<String> getAliases() {
+		return aliases;
+	}
+
+	public abstract int getMandatoryArgsCount();
+
+	public abstract int getArgsCount();
+
+	public abstract ReturnType getReturnType();
+
+	public abstract String statementFor(String indent, List<TypeObject> args,
+			Variable returnVar) throws InvalidSyntaxException;
+
+	@Override
+	public String toString() {
+		return "Function[" + getName() + "]";
+	}
 
 }

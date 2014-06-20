@@ -7,8 +7,8 @@ import bridlensis.NSISStatements;
 
 class Instruction extends BuiltinFunction {
 
-	public Instruction(String displayName, int argsCount, int returnArgIndex) {
-		super(displayName, argsCount, returnArgIndex);
+	public Instruction(String name, int argsCount, int returnArgIndex) {
+		super(name, argsCount, returnArgIndex);
 	}
 
 	@Override
@@ -19,7 +19,7 @@ class Instruction extends BuiltinFunction {
 		if (getReturnType() != ReturnType.VOID) {
 			cArgs.add(getReturnArgIndex(), returnVar);
 		}
-		sb.append(getDisplayName());
+		sb.append(getName());
 		sb.append(' ');
 		for (TypeObject cArg : cArgs) {
 			if (!cArg.equals(NSISStatements.NULL)) {

@@ -9,15 +9,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Scanner;
 
-import bridlensis.env.BuiltinElements;
-import bridlensis.env.Callable;
 import bridlensis.env.DefaultNameGenerator;
-import bridlensis.env.Environment;
+import bridlensis.env.EnvironmentFactory;
 import bridlensis.env.NameGenerator;
-import bridlensis.env.Variable;
 
 public class MakeBridleNSIS {
 
@@ -217,13 +213,9 @@ public class MakeBridleNSIS {
 		stdout.println("Encoding: " + encoding);
 		stdout.println();
 
-		Map<String, Variable> variables = BuiltinElements
-				.loadBuiltinVariables();
-		Map<String, Callable> functions = BuiltinElements
-				.loadBuiltinFunctions(nameGenerator);
-		Parser parser = new Parser(new StatementParser(new Environment(
-				variables, functions), nameGenerator), baseDir, outDir,
-				encoding, excludeFiles);
+		Parser parser = new Parser(new StatementParser(
+				EnvironmentFactory.build(nameGenerator), nameGenerator),
+				baseDir, outDir, encoding, excludeFiles);
 
 		long time = System.currentTimeMillis();
 		parser.parse(inputFile.getName(), outputFile.getName());

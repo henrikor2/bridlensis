@@ -4,13 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class BuiltinElementsTest {
+public class EnvironmentFactoryTest {
 
 	@Test
 	public void testLoadBuiltinFunctions() {
-		Environment env = new Environment(
-				BuiltinElements.loadBuiltinVariables(),
-				BuiltinElements.loadBuiltinFunctions(null));
+		Environment env = EnvironmentFactory.build(null);
 		try {
 			env.registerUserFunction("DetailPrint");
 			fail();
@@ -21,9 +19,7 @@ public class BuiltinElementsTest {
 
 	@Test
 	public void testLoadBuiltinVariables() throws EnvironmentException {
-		Environment env = new Environment(
-				BuiltinElements.loadBuiltinVariables(),
-				BuiltinElements.loadBuiltinFunctions(null));
+		Environment env = EnvironmentFactory.build(null);
 		assertTrue(env.containsVariable("r2", null));
 		assertTrue(env.containsVariable("r3", null));
 		assertTrue(env.containsVariable("r9", null));

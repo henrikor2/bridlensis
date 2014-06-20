@@ -1,6 +1,7 @@
 package bridlensis.env;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +16,31 @@ public class Environment {
 			"elseif", "else", "endif", "do", "while", "until", "continue",
 			"break", "loop");
 
-	private Map<String, Callable> callables;
-	private Map<String, Variable> vars;
+	private final Map<String, Variable> vars;
+	private final Map<String, Callable> callables;
 
-	public Environment(Map<String, Variable> vars,
-			Map<String, Callable> callables) {
-		this.vars = vars;
-		this.callables = callables;
+	protected Environment() {
+		vars = new HashMap<>();
+		callables = new HashMap<>();
+	}
+
+	protected void add(Variable variable) {
+		if (vars.containsKey(variable.getName())) {
+			throw new AssertionError("Variable " + variable.getName()
+					+ " already exists.");
+		}
+		vars.put(variable.getName(), variable);
+	}
+
+	protected void add(Callable callable) {
+		for (String alias : callable.getAliases()) {
+			String normalizedName = alias.toLowerCase();
+			if (callables.containsKey(normalizedName)) {
+				throw new AssertionError("Function alias " + alias
+						+ " already exists.");
+			}
+			callables.put(normalizedName, callable);
+		}
 	}
 
 	public Variable registerVariable(String name, UserFunction enclosingFunction)

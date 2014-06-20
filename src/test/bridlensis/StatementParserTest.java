@@ -9,9 +9,9 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-import bridlensis.env.BuiltinElements;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.EnvironmentFactory;
 import bridlensis.env.SimpleNameGenerator;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
@@ -19,24 +19,23 @@ import bridlensis.env.UserFunction;
 
 public class StatementParserTest {
 
+	private StatementParser createStatementParser() {
+		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
+		StatementParser parser = new StatementParser(
+				EnvironmentFactory.build(nameGenerator), nameGenerator);
+		return parser;
+	}
+
 	private InputReader readerFor(String string) throws InvalidSyntaxException {
 		InputReader reader = new InputReader(new Scanner(string));
 		reader.goToNextStatement();
 		return reader;
 	}
 
-	private StatementParser createParser() {
-		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
-		Environment environment = new Environment(
-				BuiltinElements.loadBuiltinVariables(),
-				BuiltinElements.loadBuiltinFunctions(nameGenerator));
-		return new StatementParser(environment, nameGenerator);
-	}
-
 	@Test
 	public void testParseExpression() throws InvalidSyntaxException,
 			ParserException, EnvironmentException {
-		StatementParser parser = createParser();
+		StatementParser parser = createStatementParser();
 		InputReader reader;
 		StringBuilder buffer;
 		StringBuilder expected;
@@ -136,7 +135,7 @@ public class StatementParserTest {
 
 	@Test
 	public void testCall() throws InvalidSyntaxException, EnvironmentException {
-		StatementParser parser = createParser();
+		StatementParser parser = createStatementParser();
 		Environment env = parser.getEnvironment();
 		StringBuilder expected;
 

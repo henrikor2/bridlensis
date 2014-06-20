@@ -4,12 +4,13 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionDelete implements Callable {
+class FunctionDelete extends Callable {
 
 	private static final int FILE_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
-	FunctionDelete() {
+	protected FunctionDelete() {
+		super("Delete", "FileDelete");
 	}
 
 	@Override
@@ -42,11 +43,6 @@ class FunctionDelete implements Callable {
 		}
 		sb.append(args.get(FILE_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[delete]";
 	}
 
 }

@@ -5,17 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
-
 import org.junit.Test;
 
 public class EnvironmentTest {
 
 	@Test
 	public void testRegisterVariable() throws EnvironmentException {
-		Environment env = new Environment(
-				BuiltinElements.loadBuiltinVariables(),
-				BuiltinElements.loadBuiltinFunctions(null));
+		Environment env = EnvironmentFactory.build(null);
 		assertEquals("a", env.registerVariable("a", null).getName());
 		try {
 			env.registerVariable("a", null);
@@ -49,8 +45,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testContainsVariable() throws EnvironmentException {
-		Environment env = new Environment(new HashMap<String, Variable>(),
-				new HashMap<String, Callable>());
+		Environment env = EnvironmentFactory.build(null);
 		assertFalse(env.containsVariable("a", null));
 		assertEquals("a", env.registerVariable("a", null).getName());
 		assertTrue(env.containsVariable("a", null));
@@ -60,8 +55,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testGetVariable() throws EnvironmentException {
-		Environment env = new Environment(new HashMap<String, Variable>(),
-				new HashMap<String, Callable>());
+		Environment env = EnvironmentFactory.build(null);
 		try {
 			env.getVariable("a", null);
 			fail();
@@ -83,8 +77,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testGetCallable() throws EnvironmentException {
-		Environment env = new Environment(new HashMap<String, Variable>(),
-				new HashMap<String, Callable>());
+		Environment env = EnvironmentFactory.build(null);
 		try {
 			env.getCallable("a");
 			fail();
@@ -97,8 +90,7 @@ public class EnvironmentTest {
 
 	@Test
 	public void testRegisterFunction() throws EnvironmentException {
-		Environment env = new Environment(new HashMap<String, Variable>(),
-				new HashMap<String, Callable>());
+		Environment env = EnvironmentFactory.build(null);
 		try {
 			env.registerUserFunction("global");
 			fail();

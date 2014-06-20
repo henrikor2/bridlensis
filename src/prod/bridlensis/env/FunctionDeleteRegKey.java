@@ -4,13 +4,14 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionDeleteRegKey implements Callable {
+class FunctionDeleteRegKey extends Callable {
 
 	private static final int ROOT_KEY_INDEX = 0;
 	private static final int SUBKEY_INDEX = 1;
 	private static final int OPTIONS_INDEX = 2;
 
-	FunctionDeleteRegKey() {
+	protected FunctionDeleteRegKey() {
+		super("DeleteRegKey");
 	}
 
 	@Override
@@ -45,11 +46,6 @@ class FunctionDeleteRegKey implements Callable {
 		sb.append(' ');
 		sb.append(args.get(SUBKEY_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[deleteregkey]";
 	}
 
 }

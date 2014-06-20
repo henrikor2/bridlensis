@@ -7,26 +7,24 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-import bridlensis.env.BuiltinElements;
-import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.EnvironmentFactory;
 import bridlensis.env.SimpleNameGenerator;
 
 public class ParserTest {
+
+	private Parser createParser() {
+		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
+		Parser parser = new Parser(new StatementParser(
+				EnvironmentFactory.build(nameGenerator), nameGenerator), null,
+				null, null, null);
+		return parser;
+	}
 
 	private InputReader readerFor(String string) throws InvalidSyntaxException {
 		InputReader reader = new InputReader(new Scanner(string));
 		reader.goToNextStatement();
 		return reader;
-	}
-
-	private Parser createParser() {
-		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
-		Environment environment = new Environment(
-				BuiltinElements.loadBuiltinVariables(),
-				BuiltinElements.loadBuiltinFunctions(nameGenerator));
-		return new Parser(new StatementParser(environment, nameGenerator),
-				null, null, null, null);
 	}
 
 	@Test
@@ -423,7 +421,7 @@ public class ParserTest {
 			// all good
 			System.err.println(e.getMessage());
 		}
-		
+
 		try {
 			parser.parseStatement(readerFor("WriteRegStr(\"HKLM\",   ${VERSION_REG_PATH}     \"InstallDir\",      instdir)"));
 			fail();
@@ -431,7 +429,7 @@ public class ParserTest {
 			// all good
 			System.err.println(e.getMessage());
 		}
-		
+
 		try {
 			parser.parseStatement(readerFor("bar()"));
 			fail();

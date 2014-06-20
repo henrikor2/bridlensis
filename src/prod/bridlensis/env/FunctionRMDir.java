@@ -5,12 +5,13 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionRMDir implements Callable {
+public class FunctionRMDir extends Callable {
 
 	private static final int DIR_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
-	FunctionRMDir() {
+	protected FunctionRMDir() {
+		super("RMDir");
 	}
 
 	@Override
@@ -43,11 +44,6 @@ public class FunctionRMDir implements Callable {
 		}
 		sb.append(args.get(DIR_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[rmdir]";
 	}
 
 }

@@ -2,7 +2,7 @@ package bridlensis.env;
 
 import java.lang.reflect.InvocationTargetException;
 
-abstract class BuiltinFunction implements Callable {
+abstract class BuiltinFunction extends Callable {
 
 	protected static BuiltinFunction parse(String line,
 			Class<? extends BuiltinFunction> instanceClass) {
@@ -27,19 +27,13 @@ abstract class BuiltinFunction implements Callable {
 		}
 	}
 
-	private String displayName;
 	private int argsCount;
 	private int returnArgIndex;
 
-	protected BuiltinFunction(String displayName, int argsCount,
-			int returnArgIndex) {
-		this.displayName = displayName;
+	protected BuiltinFunction(String name, int argsCount, int returnArgIndex) {
+		super(name);
 		this.argsCount = argsCount;
 		this.returnArgIndex = returnArgIndex;
-	}
-
-	protected String getDisplayName() {
-		return displayName;
 	}
 
 	protected int getReturnArgIndex() {
@@ -59,11 +53,6 @@ abstract class BuiltinFunction implements Callable {
 	@Override
 	public ReturnType getReturnType() {
 		return returnArgIndex == -1 ? ReturnType.VOID : ReturnType.REQUIRED;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[displayName=" + displayName + "]";
 	}
 
 }

@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 import org.markdown4j.Markdown4jProcessor;
 
-import bridlensis.env.BuiltinElements;
+import bridlensis.env.EnvironmentFactory;
 
 public class HTMLConvert {
 
@@ -60,10 +60,10 @@ public class HTMLConvert {
 			markdownToHtml(MANUAL_MD_FUNCREF, output);
 			markdownToHtml(MANUAL_MD_FUNCREF_HEADERS, output);
 			writeFunctionReference(
-					BuiltinElements.getBuiltinHeaderFunctionsDef(), output);
+					EnvironmentFactory.getBuiltinHeaderFunctionsDef(), output);
 			markdownToHtml(MANUAL_MD_FUNCREF_INSTRUCTIONS, output);
-			writeFunctionReference(BuiltinElements.getBuiltinInstructionsDef(),
-					output);
+			writeFunctionReference(
+					EnvironmentFactory.getBuiltinInstructionsDef(), output);
 			output.write("<p style=\"color: #CCCCCC; margin-top: 24px;\">;eof BridleNSIS Manual</p>");
 			endHTMLFile(output);
 		}

@@ -6,18 +6,13 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-public class UserFunction implements Callable {
+public class UserFunction extends Callable {
 
-	private final String name;
 	private List<Variable> args = new ArrayList<>();
 	private boolean hasReturn = false;
 
-	UserFunction(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
+	protected UserFunction(String name) {
+		super(name);
 	}
 
 	public void addArgument(Variable arg) {
@@ -67,11 +62,6 @@ public class UserFunction implements Callable {
 			sb.append(returnVar.getValue());
 		}
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "UserFunction[" + name + "]";
 	}
 
 }

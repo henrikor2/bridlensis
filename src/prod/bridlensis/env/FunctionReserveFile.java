@@ -4,12 +4,13 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionReserveFile implements Callable {
+class FunctionReserveFile extends Callable {
 
 	private static final int FILE_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
-	FunctionReserveFile() {
+	protected FunctionReserveFile() {
+		super("ReserveFile");
 	}
 
 	@Override
@@ -42,11 +43,6 @@ class FunctionReserveFile implements Callable {
 		}
 		sb.append(args.get(FILE_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[reservefile]";
 	}
 
 }

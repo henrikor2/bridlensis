@@ -5,13 +5,14 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionRename implements Callable {
+public class FunctionRename extends Callable {
 
 	private static final int SOURCE_INDEX = 0;
 	private static final int TARGET_INDEX = 1;
 	private static final int OPTIONS_INDEX = 2;
 
-	FunctionRename() {
+	protected FunctionRename() {
+		super("Rename", "FileRename");
 	}
 
 	@Override
@@ -46,11 +47,6 @@ public class FunctionRename implements Callable {
 		sb.append(" ");
 		sb.append(args.get(FunctionRename.TARGET_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[rename]";
 	}
 
 }

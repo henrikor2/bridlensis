@@ -5,13 +5,14 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionFile implements Callable {
+public class FunctionFile extends Callable {
 
 	private static final int FILE_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 	private static final int OUTPATH_INDEX = 2;
 
-	FunctionFile() {
+	protected FunctionFile() {
+		super("File");
 	}
 
 	@Override
@@ -50,11 +51,6 @@ public class FunctionFile implements Callable {
 		}
 		sb.append(args.get(FILE_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[file]";
 	}
 
 }

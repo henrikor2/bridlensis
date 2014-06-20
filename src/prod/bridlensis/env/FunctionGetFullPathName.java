@@ -4,12 +4,13 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionGetFullPathName implements Callable {
+class FunctionGetFullPathName extends Callable {
 
 	private static final int PATH_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
-	FunctionGetFullPathName() {
+	protected FunctionGetFullPathName() {
+		super("GetFullPathName");
 	}
 
 	@Override
@@ -44,11 +45,6 @@ class FunctionGetFullPathName implements Callable {
 		sb.append(' ');
 		sb.append(args.get(PATH_INDEX).getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[getfullpathname]";
 	}
 
 }

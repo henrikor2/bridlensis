@@ -4,7 +4,7 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionWordFind implements Callable {
+class FunctionWordFind extends Callable {
 
 	private static final int STRING_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
@@ -14,7 +14,8 @@ class FunctionWordFind implements Callable {
 
 	private final boolean caseSensitive;
 
-	FunctionWordFind(boolean caseSensitive) {
+	protected FunctionWordFind(boolean caseSensitive) {
+		super("WordFind" + (caseSensitive ? "S" : ""));
 		this.caseSensitive = caseSensitive;
 	}
 
@@ -78,11 +79,6 @@ class FunctionWordFind implements Callable {
 		sb.append(' ');
 		sb.append(returnVar.getValue());
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return "Function[wordfind]";
 	}
 
 }
