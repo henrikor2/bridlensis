@@ -5,7 +5,11 @@ Unless stated otherwise BridleNSIS follows [the NSIS Scripting Reference](http:/
 
 ### Reserved Words
 
-Reserved words are: `var`, `global`, `function`, `return`, `functionend`, `if`, `not`, `or`, `and`, `elseif`, `else`, `endif`, `do`, `while`, `until`, `continue`, `break`, and `loop`.
+Reserved words are: 
+
+%%% reservedwords 
+<!-- reserved words --> 
+%%%
 
 Variable or function name cannot be a reserved word.
 

@@ -105,7 +105,8 @@ public class HTMLConvert {
 			UnsupportedEncodingException, FileNotFoundException, AssertionError {
 		try (InputStreamReader input = openMarkdownSourceFile(markdownFile)) {
 			Markdown4jProcessor processor = new Markdown4jProcessor()
-					.registerPlugins(new BuiltinVariablesPlugin());
+					.registerPlugins(new BuiltinVariablesPlugin(),
+							new ReservedWordsPlugin());
 			output.write(processor.process(input));
 		}
 	}

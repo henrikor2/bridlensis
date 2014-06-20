@@ -127,4 +127,8 @@ public class Environment {
 		return function;
 	}
 
+	public static Iterable<String> getReservedWords() {
+		return RESERVED_WORDS;
+	}
+
 }
