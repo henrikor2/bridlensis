@@ -1,74 +1,105 @@
 package bridlensis.env;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class EnvironmentFactory {
 
-	public static InputStream getBuiltinVariablesDef() {
-		return EnvironmentFactory.class
-				.getResourceAsStream("builtin_variables.conf");
+	public static List<Variable> getBuiltinVariables() {
+		List<Variable> variables = new ArrayList<>();
+		try (Scanner scanner = new Scanner(
+				EnvironmentFactory.class
+						.getResourceAsStream("builtin_variables.conf"))) {
+			while (scanner.hasNext()) {
+				variables.add(new Variable(scanner.next().toLowerCase()));
+			}
+		}
+		return variables;
 	}
 
-	public static InputStream getBuiltinInstructionsDef() {
-		return EnvironmentFactory.class
-				.getResourceAsStream("builtin_instructions.conf");
+	public static List<Callable> getBuiltinHeaderFunctions() {
+		return getBuiltinFunctions(
+				EnvironmentFactory.class
+						.getResourceAsStream("builtin_functionheaders.conf"),
+				HeaderFunction.class);
 	}
 
-	public static InputStream getBuiltinHeaderFunctionsDef() {
-		return EnvironmentFactory.class
-				.getResourceAsStream("builtin_functionheaders.conf");
+	public static List<Callable> getBuiltinInstructionFunctions() {
+		return getBuiltinFunctions(
+				EnvironmentFactory.class
+						.getResourceAsStream("builtin_instructions.conf"),
+				Instruction.class);
+	}
+
+	private static List<Callable> getBuiltinFunctions(InputStream definitions,
+			Class<? extends BuiltinFunction> instanceClass) {
+		List<Callable> functions = new ArrayList<>();
+		try (Scanner scanner = new Scanner(definitions)) {
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.length() > 0 && line.charAt(0) != '#') {
+					functions.add(BuiltinFunction.parse(line, instanceClass));
+				}
+			}
+		}
+		return functions;
+	}
+
+	public static List<Callable> getBuiltinCustomFunctions(
+			NameGenerator nameGenerator, Callable functionStrCpy) {
+		List<Callable> customFunctions = new ArrayList<>();
+		customFunctions.add(new FunctionMsgBox(nameGenerator, functionStrCpy));
+		customFunctions.add(new FunctionFile());
+		customFunctions.add(new FunctionReserveFile());
+		customFunctions.add(new FunctionCopy());
+		customFunctions.add(new FunctionDelete());
+		customFunctions.add(new FunctionRename());
+		customFunctions.add(new FunctionRMDir());
+		customFunctions.add(new FunctionDeleteRegKey());
+		customFunctions.add(new FunctionGetFullPathName());
+		customFunctions.add(new FunctionWordFind(false));
+		customFunctions.add(new FunctionWordFind(true));
+		return customFunctions;
 	}
 
 	public static Environment build(NameGenerator nameGenerator) {
 		Environment environment = new Environment();
 
 		// Built-in variables
-		try (Scanner scanner = new Scanner(getBuiltinVariablesDef())) {
-			while (scanner.hasNext()) {
-				environment.add(new Variable(scanner.next().toLowerCase()));
-			}
+		List<Variable> variables = getBuiltinVariables();
+		for (Variable variable : variables) {
+			environment.add(variable);
 		}
 
 		// NSIS instructions as functions
-		add(environment, Instruction.class, getBuiltinInstructionsDef());
+		List<Callable> instrcutions = getBuiltinInstructionFunctions();
+		for (Callable instruction : instrcutions) {
+			environment.add(instruction);
+		}
 
 		// NSIS function headers as functions
-		add(environment, HeaderFunction.class, getBuiltinHeaderFunctionsDef());
+		List<Callable> headers = getBuiltinHeaderFunctions();
+		for (Callable header : headers) {
+			environment.add(header);
+		}
 
-		// Built-in Bridle functions
+		Callable functionStrCpy;
 		try {
-			environment.add(new FunctionMsgBox(nameGenerator, environment
-					.getCallable("strcpy")));
+			functionStrCpy = environment.getCallable("strcpy");
 		} catch (EnvironmentException e) {
 			throw new AssertionError(e);
 		}
-		environment.add(new FunctionFile());
-		environment.add(new FunctionReserveFile());
-		environment.add(new FunctionCopy());
-		environment.add(new FunctionDelete());
-		environment.add(new FunctionRename());
-		environment.add(new FunctionRMDir());
-		environment.add(new FunctionDeleteRegKey());
-		environment.add(new FunctionGetFullPathName());
-		environment.add(new FunctionWordFind(false));
-		environment.add(new FunctionWordFind(true));
+
+		// Built-in Bridle functions
+		List<Callable> customFunctions = getBuiltinCustomFunctions(
+				nameGenerator, functionStrCpy);
+		for (Callable function : customFunctions) {
+			environment.add(function);
+		}
 
 		return environment;
 	}
 
-	private static void add(Environment environment,
-			Class<? extends BuiltinFunction> instanceClass,
-			InputStream definitions) {
-		Scanner scanner = new Scanner(definitions);
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.length() > 0 && line.charAt(0) != '#') {
-				BuiltinFunction function = BuiltinFunction.parse(line,
-						instanceClass);
-				environment.add(function);
-			}
-		}
-		scanner.close();
-	}
 }

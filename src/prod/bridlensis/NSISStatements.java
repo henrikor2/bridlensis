@@ -1,6 +1,5 @@
 package bridlensis;
 
-import java.util.Iterator;
 import java.util.List;
 
 import bridlensis.env.Callable;
@@ -57,8 +56,7 @@ public class NSISStatements {
 		StringBuilder sb = begin(indent);
 		sb.append("Function ");
 		sb.append(function.getName());
-		Iterator<Variable> args = function.argumentsIterator();
-		while (args.hasNext()) {
+		for (int i = 0; i < function.getArgsCount(); i++) {
 			sb.append(NEWLINE_MARKER);
 			if (indent.length() != 0) {
 				sb.append(indent);
@@ -67,7 +65,7 @@ public class NSISStatements {
 				sb.append(DEFAULT_INDENT);
 			}
 			sb.append("Pop ");
-			sb.append(args.next().getValue());
+			sb.append(function.getArgument(i).getValue());
 		}
 		return sb.toString();
 	}

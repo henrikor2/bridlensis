@@ -7,8 +7,8 @@ import bridlensis.NSISStatements;
 
 class HeaderFunction extends BuiltinFunction {
 
-	public HeaderFunction(String name, int argsCount, int returnArgIndex) {
-		super(name, argsCount, returnArgIndex);
+	public HeaderFunction(String name) {
+		super(name);
 	}
 
 	@Override
@@ -30,4 +30,5 @@ class HeaderFunction extends BuiltinFunction {
 		}
 		return sb.toString();
 	}
+
 }

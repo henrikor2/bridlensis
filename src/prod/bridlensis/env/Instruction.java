@@ -7,8 +7,8 @@ import bridlensis.NSISStatements;
 
 class Instruction extends BuiltinFunction {
 
-	public Instruction(String name, int argsCount, int returnArgIndex) {
-		super(name, argsCount, returnArgIndex);
+	public Instruction(String name) {
+		super(name);
 	}
 
 	@Override
@@ -29,4 +29,5 @@ class Instruction extends BuiltinFunction {
 		}
 		return sb.toString();
 	}
+
 }

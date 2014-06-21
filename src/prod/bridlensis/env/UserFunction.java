@@ -1,33 +1,20 @@
 package bridlensis.env;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import bridlensis.NSISStatements;
 
 public class UserFunction extends Callable {
 
-	private List<Variable> args = new ArrayList<>();
 	private boolean hasReturn = false;
 
 	protected UserFunction(String name) {
 		super(name);
 	}
 
-	public void addArgument(Variable arg) {
-		args.add(arg);
-	}
-
 	@Override
 	public int getMandatoryArgsCount() {
-		// All arguments are mandatory
-		return args.size();
-	}
-
-	@Override
-	public int getArgsCount() {
-		return args.size();
+		return getArgsCount();
 	}
 
 	@Override
@@ -37,10 +24,6 @@ public class UserFunction extends Callable {
 
 	public void setHasReturn(boolean hasReturn) {
 		this.hasReturn = hasReturn;
-	}
-
-	public Iterator<Variable> argumentsIterator() {
-		return args.iterator();
 	}
 
 	@Override
