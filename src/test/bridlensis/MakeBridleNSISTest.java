@@ -96,24 +96,23 @@ public class MakeBridleNSISTest {
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
 				outputFile, "UTF-16LE", null);
 		assertFiles(expectedFile, outputFile, "UTF-16LE");
+		assertTrue(outputFile.delete());
 		assertEquals(2, outputFile_ja.length()); // Output file contains BOM
-		outputFile.delete();
-		outputFile_ja.delete();
+		assertTrue(outputFile_ja.delete());
 
 		// Must use SJIS for parsing the Japanese file
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile_ja,
 				outputFile_ja, "SJIS", null);
 		assertFiles(expectedFile_ja1, outputFile_ja, "SJIS");
-		outputFile.delete();
-		outputFile_ja.delete();
+		assertTrue(outputFile_ja.delete());
 
 		// Use exclude to skip language files
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
 				outputFile, "UTF-16LE", Arrays.asList("I18N_ja.nsh"));
 		assertFiles(expectedFile, outputFile, "UTF-16LE");
+		assertTrue(outputFile.delete());
 		assertFiles(expectedFile_ja2, outputFile_ja, "SJIS");
-		outputFile.delete();
-		outputFile_ja.delete();
+		assertTrue(outputFile_ja.delete());
 	}
 
 	private void assertFiles(File expectedFile, File actualFile, String encoding)
