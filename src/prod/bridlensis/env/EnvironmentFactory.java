@@ -11,7 +11,8 @@ public class EnvironmentFactory {
 		List<Variable> variables = new ArrayList<>();
 		try (Scanner scanner = new Scanner(
 				EnvironmentFactory.class
-						.getResourceAsStream("builtin_variables.conf"))) {
+						.getResourceAsStream("builtin_variables.conf"),
+				"UTF-8")) {
 			while (scanner.hasNext()) {
 				variables.add(new Variable(scanner.next().toLowerCase()));
 			}
@@ -36,7 +37,7 @@ public class EnvironmentFactory {
 	private static List<Callable> getBuiltinFunctions(InputStream definitions,
 			Class<? extends BuiltinFunction> instanceClass) {
 		List<Callable> functions = new ArrayList<>();
-		try (Scanner scanner = new Scanner(definitions)) {
+		try (Scanner scanner = new Scanner(definitions, "UTF-8")) {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				if (line.length() > 0 && line.charAt(0) != '#') {
