@@ -5,29 +5,15 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionFile extends Callable {
+public class FunctionFile extends CustomFunction {
 
 	private static final int FILE_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 	private static final int OUTPATH_INDEX = 2;
 
 	protected FunctionFile() {
-		super("File");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 1;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 3;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.VOID;
+		super(1, ReturnType.VOID, "File");
+		registerArguments("file", "options", "outpath");
 	}
 
 	@Override

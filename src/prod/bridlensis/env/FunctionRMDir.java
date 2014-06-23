@@ -5,28 +5,14 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionRMDir extends Callable {
+public class FunctionRMDir extends CustomFunction {
 
 	private static final int DIR_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
 	protected FunctionRMDir() {
-		super("RMDir");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 1;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.ERRORFLAG;
+		super(1, ReturnType.ERRORFLAG, "RMDir");
+		registerArguments("dir", "options");
 	}
 
 	@Override

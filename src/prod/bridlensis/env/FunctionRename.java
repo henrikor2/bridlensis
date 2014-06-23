@@ -5,29 +5,15 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-public class FunctionRename extends Callable {
+public class FunctionRename extends CustomFunction {
 
 	private static final int SOURCE_INDEX = 0;
 	private static final int TARGET_INDEX = 1;
 	private static final int OPTIONS_INDEX = 2;
 
 	protected FunctionRename() {
-		super("Rename", "FileRename");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 3;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.ERRORFLAG;
+		super(2, ReturnType.ERRORFLAG, "FileRename", "Rename");
+		registerArguments("source", "target", "options");
 	}
 
 	@Override

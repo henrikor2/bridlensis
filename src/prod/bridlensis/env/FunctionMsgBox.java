@@ -7,7 +7,7 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-class FunctionMsgBox extends Callable {
+class FunctionMsgBox extends CustomFunction {
 
 	private static final int BUTTONGROUP_INDEX = 0;
 	private static final int MESSAGE_INDEX = 1;
@@ -57,24 +57,10 @@ class FunctionMsgBox extends Callable {
 	private Callable strcpy;
 
 	protected FunctionMsgBox(NameGenerator nameGenerator, Callable strcpy) {
-		super("MsgBox");
+		super(2, ReturnType.OPTIONAL, "MsgBox");
 		this.nameGenerator = nameGenerator;
 		this.strcpy = strcpy;
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 4;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.OPTIONAL;
+		registerArguments("button_group", "message", "options", "sd_return");
 	}
 
 	protected Collection<ReturnOption> returnOptions(ButtonGroup buttons)

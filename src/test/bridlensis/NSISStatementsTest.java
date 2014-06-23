@@ -54,9 +54,9 @@ public class NSISStatementsTest {
 				NSISStatements.functionBegin("    ", foo));
 
 		UserFunction bar = env.registerUserFunction("bar");
-		bar.addArgument(env.registerVariable("a", bar));
-		bar.addArgument(env.registerVariable("b", bar));
-		bar.addArgument(env.registerVariable("c", bar));
+		bar.registerArgument(env.registerVariable("a", bar));
+		bar.registerArgument(env.registerVariable("b", bar));
+		bar.registerArgument(env.registerVariable("c", bar));
 		bar.setHasReturn(true);
 		assertEquals(
 				"  Function bar\r\n    Pop $bar.a\r\n    Pop $bar.b\r\n    Pop $bar.c",

@@ -4,28 +4,14 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionReserveFile extends Callable {
+class FunctionReserveFile extends CustomFunction {
 
 	private static final int FILE_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
 	protected FunctionReserveFile() {
-		super("ReserveFile");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 1;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.VOID;
+		super(1, ReturnType.VOID, "ReserveFile");
+		registerArguments("file", "options");
 	}
 
 	@Override

@@ -1,8 +1,10 @@
 package bridlensis.env;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import bridlensis.InvalidSyntaxException;
 
@@ -23,23 +25,29 @@ public abstract class Callable {
 		this.arguments = new ArrayList<Variable>();
 	}
 
-	public String getName() {
+	public final String getName() {
 		return aliases.get(0);
 	}
 
-	public Iterable<String> getAliases() {
+	public final List<String> getAliases() {
 		return aliases;
 	}
 
-	public void addArgument(Variable arg) {
+	protected final void registerArguments(String... args) {
+		for (String arg : args) {
+			registerArgument(new Variable(arg));
+		}
+	}
+
+	protected void registerArgument(Variable arg) {
 		arguments.add(arg);
 	}
 
-	public int getArgsCount() {
+	public final int getArgsCount() {
 		return arguments.size();
 	}
 
-	public Variable getArgument(int index) {
+	public final Variable getArgument(int index) {
 		return arguments.get(index);
 	}
 
@@ -50,18 +58,27 @@ public abstract class Callable {
 	public abstract String statementFor(String indent, List<TypeObject> args,
 			Variable returnVar) throws InvalidSyntaxException;
 
-	public String getDescription() {
+	public abstract String getDescription();
+
+	public final String getMarkdownHelp() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getName());
-		sb.append('(');
-		for (int i = 0; i < arguments.size(); i++) {
-			if (i != 0) {
-				sb.append(", ");
+		try (Scanner scanner = new Scanner(getMarkdownHelpAsStream(), "UTF-8")) {
+			while (scanner.hasNextLine()) {
+				sb.append(scanner.nextLine());
+				sb.append("\r\n");
 			}
-			sb.append(arguments.get(i).getName());
 		}
-		sb.append(')');
 		return sb.toString();
+	}
+
+	private InputStream getMarkdownHelpAsStream() {
+		String mdFileName = getClass().getSimpleName() + ".md";
+		InputStream stream = getClass().getResourceAsStream(mdFileName);
+		if (stream == null) {
+			throw new AssertionError("Help file for class "
+					+ getClass().getSimpleName() + " not found");
+		}
+		return stream;
 	}
 
 	@Override

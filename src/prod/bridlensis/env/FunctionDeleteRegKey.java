@@ -4,29 +4,15 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionDeleteRegKey extends Callable {
+class FunctionDeleteRegKey extends CustomFunction {
 
 	private static final int ROOT_KEY_INDEX = 0;
 	private static final int SUBKEY_INDEX = 1;
 	private static final int OPTIONS_INDEX = 2;
 
 	protected FunctionDeleteRegKey() {
-		super("DeleteRegKey");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 3;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.ERRORFLAG;
+		super(2, ReturnType.ERRORFLAG, "DeleteRegKey");
+		registerArguments("root", "key", "options");
 	}
 
 	@Override

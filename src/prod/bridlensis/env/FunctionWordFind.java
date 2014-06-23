@@ -4,7 +4,7 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionWordFind extends Callable {
+class FunctionWordFind extends CustomFunction {
 
 	private static final int STRING_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
@@ -15,23 +15,9 @@ class FunctionWordFind extends Callable {
 	private final boolean caseSensitive;
 
 	protected FunctionWordFind(boolean caseSensitive) {
-		super("WordFind" + (caseSensitive ? "S" : ""));
+		super(3, ReturnType.REQUIRED, "WordFind" + (caseSensitive ? "S" : ""));
 		this.caseSensitive = caseSensitive;
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 3;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 5;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.REQUIRED;
+		registerArguments("string", "options", "delim1", "delim2", "center");
 	}
 
 	@Override

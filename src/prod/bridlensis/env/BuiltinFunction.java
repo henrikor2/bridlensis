@@ -31,7 +31,7 @@ abstract class BuiltinFunction extends Callable {
 			function.setReturnArgIndex(returnArgIndex);
 		}
 		for (String arg : args) {
-			function.addArgument(new Variable(arg));
+			function.registerArguments(arg);
 		}
 		return function;
 	}
@@ -60,4 +60,18 @@ abstract class BuiltinFunction extends Callable {
 		return returnArgIndex == -1 ? ReturnType.VOID : ReturnType.REQUIRED;
 	}
 
+	@Override
+	public String getDescription() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getName());
+		sb.append('(');
+		for (int i = 0; i < getArgsCount(); i++) {
+			if (i != 0) {
+				sb.append(", ");
+			}
+			sb.append(getArgument(i).getName());
+		}
+		sb.append(')');
+		return sb.toString();
+	}
 }

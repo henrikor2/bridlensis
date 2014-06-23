@@ -4,28 +4,14 @@ import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 
-public class FunctionCopy extends Callable {
+public class FunctionCopy extends CustomFunction {
 
 	private static final int SOURCE_INDEX = 0;
 	private static final int TARGET_INDEX = 1;
 
 	protected FunctionCopy() {
-		super("Copy", "FileCopy");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.ERRORFLAG;
+		super(2, ReturnType.ERRORFLAG, "FileCopy", "Copy");
+		registerArguments("source", "target");
 	}
 
 	@Override

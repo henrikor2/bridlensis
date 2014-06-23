@@ -117,7 +117,7 @@ class StatementParser {
 				String argName = reader.nextWord().asName();
 				Variable argVariable = registerAndDeclareVariable(argName,
 						reader.getIndent(), sb);
-				enclosingFunction.addArgument(argVariable);
+				enclosingFunction.registerArgument(argVariable);
 			} while (reader.getWordTail().isFunctionArgSeparator());
 			if (!reader.getWordTail().containsFunctionArgsClose()) {
 				throw new InvalidSyntaxException(

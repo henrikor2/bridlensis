@@ -13,6 +13,11 @@ public class UserFunction extends Callable {
 	}
 
 	@Override
+	public void registerArgument(Variable arg) {
+		super.registerArgument(arg);
+	}
+
+	@Override
 	public int getMandatoryArgsCount() {
 		return getArgsCount();
 	}
@@ -47,4 +52,8 @@ public class UserFunction extends Callable {
 		return sb.toString();
 	}
 
+	@Override
+	public String getDescription() {
+		throw new AssertionError();
+	}
 }

@@ -4,28 +4,14 @@ import java.util.List;
 
 import bridlensis.NSISStatements;
 
-class FunctionGetFullPathName extends Callable {
+class FunctionGetFullPathName extends CustomFunction {
 
 	private static final int PATH_INDEX = 0;
 	private static final int OPTIONS_INDEX = 1;
 
 	protected FunctionGetFullPathName() {
-		super("GetFullPathName");
-	}
-
-	@Override
-	public int getMandatoryArgsCount() {
-		return 1;
-	}
-
-	@Override
-	public int getArgsCount() {
-		return 2;
-	}
-
-	@Override
-	public ReturnType getReturnType() {
-		return ReturnType.REQUIRED;
+		super(1, ReturnType.REQUIRED, "GetFullPathName");
+		registerArguments("path", "options");
 	}
 
 	@Override
