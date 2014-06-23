@@ -32,7 +32,8 @@ public class MakeBridleNSIS {
 
 	static {
 		try (Scanner versionFileScanner = new Scanner(MakeBridleNSIS.class
-				.getClassLoader().getResourceAsStream("bridlensis/VERSION"))) {
+				.getClassLoader().getResourceAsStream("bridlensis/VERSION"),
+				"UTF-8")) {
 			VERSION = versionFileScanner.nextLine();
 		}
 	}
@@ -74,7 +75,8 @@ public class MakeBridleNSIS {
 	public static String usage() {
 		StringBuilder sb = new StringBuilder();
 		try (Scanner scanner = new Scanner(MakeBridleNSIS.class
-				.getClassLoader().getResourceAsStream("bridlensis/USAGE"))) {
+				.getClassLoader().getResourceAsStream("bridlensis/USAGE"),
+				"UTF-8")) {
 			while (scanner.hasNextLine()) {
 				sb.append(scanner.nextLine().replaceFirst("%VERSION%", VERSION));
 				sb.append("\r\n");
@@ -167,7 +169,7 @@ public class MakeBridleNSIS {
 			ProcessBuilder builder = new ProcessBuilder(path, "/VERSION");
 			Process process = builder.start();
 			try (BufferedReader reader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()))) {
+					new InputStreamReader(process.getInputStream(), "Cp1252"))) {
 				String version = reader.readLine();
 				stdout.print("Detected NSIS version " + version);
 			} catch (IOException e) {
@@ -257,7 +259,7 @@ public class MakeBridleNSIS {
 
 		InputStream processInput = process.getInputStream();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				processInput))) {
+				processInput, "Cp1252"))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				stdout.println(line);
