@@ -224,7 +224,7 @@ public class MakeBridleNSIS {
 		time = time < 1000 ? 1 : time / 1000;
 
 		stdout.println(String.format(
-				"\nParsed in %d seconds total of %d lines in %d file(s).\n",
+				"%nParsed in %d seconds total of %d lines in %d file(s).%n",
 				time, parser.getInputLines(), parser.getFileCount()));
 	}
 
