@@ -166,10 +166,13 @@ public class MakeBridleNSIS {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(path, "/VERSION");
 			Process process = builder.start();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
-			String version = reader.readLine();
-			stdout.print("Detected NSIS version " + version);
+			try (BufferedReader reader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()))) {
+				String version = reader.readLine();
+				stdout.print("Detected NSIS version " + version);
+			} catch (IOException e) {
+				stdout.print("Unable to detected NSIS version");
+			}
 			if (!path.contains("\\")) {
 				parent = "";
 				stdout.print(" in system %PATH%");
@@ -253,13 +256,16 @@ public class MakeBridleNSIS {
 		Process process = builder.start();
 
 		InputStream processInput = process.getInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				processInput));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			System.out.println(line);
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+				processInput))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				stdout.println(line);
+			}
+		} catch (IOException e) {
+			stdout.println("Unable to read makensis.exe output: "
+					+ e.getMessage());
 		}
-
 		int exitCode = process.waitFor();
 		return exitCode;
 	}
