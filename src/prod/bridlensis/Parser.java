@@ -182,8 +182,11 @@ public class Parser {
 				sourceFile.getAbsolutePath(), outDir.getAbsolutePath()));
 		try (FileInputStream input = new FileInputStream(sourceFile);
 				FileOutputStream output = new FileOutputStream(destFile)) {
-			if (!destFile.exists()) {
-				destFile.createNewFile();
+			if (!destFile.exists() && !destFile.createNewFile()) {
+				throw new ParserException(sourceFile.getAbsolutePath(),
+						lineNumber, new IOException(
+								"Unable to create output file "
+										+ destFile.getAbsolutePath()));
 			}
 			FileChannel destination = output.getChannel();
 			FileChannel source = input.getChannel();
