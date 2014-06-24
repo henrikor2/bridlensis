@@ -63,6 +63,13 @@ public class Parser {
 			throws UnsupportedEncodingException, FileNotFoundException,
 			IOException {
 		File outputFile = new File(outDir, outputFileName);
+		File outDirPath = outputFile.getParentFile();
+		if (!outDirPath.exists() || !outDirPath.isDirectory()) {
+			if (!outDirPath.mkdirs()) {
+				throw new IOException("Unable to create directory "
+						+ outDirPath.getAbsolutePath());
+			}
+		}
 		System.out.println("Output file: " + outputFile.getAbsolutePath());
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), encoding));
