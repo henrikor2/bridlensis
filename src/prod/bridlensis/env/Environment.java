@@ -118,7 +118,10 @@ public class Environment {
 			throw new EnvironmentException(
 					"Function name cannot be a reserved word");
 		}
-		if (name.charAt(0) != '.' && !name.matches(ALLOWED_NAME_REGEX)) {
+		if (name.charAt(0) != '.'
+				&& !(name.length() > 3 && name.substring(0, 3)
+						.equalsIgnoreCase("un."))
+				&& !name.matches(ALLOWED_NAME_REGEX)) {
 			throw new EnvironmentException(
 					"Function name cannot contain special characters");
 		}
