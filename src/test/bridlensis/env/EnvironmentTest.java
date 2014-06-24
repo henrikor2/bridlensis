@@ -103,7 +103,7 @@ public class EnvironmentTest {
 		} catch (EnvironmentException e) {
 			System.err.println(e.getMessage());
 		}
-		assertEquals(".oninit", env.registerUserFunction(".onInit").getName());
+		assertEquals(".onInit", env.registerUserFunction(".onInit").getName());
 	}
 
 }

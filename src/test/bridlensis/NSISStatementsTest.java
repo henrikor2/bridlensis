@@ -50,7 +50,7 @@ public class NSISStatementsTest {
 	public void testFunctionBegin() throws InvalidSyntaxException,
 			EnvironmentException {
 		UserFunction foo = env.registerUserFunction("Foo");
-		assertEquals("    Function foo",
+		assertEquals("    Function Foo",
 				NSISStatements.functionBegin("    ", foo));
 
 		UserFunction bar = env.registerUserFunction("bar");

@@ -99,34 +99,32 @@ public class Environment {
 	}
 
 	public Callable getCallable(String name) throws EnvironmentException {
-		name = name.toLowerCase();
-		if (!callables.containsKey(name)) {
+		String key = name.toLowerCase();
+		if (!callables.containsKey(key)) {
 			throw new EnvironmentException(String.format(
 					"Function '%s' not found", name));
 		}
-		return callables.get(name);
+		return callables.get(key);
 	}
 
 	public UserFunction registerUserFunction(String name)
 			throws EnvironmentException {
-		name = name.toLowerCase();
-		if (callables.containsKey(name)) {
+		String key = name.toLowerCase();
+		if (callables.containsKey(key)) {
 			throw new EnvironmentException(String.format(
 					"Function '%s' already exists", name));
 		}
-		if (RESERVED_WORDS.contains(name)) {
+		if (RESERVED_WORDS.contains(key)) {
 			throw new EnvironmentException(
 					"Function name cannot be a reserved word");
 		}
-		if (name.charAt(0) != '.'
-				&& !(name.length() > 3 && name.substring(0, 3)
-						.equalsIgnoreCase("un."))
-				&& !name.matches(ALLOWED_NAME_REGEX)) {
+		if (key.charAt(0) != '.' && !key.startsWith("un.")
+				&& !key.matches(ALLOWED_NAME_REGEX)) {
 			throw new EnvironmentException(
 					"Function name cannot contain special characters");
 		}
 		UserFunction function = new UserFunction(name);
-		callables.put(name, function);
+		callables.put(key, function);
 		return function;
 	}
 

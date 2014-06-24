@@ -149,7 +149,7 @@ public class StatementParserTest {
 		UserFunction foo = env.registerUserFunction("Foo");
 
 		expected = new StringBuilder();
-		expected.append("\tCall foo");
+		expected.append("\tCall Foo");
 		assertEquals(
 				expected.toString(),
 				parser.call("\t", env.getCallable("foo"),
@@ -157,7 +157,7 @@ public class StatementParserTest {
 
 		expected = new StringBuilder();
 		expected.append("");
-		assertEquals(" Push $c\r\n Push $b\r\n Push $a\r\n Call foo",
+		assertEquals(" Push $c\r\n Push $b\r\n Push $a\r\n Call Foo",
 				parser.call(" ", env.getCallable("Foo"), Arrays.asList(
 						SimpleTypeObject.special("$a"),
 						SimpleTypeObject.special("$b"),
@@ -168,10 +168,10 @@ public class StatementParserTest {
 		expected = new StringBuilder();
 		expected.append("MessageBox MB_OKCANCEL|MB_ICONINFORMATION \"hello\" /SD IDOK IDOK msgbox_s02 IDCANCEL msgbox_s03\r\n");
 		expected.append("    msgbox_s02:\r\n");
-		expected.append("        StrCpy $foo.ret \"OK\" \r\n");
+		expected.append("        StrCpy $Foo.ret \"OK\" \r\n");
 		expected.append("        GoTo msgbox_s01\r\n");
 		expected.append("    msgbox_s03:\r\n");
-		expected.append("        StrCpy $foo.ret \"CANCEL\" \r\n");
+		expected.append("        StrCpy $Foo.ret \"CANCEL\" \r\n");
 		expected.append("        GoTo msgbox_s01\r\n");
 		expected.append("    msgbox_s01:");
 		assertEquals(expected.toString(), parser.call("", env
