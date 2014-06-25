@@ -177,6 +177,22 @@ See supported comparison and flag tests in If statement.
     Loop
 
 
+### Macros
+
+BridleNSIS syntax is not allowed inside macros and anything defined inside macros is not visible for Bridle parser. This is to avoid problems with compile time function and variable detection. A classic example is the shared installer and uninstaller function defined via macros:
+
+    !macro myfunc un
+    Function ${un}myfunc
+        ...
+    FunctionEnd
+    !macroend
+    
+    !insertmacro myfunc ""
+    !insertmacro myfunc "un."
+
+In this case functions myfunc and un.myfunc cannot be called using Bridle syntax `myfunc()` or `un.myfun()`, neither you can use Bridle syntax inside myfunc body.
+
+
 ## Function Reference
 
 

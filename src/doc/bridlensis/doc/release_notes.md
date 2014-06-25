@@ -6,6 +6,7 @@ Release date: TBD
 
 ### What's New
 
+*   BridleNSIS syntax is not allowed inside macros and anything defined inside macros is not visible for BridleNSIS parser
 *   New convenience functions for all text and word function headers as defined in NSIS 3.0a2
 *   Add support for defining several variables at once (`Var a, b, c`)
 *   Improved syntax checks for function arguments and comparison statements

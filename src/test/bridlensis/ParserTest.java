@@ -1105,4 +1105,57 @@ public class ParserTest {
 		}
 	}
 
+	@Test
+	public void testMacros() throws InvalidSyntaxException,
+			EnvironmentException, ParserException {
+		Parser parser = createParser();
+		String plainNSIS;
+
+		// Function and variable names should not have funny stuff...
+		try {
+			parser.parseStatement(readerFor("Function ${un}myfunc"));
+			fail();
+		} catch (EnvironmentException e) {
+			// OK
+			System.out.println(e.getMessage());
+		}
+
+		// ...unless it's inside macro because macros are skipped completely
+		plainNSIS = "!macro myfunc un";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "Var /GLOBAL myvar";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "Function ${un}myfunc";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "  Call ${un}someotherfunc";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "  DetailPrint something";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "FunctionEnd";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "!macroend";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "!insertmacro myfunc \"\"";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+		plainNSIS = "!insertmacro myfunc \"un.\"";
+		assertEquals(plainNSIS, parser.parseStatement(readerFor(plainNSIS)));
+
+		// Variable myvar is defined inside macro and cannot be seen
+		try {
+			parser.parseStatement(readerFor("a = myvar"));
+			fail();
+		} catch (EnvironmentException e) {
+			// OK
+			System.out.println(e.getMessage());
+		}
+
+		// Function myfunc is defined inside macro and cannot be seen
+		try {
+			parser.parseStatement(readerFor("myfunc()"));
+			fail();
+		} catch (EnvironmentException e) {
+			// OK
+			System.out.println(e.getMessage());
+		}
+	}
 }

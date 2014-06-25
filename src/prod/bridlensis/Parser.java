@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Scanner;
 
 import bridlensis.InputReader.Word;
+import bridlensis.InputReader.WordTail;
 import bridlensis.env.EnvironmentException;
 
 public class Parser {
@@ -28,6 +29,7 @@ public class Parser {
 	private int fileCount = 0;
 	private int inputLines = 0;
 	private StatementParser statementParser;
+	private boolean insideMacro;
 
 	public Parser(StatementParser statementParser, File baseDir, File outDir,
 			String encoding, Collection<String> excludeFiles) {
@@ -51,6 +53,7 @@ public class Parser {
 
 	public void parse(String inputFileName, String outputFileName)
 			throws IOException, ParserException {
+		insideMacro = false;
 		File inputFile = new File(baseDir, inputFileName);
 		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
 		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
@@ -109,11 +112,29 @@ public class Parser {
 		if (!reader.hasNextWord()) {
 			return reader.getCurrentStatement();
 		}
+
 		Word word = reader.nextWord();
 		String keyword = word.asName();
-		if (reader.getWordTail().isAssignment()) {
+		WordTail tail = reader.getWordTail();
+
+		if (tail.isCompilerCommand()) {
+			String command = reader.nextWord().asName();
+			if (command.equals("include")) {
+				return parseInclude(reader);
+			} else if (command.equals("macro")) {
+				insideMacro = true;
+				return reader.getCurrentStatement();
+			} else if (command.equals("macroend")) {
+				insideMacro = false;
+				return reader.getCurrentStatement();
+			}
+		}
+
+		if (insideMacro) {
+			return reader.getCurrentStatement();
+		} else if (tail.isAssignment()) {
 			return statementParser.parseVarAssign(word, reader);
-		} else if (reader.getWordTail().isFunctionArgsOpen()) {
+		} else if (tail.isFunctionArgsOpen()) {
 			return statementParser.parseCall(word, null, reader);
 		} else if (keyword.equals("var")) {
 			return statementParser.parseVarDeclare(reader);
@@ -138,10 +159,8 @@ public class Parser {
 			return NSISStatements.logicLibDefine(reader.getIndent(), "Break");
 		} else if (keyword.equals("loop")) {
 			return statementParser.parseDoLoop("Loop", reader);
-		} else if (reader.getWordTail().isCompilerCommand()
-				&& reader.nextWord().asName().equals("include")) {
-			return parseInclude(reader);
 		}
+
 		return reader.getCurrentStatement();
 	}
 
