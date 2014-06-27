@@ -31,4 +31,12 @@ class FunctionReserveFile extends CustomFunction {
 		return sb.toString();
 	}
 
+	@Override
+	public String getMarkdownHelp() {
+		return "Reserves a file in the data block for later use. See NSIS ReserveFile "
+				+ "instruction documentation for options.\r\n"
+				+ "\r\n"
+				+ "    ReserveFile(\"time.dll\", \"/plugin\")\r\n";
+	}
+
 }

@@ -1,6 +1,6 @@
 package bridlensis.env;
 
-public abstract class CustomFunction extends Callable {
+abstract class CustomFunction extends Callable {
 
 	private final int mandatoryArgsCount;
 	private final ReturnType returnType;

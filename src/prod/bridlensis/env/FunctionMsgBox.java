@@ -170,4 +170,27 @@ class FunctionMsgBox extends CustomFunction {
 		return sb.toString();
 	}
 
+	@Override
+	public String getMarkdownHelp() {
+		return "Displays a message box with buttons `buttons` containing the text `message`. \r\n"
+				+ "\r\n"
+				+ "*   __buttons__: One of the following `OK`, `OKCANCEL`, `ABORTRETRYIGNORE`, "
+				+ "                 `RETRYCANCEL`, `YESNO`, or `YESNOCANCEL`\r\n"
+				+ "*   __message__: Message text\r\n"
+				+ "*   __options__: `|` separated list of zero or more options: "
+				+ "                 `ICONEXCLAMATION`, `ICONINFORMATION`, `ICONQUESTION`, "
+				+ "                 `ICONSTOP`, `USERICON`, `TOPMOST`, `SETFOREGROUND`, `RIGHT`, "
+				+ "                 `RTLREADING`, `DEFBUTTON1`, `DEFBUTTON2`, `DEFBUTTON3`, and "
+				+ "                 `DEFBUTTON4`. Refer to the NSIS MessageBox instruction "
+				+ "                 documentation for details.\r\n"
+				+ "*   __sd__: Silent installer default return. Use empty string (or simply omit "
+				+ "            the argument) if message box is shown in silent install.\r\n"
+				+ "\r\n"
+				+ "Function will return name of the button user selected: `OK`, `CANCEL`, "
+				+ "`ABORT`, `RETRY`, `IGNORE`, `YES`, or `NO`.\r\n"
+				+ "\r\n"
+				+ "    If MsgBox(\"YESNO\", \"Are you sure?\") == \"YES\"\r\n"
+				+ "        ...\r\n";
+	}
+
 }

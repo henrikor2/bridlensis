@@ -39,4 +39,19 @@ public class FunctionFile extends CustomFunction {
 		return sb.toString();
 	}
 
+	@Override
+	public String getMarkdownHelp() {
+		return "Adds file(s) to be extracted. Wildcards are supported. See NSIS File "
+				+ "instruction documentation for options. Uses the current output path unless "
+				+ "argument `outpath` is given. \r\n"
+				+ "\r\n"
+				+ "    File(\"somefile.dat\")\r\n"
+				+ "    \r\n"
+				+ "    File(\"c:\\autoexec.bat\", \\       ; Specific file\r\n"
+				+ "         \"/oname=my autoexec.bak\")  ; As \"my autoexec.bak\"\r\n"
+				+ "    \r\n"
+				+ "    File(\"*.html\", \"\", \\            ; All HTML files\r\n"
+				+ "         instdir + \"\\doc\")          ; To $INSTDIR\\doc\r\n";
+	}
+
 }

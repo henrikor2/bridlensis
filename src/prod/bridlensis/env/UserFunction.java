@@ -56,4 +56,9 @@ public class UserFunction extends Callable {
 	public String getDescription() {
 		throw new AssertionError();
 	}
+
+	@Override
+	public String getMarkdownHelp() {
+		throw new AssertionError();
+	}
 }

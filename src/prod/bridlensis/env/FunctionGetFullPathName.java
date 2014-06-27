@@ -33,4 +33,13 @@ class FunctionGetFullPathName extends CustomFunction {
 		return sb.toString();
 	}
 
+	@Override
+	public String getMarkdownHelp() {
+		return "Returns the full path of the file specified. If the path portion of the "
+				+ "parameter is not found, the error flag will be set and return value will be "
+				+ "empty. See NSIS documentation for supported options (`/SHORT`). \r\n"
+				+ "\r\n" 
+				+ "    absolutePath = GetFullPathName(programfiles + \"\\NSIS\")\r\n";
+	}
+
 }

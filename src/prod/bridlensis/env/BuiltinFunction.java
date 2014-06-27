@@ -74,4 +74,9 @@ abstract class BuiltinFunction extends Callable {
 		sb.append(')');
 		return sb.toString();
 	}
+
+	@Override
+	public String getMarkdownHelp() {
+		throw new AssertionError();
+	}
 }

@@ -1,10 +1,8 @@
 package bridlensis.env;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 import bridlensis.InvalidSyntaxException;
 
@@ -60,26 +58,7 @@ public abstract class Callable {
 
 	public abstract String getDescription();
 
-	public final String getMarkdownHelp() {
-		StringBuilder sb = new StringBuilder();
-		try (Scanner scanner = new Scanner(getMarkdownHelpAsStream(), "UTF-8")) {
-			while (scanner.hasNextLine()) {
-				sb.append(scanner.nextLine());
-				sb.append("\r\n");
-			}
-		}
-		return sb.toString();
-	}
-
-	private InputStream getMarkdownHelpAsStream() {
-		String mdFileName = getClass().getSimpleName() + ".md";
-		InputStream stream = getClass().getResourceAsStream(mdFileName);
-		if (stream == null) {
-			throw new AssertionError("Help file for class "
-					+ getClass().getSimpleName() + " not found");
-		}
-		return stream;
-	}
+	public abstract String getMarkdownHelp();
 
 	@Override
 	public String toString() {
