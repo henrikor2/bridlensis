@@ -2,7 +2,7 @@
 
 ## Version 0.3.0
 
-Release date: TBD
+Release date: 2014-06-29
 
 ### What's New
 
