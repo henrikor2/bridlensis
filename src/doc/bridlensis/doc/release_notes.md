@@ -1,5 +1,13 @@
 ﻿# BridleNSIS Release Notes
 
+## Version 0.3.1
+
+Release date: TBD
+
+### What's New
+
+*   ...
+
 ## Version 0.3.0
 
 Release date: 2014-06-29
