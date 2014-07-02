@@ -6,7 +6,7 @@ Release date: TBD
 
 ### What's New
 
-*   ...
+*   New convenience functions for file function headers as defined in NSIS 3.0a2
 
 ## Version 0.3.0
 
