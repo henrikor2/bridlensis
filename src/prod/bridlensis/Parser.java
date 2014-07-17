@@ -175,7 +175,7 @@ public class Parser {
 			System.out.println("Include file '" + inputFileName
 					+ "' omitted being marked as excluded.");
 			String outputFileName = MakeBridleNSIS
-					.getBridleNSISFileName(inputFileName);
+					.convertToBridleFilename(inputFileName);
 			File outputFile = new File(outDir, outputFileName);
 			copyFile(inputFile, outputFile, reader.getLinesRead());
 			statement = NSISStatements.include(reader.getIndent(),
@@ -190,7 +190,7 @@ public class Parser {
 			System.out
 					.println("Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
-					.getBridleNSISFileName(inputFileName);
+					.convertToBridleFilename(inputFileName);
 			try (BufferedWriter writer = getOutputWriter(outputFileName)) {
 				parseFile(inputFile, writer);
 			} catch (IOException e) {

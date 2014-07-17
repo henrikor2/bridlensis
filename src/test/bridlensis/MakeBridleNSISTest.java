@@ -32,7 +32,8 @@ public class MakeBridleNSISTest {
 	}
 
 	@Test
-	public void testVariables() throws IOException, ParserException {
+	public void testVariables() throws FileNotFoundException, IOException,
+			BridleNSISException {
 		File inputFile = new File(BASE_DIR, "Variables.nsh");
 		File expectedFile = new File(BASE_DIR, "Variables.bnsh");
 		File outputFile = new File(tempDir, "Variables.bnsh");
@@ -44,7 +45,8 @@ public class MakeBridleNSISTest {
 	}
 
 	@Test
-	public void testFunctions() throws IOException, ParserException {
+	public void testFunctions() throws IOException, ParserException,
+			BridleNSISException {
 		File inputFile = new File(BASE_DIR, "Functions.nsh");
 		File expectedFile = new File(BASE_DIR, "Functions.bnsh");
 		File outputFile = new File(tempDir, "Functions.bnsh");
@@ -56,7 +58,8 @@ public class MakeBridleNSISTest {
 	}
 
 	@Test
-	public void testInclude() throws IOException, ParserException {
+	public void testInclude() throws IOException, ParserException,
+			BridleNSISException {
 		File inputFile = new File(BASE_DIR, "Include1.nsh");
 		File expectedFile1 = new File(BASE_DIR, "Include1.bnsh");
 		File expectedFile2 = new File(BASE_DIR, "Include2.bnsh");
@@ -71,7 +74,7 @@ public class MakeBridleNSISTest {
 					outputFile1, DEFAULT_ENCODING,
 					Arrays.asList("Include2.nsh"));
 			fail();
-		} catch (ParserException e) {
+		} catch (BridleNSISException e) {
 			// All good
 			System.err.println(e.getMessage());
 		}
@@ -83,7 +86,8 @@ public class MakeBridleNSISTest {
 	}
 
 	@Test
-	public void testI18N() throws IOException, ParserException {
+	public void testI18N() throws IOException, ParserException,
+			BridleNSISException {
 		File inputFile = new File(BASE_DIR, "I18N.nsi");
 		File inputFile_ja = new File(BASE_DIR, "I18N_ja.nsh");
 		File expectedFile = new File(BASE_DIR, "I18N.bnsi");

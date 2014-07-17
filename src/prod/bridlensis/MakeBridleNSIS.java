@@ -17,18 +17,14 @@ import bridlensis.env.NameGenerator;
 
 public class MakeBridleNSIS {
 
-	private static final int EXIT_OUTDIRERROR = 10;
-	private static final int EXIT_MAKEBRIDLENSISERROR = 11;
-	private static final int EXIT_MAKENSIS_NOT_FOUND = 12;
-	private static final int EXIT_MAKENSISERROR = 13;
+	public static final String VERSION;
+
+	public static final int EXIT_OUTDIRERROR = 10;
+	public static final int EXIT_MAKEBRIDLENSISERROR = 11;
+	public static final int EXIT_MAKENSIS_NOT_FOUND = 12;
+	public static final int EXIT_MAKENSISERROR = 13;
 
 	private static final String MAKENSIS_EXE = "makensis.exe";
-	private static final String MAKENSIS_PROGRAMS_PATH = "C:\\Program Files\\NSIS\\"
-			+ MAKENSIS_EXE;
-	private static final String MAKENSIS_PROGRAMS86_PATH = "C:\\Program Files (x86)\\NSIS\\"
-			+ MAKENSIS_EXE;
-
-	public static final String VERSION;
 
 	static {
 		try (Scanner versionFileScanner = new Scanner(MakeBridleNSIS.class
@@ -39,38 +35,6 @@ public class MakeBridleNSIS {
 	}
 
 	private static PrintStream stdout = System.out;
-
-	private static class Arguments {
-
-		File inputFile = null;
-		String encoding = System.getProperty("file.encoding");
-		String nsisHome = null;
-		File outDir = null;
-		ArrayList<String> nsisOptions = new ArrayList<>();
-		ArrayList<String> excludeFiles = new ArrayList<>();
-
-		static Arguments parse(String[] args) {
-			Arguments arguments = new Arguments();
-			for (int i = 0; i < args.length; i++) {
-				if (args[i].equals("-n")) {
-					arguments.nsisHome = args[++i];
-				} else if (args[i].equals("-o")) {
-					arguments.outDir = new File(args[++i]);
-				} else if (args[i].equals("-e")) {
-					arguments.encoding = args[++i];
-				} else if (args[i].equals("-x")) {
-					arguments.excludeFiles.addAll(Arrays.asList(args[++i]
-							.split(":")));
-				} else if (args[i].startsWith("/")) {
-					arguments.nsisOptions.add(args[i]);
-				} else {
-					arguments.inputFile = new File(args[i]);
-				}
-			}
-			return arguments;
-		}
-
-	}
 
 	public static String usage() {
 		StringBuilder sb = new StringBuilder();
@@ -92,124 +56,151 @@ public class MakeBridleNSIS {
 		stdout.println("See the User Manual for license details and credits.");
 		stdout.println();
 
-		Arguments arguments = Arguments.parse(args);
+		BridleNSISArguments arguments = parseArguments(args);
 
-		if (arguments.inputFile == null) {
+		if (arguments.getInputFile() == null) {
 			System.out.println("Usage: ");
 			System.out.println("  " + usage());
 			System.exit(0);
 			return;
 		}
 
-		if (arguments.outDir == null) {
-			File parent = arguments.inputFile.getAbsoluteFile().getParentFile();
-			if (parent == null) {
-				stdout.println("Unable to resolve outdir based on input file "
-						+ arguments.inputFile.getAbsolutePath());
-				System.exit(EXIT_OUTDIRERROR);
-				return;
-			}
-			arguments.outDir = parent;
-		}
-
-		if (!arguments.outDir.mkdir() && !arguments.outDir.exists()
-				&& !arguments.outDir.isDirectory()) {
-			stdout.println("Unable to create outdir "
-					+ arguments.outDir.getAbsolutePath());
-			System.exit(EXIT_OUTDIRERROR);
-			return;
-		}
-
-		File outputFile = new File(arguments.outDir,
-				getBridleNSISFileName(arguments.inputFile.getName()));
-
+		int exitCode;
 		try {
-			makeBridleNSIS(new DefaultNameGenerator(), arguments.inputFile,
-					outputFile, arguments.encoding, arguments.excludeFiles);
-		} catch (IOException | ParserException e) {
-			stdout.println(e.getMessage());
-			System.exit(EXIT_MAKEBRIDLENSISERROR);
-			return;
+			exitCode = execute(arguments);
+		} catch (BridleNSISException e) {
+			exitCode = e.getErrorCode();
 		}
 
-		String nsisHome;
-		if (arguments.nsisHome != null && !arguments.nsisHome.isEmpty()) {
-			nsisHome = findNSIS(new File(arguments.nsisHome, MAKENSIS_EXE)
-					.getAbsolutePath());
-		} else {
-			nsisHome = findNSIS(MAKENSIS_EXE);
-			if (nsisHome == null) {
-				nsisHome = findNSIS(MAKENSIS_PROGRAMS86_PATH);
-				if (nsisHome == null) {
-					nsisHome = findNSIS(MAKENSIS_PROGRAMS_PATH);
-				}
-			}
-		}
-		if (nsisHome == null) {
-			stdout.println("NSIS home not found.");
-			System.exit(EXIT_MAKENSIS_NOT_FOUND);
-			return;
-		}
-
-		int exitCode = 0xFFFF;
-		try {
-			exitCode = makeNSIS(outputFile.getAbsolutePath(), nsisHome,
-					arguments.nsisOptions);
-		} catch (IOException | InterruptedException e) {
-			stdout.println("Unable to run makensis.exe: " + e.getMessage());
-			System.exit(EXIT_MAKENSISERROR);
-			return;
-		}
 		System.exit(exitCode);
 	}
 
-	private static String findNSIS(String path) {
-		String parent = null;
+	public static int execute(BridleNSISArguments arguments)
+			throws BridleNSISException {
+		File outputFile = getOutFile(arguments.getOutDir(),
+				arguments.getInputFile());
+		makeBridleNSIS(new DefaultNameGenerator(), arguments.getInputFile(),
+				outputFile, arguments.getEncoding(),
+				arguments.getExcludeFiles());
+		String nsisHome = findNSISHome(arguments.getNsisHome());
+		return makeNSIS(outputFile.getAbsolutePath(), nsisHome,
+				arguments.getNSISOptions());
+	}
+
+	private static BridleNSISArguments parseArguments(String[] args) {
+		BridleNSISArguments arguments = new BridleNSISArguments();
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-n")) {
+				arguments.setNsisHome(args[++i]);
+			} else if (args[i].equals("-o")) {
+				arguments.setOutDir(new File(args[++i]));
+			} else if (args[i].equals("-e")) {
+				arguments.setEncoding(args[++i]);
+			} else if (args[i].equals("-x")) {
+				arguments.addAllExcludes(Arrays.asList(args[++i].split(System
+						.getProperty("path.separator"))));
+			} else if (args[i].startsWith("/")) {
+				arguments.addNSISOption(args[i]);
+			} else {
+				arguments.setInputFile(new File(args[i]));
+			}
+		}
+		return arguments;
+	}
+
+	private static File getOutFile(File outDir, File inputFile)
+			throws BridleNSISException {
+		if (outDir == null) {
+			File parent = inputFile.getAbsoluteFile().getParentFile();
+			if (parent == null) {
+				throw new BridleNSISException(EXIT_OUTDIRERROR,
+						"Unable to resolve outdir based on input file "
+								+ inputFile.getAbsolutePath());
+			}
+			outDir = parent;
+		}
+		if (!outDir.mkdir() && !outDir.exists() && !outDir.isDirectory()) {
+			throw new BridleNSISException(EXIT_OUTDIRERROR,
+					"Unable to create outdir " + outDir.getAbsolutePath());
+		}
+		return new File(outDir, convertToBridleFilename(inputFile.getName()));
+	}
+
+	private static String findNSISHome(String startDir)
+			throws BridleNSISException {
+		if (startDir != null && !startDir.trim().isEmpty()
+				&& isNSISHome(startDir)) {
+			return startDir;
+		}
+
+		if (isNSISHome("")) {
+			return "";
+		}
+
+		String homeX86 = System.getenv("ProgramFiles(x86)")
+				+ System.getProperty("file.separator") + "NSIS";
+		if (isNSISHome(homeX86)) {
+			return homeX86;
+		}
+
+		String homeX64 = System.getenv("ProgramFiles")
+				+ System.getProperty("file.separator") + "NSIS";
+		if (isNSISHome(homeX64)) {
+			return homeX64;
+		}
+
+		throw new BridleNSISException(EXIT_MAKENSIS_NOT_FOUND,
+				"NSIS home not found.");
+	}
+
+	private static boolean isNSISHome(String dir) {
+		String exec;
+		if (dir == null || dir.trim().isEmpty()) {
+			exec = MAKENSIS_EXE;
+		} else {
+			exec = new File(dir, MAKENSIS_EXE).getPath();
+		}
 		try {
-			ProcessBuilder builder = new ProcessBuilder(path, "/VERSION");
+			ProcessBuilder builder = new ProcessBuilder(exec, "/VERSION");
 			Process process = builder.start();
 			try (BufferedReader reader = new BufferedReader(
-					new InputStreamReader(process.getInputStream(), "Cp1252"))) {
+					new InputStreamReader(process.getInputStream(),
+							System.getProperty("file.encoding")))) {
 				String version = reader.readLine();
 				stdout.print("Detected NSIS version " + version);
 			} catch (IOException e) {
 				stdout.print("Unable to detected NSIS version");
 			}
-			if (!path.contains("\\")) {
-				parent = "";
+			if (!exec.contains(System.getProperty("file.separator"))) {
 				stdout.print(" in system %PATH%");
 			} else {
-				parent = new File(path).getParent();
-				stdout.print(" in folder " + parent);
+				stdout.print(" in folder " + dir);
 			}
 			stdout.println(".");
-			if (process.waitFor() != 0) {
-				parent = null;
-			}
+			return (process.waitFor() == 0);
 		} catch (IOException | InterruptedException e) {
-			// Fall back to default return
+			return false;
 		}
-		return parent;
 	}
 
-	static String getBridleNSISFileName(String inputFileName) {
+	static String convertToBridleFilename(String filename) {
 		String outputFileName;
-		int fileExtIndex = inputFileName.lastIndexOf('.');
+		int fileExtIndex = filename.lastIndexOf('.');
 		if (fileExtIndex != -1) {
-			outputFileName = inputFileName.substring(0, fileExtIndex) + ".b"
-					+ inputFileName.substring(fileExtIndex + 1);
+			outputFileName = filename.substring(0, fileExtIndex) + ".b"
+					+ filename.substring(fileExtIndex + 1);
 		} else {
-			outputFileName = inputFileName + ".bnsi";
+			outputFileName = filename + ".bnsi";
 		}
 		return outputFileName;
 	}
 
 	protected static void makeBridleNSIS(NameGenerator nameGenerator,
 			File inputFile, File outputFile, String encoding,
-			Collection<String> excludeFiles) throws IOException,
-			ParserException {
+			Collection<String> excludeFiles) throws BridleNSISException {
 		if (outputFile.equals(inputFile)) {
-			throw new IOException("Cannot override input file");
+			throw new BridleNSISException(EXIT_MAKEBRIDLENSISERROR,
+					"Cannot override input file");
 		}
 
 		File baseDir = inputFile.getParentFile();
@@ -224,7 +215,11 @@ public class MakeBridleNSIS {
 				baseDir, outDir, encoding, excludeFiles);
 
 		long time = System.currentTimeMillis();
-		parser.parse(inputFile.getName(), outputFile.getName());
+		try {
+			parser.parse(inputFile.getName(), outputFile.getName());
+		} catch (IOException | ParserException e) {
+			throw new BridleNSISException(EXIT_MAKEBRIDLENSISERROR, e);
+		}
 		time = System.currentTimeMillis() - time;
 		time = time < 1000 ? 1 : time / 1000;
 
@@ -234,8 +229,7 @@ public class MakeBridleNSIS {
 	}
 
 	private static int makeNSIS(String filename, String nsisHome,
-			Collection<String> nsisOptions) throws IOException,
-			InterruptedException {
+			Collection<String> nsisOptions) throws BridleNSISException {
 		ArrayList<String> cmd = new ArrayList<String>();
 
 		String exec = new File(nsisHome, MAKENSIS_EXE).getAbsolutePath();
@@ -255,7 +249,12 @@ public class MakeBridleNSIS {
 
 		ProcessBuilder builder = new ProcessBuilder(cmd);
 		builder.redirectErrorStream(true);
-		Process process = builder.start();
+		Process process;
+		try {
+			process = builder.start();
+		} catch (IOException e) {
+			throw new BridleNSISException(EXIT_MAKENSISERROR, e);
+		}
 
 		InputStream processInput = process.getInputStream();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -268,8 +267,12 @@ public class MakeBridleNSIS {
 			stdout.println("Unable to read makensis.exe output: "
 					+ e.getMessage());
 		}
-		int exitCode = process.waitFor();
-		return exitCode;
+
+		try {
+			return process.waitFor();
+		} catch (InterruptedException e) {
+			throw new BridleNSISException(EXIT_MAKENSISERROR, e);
+		}
 	}
 
 }
