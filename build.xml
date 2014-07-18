@@ -31,6 +31,9 @@
                debug="on"
                includeAntRuntime="false">
             <src path="${bridle.prod.src}" />
+            <classpath>
+                <pathelement location="${ant.home}/lib/ant.jar" />
+            </classpath>
         </javac>
     </target>
 
@@ -137,26 +140,15 @@
     </target>
 
     <target name="installer::makebridle">
-        <condition property="bridle.nsis.home.switch" value="-n" else="">
-            <and>
-                <isset property="bridle.nsis.home" />
-                <length string="${bridle.nsis.home}"
-                        when="greater"
-                        length="0" />
-            </and>
-        </condition>
-        <java classname="bridlensis.MakeBridleNSIS"
-              fork="true"
-              failonerror="true">
-            <classpath>
-                <pathelement path="${bridle.prod.bin}" />
-            </classpath>
-            <arg line="${bridle.nsis.home.switch}" />
-            <arg value="${bridle.nsis.home}" />
-            <arg value="Example/Installer.nsi" />
-            <arg value="/DBRIDLE_HOME=${basedir}" />
-            <arg value="/DBRIDLE_VERSION=${bridle.version}" />
-        </java>
+        <taskdef name="bridle"
+                 classname="bridlensis.ApacheAntTask"
+                 classpath="${bridle.prod.bin}" />
+        <bridle file="Example/Installer.nsi"
+                nsishome="${bridle.nsis.home}"
+                encoding="Cp1252">
+            <nsisoption value="/DBRIDLE_HOME=${basedir}" />
+            <nsisoption value="/DBRIDLE_VERSION=${bridle.version}" />
+        </bridle>
     </target>
 
 </project>

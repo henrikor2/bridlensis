@@ -21,6 +21,9 @@ This document assumes that the reader is familiar with NSIS features and usage. 
 
 ## Usage
 
+
+### Command-Line
+
 BridleNSIS compiler will parse the input file(s) and convert them to pure NSIS. Converted files (.snsi or .snsh) are then passed to the NSIS compiler (makensis.exe) automatically.
 
 Use Java 1.7 or newer to run BridleNSIS compiler:
@@ -28,6 +31,37 @@ Use Java 1.7 or newer to run BridleNSIS compiler:
 %%% usage 
 <!-- usage --> 
 %%%
+
+
+### Apache ANT
+
+Compile BridleNSIS directly from Apache ANT by adding the following task definition:
+
+    <taskdef name="bridle"
+             classname="bridlensis.ApacheAntTask"
+             classpath="path/to/bridlensis.jar" />
+
+Parameters:
+
+*   `file`: BridleNSIS script file to compile (__required__)
+*   `nsishome`: NSIS home directory
+*   `output`: Output directory for converted script files
+*   `encoding`: Input/output file encoding
+*   `excludes`: Colon-separated list of files to exclude
+
+Optional nested elements:
+
+*   `<nsisoption value="value" />`: NSIS compiler option
+*   `<exclude file="path-to-file" />`: Exclude file
+
+Example:
+
+    <bridle file="MyInstaller.nsi"
+            nsishome="C:\Program Files (x86)\NSIS-3.0a2"
+            output="${java.io.tmpdir}">
+        <nsisoption value="/V4" />
+        <nsisoption value="/Dant.home=${ant.home}" />
+    </bridle>
 
 
 ### Multilingual Installers
