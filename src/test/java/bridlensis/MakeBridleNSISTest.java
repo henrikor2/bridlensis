@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -21,8 +22,6 @@ public class MakeBridleNSISTest {
 
 	private static final String DEFAULT_ENCODING = "Cp1252";
 
-	private static final String BASE_DIR = "src/test/bridlensis/";
-
 	private File tempDir;
 
 	@Before
@@ -31,11 +30,20 @@ public class MakeBridleNSISTest {
 		tempDir.deleteOnExit();
 	}
 
+	private File getResourceAsFile(String name) {
+		try {
+			return new File(ClassLoader.getSystemResource("bridlensis/" + name)
+					.toURI());
+		} catch (URISyntaxException e) {
+			throw new AssertionError();
+		}
+	}
+
 	@Test
 	public void testVariables() throws FileNotFoundException, IOException,
 			BridleNSISException {
-		File inputFile = new File(BASE_DIR, "Variables.nsh");
-		File expectedFile = new File(BASE_DIR, "Variables.bnsh");
+		File inputFile = getResourceAsFile("Variables.nsh");
+		File expectedFile = getResourceAsFile("Variables.bnsh");
 		File outputFile = new File(tempDir, "Variables.bnsh");
 		outputFile.deleteOnExit();
 
@@ -47,8 +55,8 @@ public class MakeBridleNSISTest {
 	@Test
 	public void testFunctions() throws IOException, ParserException,
 			BridleNSISException {
-		File inputFile = new File(BASE_DIR, "Functions.nsh");
-		File expectedFile = new File(BASE_DIR, "Functions.bnsh");
+		File inputFile = getResourceAsFile("Functions.nsh");
+		File expectedFile = getResourceAsFile("Functions.bnsh");
 		File outputFile = new File(tempDir, "Functions.bnsh");
 		outputFile.deleteOnExit();
 
@@ -60,9 +68,9 @@ public class MakeBridleNSISTest {
 	@Test
 	public void testInclude() throws IOException, ParserException,
 			BridleNSISException {
-		File inputFile = new File(BASE_DIR, "Include1.nsh");
-		File expectedFile1 = new File(BASE_DIR, "Include1.bnsh");
-		File expectedFile2 = new File(BASE_DIR, "Include2.bnsh");
+		File inputFile = getResourceAsFile("Include1.nsh");
+		File expectedFile1 = getResourceAsFile("Include1.bnsh");
+		File expectedFile2 = getResourceAsFile("Include2.bnsh");
 		File outputFile1 = new File(tempDir, "Include1.bnsh");
 		File outputFile2 = new File(tempDir, "Include2.bnsh");
 		outputFile1.deleteOnExit();
@@ -88,11 +96,11 @@ public class MakeBridleNSISTest {
 	@Test
 	public void testI18N() throws IOException, ParserException,
 			BridleNSISException {
-		File inputFile = new File(BASE_DIR, "I18N.nsi");
-		File inputFile_ja = new File(BASE_DIR, "I18N_ja.nsh");
-		File expectedFile = new File(BASE_DIR, "I18N.bnsi");
-		File expectedFile_ja1 = new File(BASE_DIR, "I18N_ja1.bnsh");
-		File expectedFile_ja2 = new File(BASE_DIR, "I18N_ja2.bnsh");
+		File inputFile = getResourceAsFile("I18N.nsi");
+		File inputFile_ja = getResourceAsFile("I18N_ja.nsh");
+		File expectedFile = getResourceAsFile("I18N.bnsi");
+		File expectedFile_ja1 = getResourceAsFile("I18N_ja1.bnsh");
+		File expectedFile_ja2 = getResourceAsFile("I18N_ja2.bnsh");
 		File outputFile = new File(tempDir, "I18N.bnsi");
 		File outputFile_ja = new File(tempDir, "I18N_ja.bnsh");
 

@@ -1,6 +1,7 @@
 package bridlensis.doc;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,8 +27,16 @@ public class HTMLConvert {
 	public static void main(String[] args) {
 		int exitCode = 0;
 		try {
-			writeReleaseNotes();
-			writeManual();
+			File outDir = new File((args.length > 0 ? args[0] : ".") + '\\');
+			if (!outDir.exists() && !outDir.isDirectory()) {
+				if (!outDir.mkdirs()) {
+					System.out.println("Uable to create outdir "
+							+ outDir.getAbsolutePath());
+					System.exit(1);
+				}
+			}
+			writeReleaseNotes(outDir);
+			writeManual(outDir);
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			exitCode = 1;
@@ -35,18 +44,20 @@ public class HTMLConvert {
 		System.exit(exitCode);
 	}
 
-	private static void writeReleaseNotes() throws IOException {
+	private static void writeReleaseNotes(File outDir) throws IOException {
 		try (BufferedWriter output = beginHTMLFile(RELNOTES_CSS,
-				RELNOTES_HTML_FILENAME)) {
+				outDir.getPath() + System.getProperty("file.separator")
+						+ RELNOTES_HTML_FILENAME)) {
 			markdownToHtml(RELNOTES_MD, output);
 			endHTMLFile(output);
 		}
 		System.out.println("Release Notes done");
 	}
 
-	private static void writeManual() throws IOException {
-		try (BufferedWriter output = beginHTMLFile(MANUAL_CSS,
-				MANUAL_MD_HTML_FILENAME)) {
+	private static void writeManual(File outDir) throws IOException {
+		try (BufferedWriter output = beginHTMLFile(MANUAL_CSS, outDir.getPath()
+				+ System.getProperty("file.separator")
+				+ MANUAL_MD_HTML_FILENAME)) {
 			markdownToHtml(MANUAL_MD, output);
 			output.write("<p style=\"color: #CCCCCC; margin-top: 24px;\">;eof BridleNSIS Manual</p>");
 			endHTMLFile(output);
