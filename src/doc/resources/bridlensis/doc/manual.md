@@ -35,7 +35,7 @@ Use Java 1.7 or newer to run BridleNSIS compiler:
 
 ### Apache ANT
 
-Compile BridleNSIS directly from Apache ANT by adding the following task definition:
+Use the following task definition to compile BridleNSIS scripts from Apache ANT:
 
     <taskdef name="bridle"
              classname="bridlensis.ApacheAntTask"
@@ -52,7 +52,7 @@ Parameters:
 Optional nested elements:
 
 *   `<nsisoption value="value" />`: NSIS compiler option
-*   `<exclude file="path-to-file" />`: Exclude file
+*   `<exclude file="path\to\file.nsi" />`: Exclude file definition
 
 Example:
 
@@ -64,11 +64,28 @@ Example:
     </bridle>
 
 
+### Gradle
+
+You can compile BridleNSIS scripts from Gradle by re-using the above ANT task.
+
+    task(makeBridleNSIS) << {
+        ant.taskdef(name: 'makeBridleNSIS', classname: 'bridlensis.ApacheAntTask') {
+            classpath {
+                fileset(dir: 'path/to/bridlensis', includes: 'BridleNSIS-*.jar')
+            }
+        }
+        ant.makeBridleNSIS(file: 'MultiLanguageProject.nsi', encoding: 'Cp1252') {
+            exclude(file: 'LangStrings_ru.nsh')
+            exclude(file: 'LangStrings_ja.nsh')
+        }
+    }
+
+
 ### Multilingual Installers
 
-Unlike NSIS BridleNSIS can handle only one encoding and character set at the time. Compiler uses the Windows system encoding unless defined in argument `-e`. See [Java documentation](http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html) for the list of supported character encodings.
+Unlike NSIS BridleNSIS can handle only one encoding and character set at the time. Compiler uses the Windows system encoding unless overwritten by `-e` command-line argument. See [Java documentation](http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html) for the list of supported character encodings.
 
-When building Unicode installer with NSIS v3.0 or newer you probably want to use `-e UTF-16LE`. With non-Unicode installers and mixed character sets you must separate the multilingual strings to own files (see NSIS instruction `LangString`) and add them to excluded files list by using `-x` argument.
+When building Unicode installer with NSIS v3.0 or newer you probably want to use encoding `UTF-16LE`. With non-Unicode installers and mixed character sets you must separate the multilingual strings to own files (see NSIS instruction `LangString`) and add them to excluded files list by using command-line argument `-x`.
 
 Example:
 

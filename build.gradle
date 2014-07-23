@@ -1,0 +1,91 @@
+apply plugin: 'java'
+
+version = new File('src/main/resources/bridlensis/VERSION').text
+sourceCompatibility = 1.7
+project.ext.nsisHome = ''
+
+sourceSets {
+    doc {
+        java {
+            srcDir 'src/doc/java'
+        }
+        resources {
+            srcDir 'src/doc/resources'
+        }
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += compileClasspath
+    }
+}
+
+configurations {
+    bridle
+}
+
+repositories {
+   flatDir {
+       dirs 'lib'
+   }
+}
+
+dependencies {
+    compile fileTree(dir: gradle.gradleHomeDir.toString() + '/lib', 
+                     include: 'ant-*.jar')
+
+    testCompile name: 'junit-4.11'
+    testCompile name: 'hamcrest-core-1.3'
+
+    docCompile name: 'markdown4j-2.2'
+
+    bridle sourceSets.main.runtimeClasspath
+}
+
+jar {
+    archiveName = 'BridleNSIS-' + version + '.jar'
+    dependsOn = [test]
+    manifest {
+        attributes 'Implementation-Title': 'BridleNSIS', 
+                   'Implementation-Version': version,
+                   'Main-Class': 'bridlensis.MakeBridleNSIS'
+    }
+}
+
+docClasses.dependsOn jar
+
+task(doc, dependsOn: 'docClasses', type: JavaExec) {
+    main 'bridlensis.doc.HTMLConvert'
+    classpath = sourceSets.doc.runtimeClasspath
+    args 'build/doc'
+}
+
+task(installer, dependsOn: 'doc') << {
+    copy {
+        from '.'
+        include 'LICENSE'
+        into 'build/inst'
+    }
+    copy {
+        from 'build/doc'
+        from 'build/libs'
+        into 'build/inst'
+    }
+    copy {
+        from 'src/inst'
+        into 'build/inst/Example'
+    }
+    
+    ant.taskdef(name: 'bridle', 
+                classname: 'bridlensis.ApacheAntTask', 
+                classpath: configurations.bridle.asPath) {
+    }
+    
+    ant.bridle(file: 'build/inst/Example/Installer.nsi', 
+               nsisHome: project.ext.nsisHome, 
+               encoding: 'Cp1252') {
+        nsisOption(value: '/DBRIDLE_HOME=${basedir}\\build\\inst')
+        nsisOption(value: '/DBRIDLE_VERSION=' + version)
+    }
+}
+
+logging.captureStandardOutput LogLevel.INFO
+
+defaultTasks 'installer'
