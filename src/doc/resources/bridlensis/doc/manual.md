@@ -33,11 +33,11 @@ Use Java 1.7 or newer to run BridleNSIS compiler:
 %%%
 
 
-### Apache ANT
+### Apache Ant
 
-Use the following task definition to compile BridleNSIS scripts from Apache ANT:
+Use the following task definition to compile BridleNSIS scripts from Apache Ant:
 
-    <taskdef name="bridle"
+    <taskdef name="makeBridleNSIS"
              classname="bridlensis.ApacheAntTask"
              classpath="path/to/bridlensis.jar" />
 
@@ -56,17 +56,17 @@ Optional nested elements:
 
 Example:
 
-    <bridle file="MyInstaller.nsi"
-            nsishome="C:\Program Files (x86)\NSIS-3.0a2"
-            output="${java.io.tmpdir}">
+    <makeBridleNSIS file="MyInstaller.nsi"
+                    nsishome="C:\Program Files (x86)\NSIS-3.0a2"
+                    output="${java.io.tmpdir}">
         <nsisoption value="/V4" />
         <nsisoption value="/Dant.home=${ant.home}" />
-    </bridle>
+    </makeBridleNSIS>
 
 
 ### Gradle
 
-You can compile BridleNSIS scripts from Gradle by re-using the above ANT task.
+You can compile BridleNSIS scripts from Gradle by re-using the above Ant task.
 
     task(makeBridleNSIS) << {
         ant.taskdef(name: 'makeBridleNSIS', classname: 'bridlensis.ApacheAntTask') {

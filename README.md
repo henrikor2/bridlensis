@@ -6,12 +6,12 @@ Latest version: [0.3.0](https://github.com/henrikor2/bridlensis/raw/master/dist/
 
 ## Build From Source Code
 
-Build from source code requires JDK 1.7 or newer, NSIS, and either Apache ANT 1.8 (or newer) or Gradle 2.0.
+Build from source code requires JDK 1.7 or newer, NSIS, and either Apache Ant 1.8 (or newer) or Gradle 2.0.
 
-1.   Compile BridleNSIS Java classes: `>ant|grdle classes`
-2.   Compile and run JUnit tests: `>ant|grdle test`
-3.   Create distribution jar package: `>ant|grdle jar`
-4.   Generate HTML documents: `>ant|grdle doc`
-5.   Compile NSIS installer: `>ant|grdle installer`
+1.   Compile BridleNSIS Java classes: `>ant|gradle classes`
+2.   Compile and run tests: `>ant|gradle test`
+3.   Create distribution jar package: `>ant|gradle jar`
+4.   Generate documentation: `>ant|gradle doc`
+5.   Compile installer: `>ant|gradle installer`
 
-Or simply build all by `>ant|grdle`.
+Or simply build all by `>ant|gradle`.
