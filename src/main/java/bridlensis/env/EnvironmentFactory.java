@@ -62,6 +62,8 @@ public class EnvironmentFactory {
 		customFunctions.add(new FunctionGetFullPathName());
 		customFunctions.add(new FunctionWordFind(false));
 		customFunctions.add(new FunctionWordFind(true));
+		customFunctions.add(new FunctionStrCmp());
+		customFunctions.add(new FunctionIntCmp());
 		return customFunctions;
 	}
 

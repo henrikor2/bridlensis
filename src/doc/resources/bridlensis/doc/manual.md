@@ -262,6 +262,8 @@ BridleNSIS built-in functions provides a convenience access to some NSIS feature
     DeleteRegKey
     GetFullPathName
     WordFind
+    StrCmp
+    IntCmp
 %%%
 
 

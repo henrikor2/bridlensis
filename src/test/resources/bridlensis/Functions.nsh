@@ -78,3 +78,11 @@ ConfigWriteS("C:\apache\conf\httpd.conf", "Timeout ", "30")
 Function un.onInit
     ; Pass-through
 FunctionEnd
+
+; StrCmp
+StrCmp(r0, "a string", "same")
+StrCmp(r0, "a string", "same", "different")
+
+; IntCmp
+IntCmp(r0, 5, "is5", "lessthan5")
+IntCmp(r0, 5, "is5", "lessthan5", "morethan5")
