@@ -17,7 +17,7 @@ public class ParserTest {
 		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
 		Parser parser = new Parser(new StatementParser(
 				EnvironmentFactory.build(nameGenerator), nameGenerator), null,
-				null, null, null);
+				null, null, null, System.out);
 		return parser;
 	}
 

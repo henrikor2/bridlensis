@@ -59,8 +59,8 @@ public class MakeBridleNSIS {
 		BridleNSISArguments arguments = parseArguments(args);
 
 		if (arguments.getInputFile() == null) {
-			System.out.println("Usage: ");
-			System.out.println("  " + usage());
+			stdout.println("Usage: ");
+			stdout.println("  " + usage());
 			System.exit(0);
 			return;
 		}
@@ -69,6 +69,7 @@ public class MakeBridleNSIS {
 		try {
 			exitCode = execute(arguments);
 		} catch (BridleNSISException e) {
+			stdout.println(e.getMessage());
 			exitCode = e.getErrorCode();
 		}
 
@@ -212,7 +213,7 @@ public class MakeBridleNSIS {
 
 		Parser parser = new Parser(new StatementParser(
 				EnvironmentFactory.build(nameGenerator), nameGenerator),
-				baseDir, outDir, encoding, excludeFiles);
+				baseDir, outDir, encoding, excludeFiles, stdout);
 
 		long time = System.currentTimeMillis();
 		try {

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -26,13 +27,15 @@ public class Parser {
 	private File outDir;
 	private String encoding;
 	private Collection<String> excludeFiles;
+	private PrintStream outStream;
 	private int fileCount = 0;
 	private int inputLines = 0;
 	private StatementParser statementParser;
 	private boolean insideMacro;
 
 	public Parser(StatementParser statementParser, File baseDir, File outDir,
-			String encoding, Collection<String> excludeFiles) {
+			String encoding, Collection<String> excludeFiles,
+			PrintStream outStream) {
 		this.baseDir = baseDir;
 		this.outDir = outDir;
 		this.encoding = encoding;
@@ -41,6 +44,7 @@ public class Parser {
 		if (excludeFiles != null) {
 			this.excludeFiles.addAll(excludeFiles);
 		}
+		this.outStream = outStream;
 	}
 
 	public int getInputLines() {
@@ -55,7 +59,7 @@ public class Parser {
 			throws IOException, ParserException {
 		insideMacro = false;
 		File inputFile = new File(baseDir, inputFileName);
-		System.out.println("Begin parse file: " + inputFile.getAbsolutePath());
+		outStream.println("Begin parse file: " + inputFile.getAbsolutePath());
 		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
 			writer.write(NSISStatements.nullDefine());
 			parseFile(inputFile, writer);
@@ -73,7 +77,7 @@ public class Parser {
 						+ outDirPath.getAbsolutePath());
 			}
 		}
-		System.out.println("Output file: " + outputFile.getAbsolutePath());
+		outStream.println("Output file: " + outputFile.getAbsolutePath());
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), encoding));
 		if (encoding.equalsIgnoreCase("UTF-16LE")) {
@@ -94,9 +98,8 @@ public class Parser {
 				writer.write(parseStatement(reader));
 				writer.write(NSISStatements.NEWLINE_MARKER);
 			}
-			System.out.println(String.format(
-					"End parsing %d lines in file %s.", reader.getLinesRead(),
-					inputFile.getAbsolutePath()));
+			outStream.println(String.format("End parsing %d lines in file %s.",
+					reader.getLinesRead(), inputFile.getAbsolutePath()));
 			inputLines += reader.getLinesRead();
 		} catch (InvalidSyntaxException | EnvironmentException e) {
 			throw new ParserException(inputFile.getAbsolutePath(),
@@ -172,7 +175,7 @@ public class Parser {
 		if (excludeFiles.contains(inputFileName)
 				|| excludeFiles.contains(inputFile.getAbsolutePath())) {
 			// Handle excluded file
-			System.out.println("Include file '" + inputFileName
+			outStream.println("Include file '" + inputFileName
 					+ "' omitted being marked as excluded.");
 			String outputFileName = MakeBridleNSIS
 					.convertToBridleFilename(inputFileName);
@@ -182,13 +185,12 @@ public class Parser {
 					outputFileName);
 		} else if (!inputFile.exists()) {
 			// Include file not found
-			System.out.println("Include file '" + inputFileName
+			outStream.println("Include file '" + inputFileName
 					+ "' not found, assuming it's found by NSIS.");
 			statement = reader.getCurrentStatement();
 		} else {
 			// Parse include file
-			System.out
-					.println("Follow include: " + inputFile.getAbsolutePath());
+			outStream.println("Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
 					.convertToBridleFilename(inputFileName);
 			try (BufferedWriter writer = getOutputWriter(outputFileName)) {
@@ -204,7 +206,7 @@ public class Parser {
 
 	private void copyFile(File sourceFile, File destFile, int lineNumber)
 			throws ParserException {
-		System.out.println(String.format("Copy file '%s' to directory '%s'",
+		outStream.println(String.format("Copy file '%s' to directory '%s'",
 				sourceFile.getAbsolutePath(), outDir.getAbsolutePath()));
 		try (FileInputStream input = new FileInputStream(sourceFile);
 				FileOutputStream output = new FileOutputStream(destFile)) {

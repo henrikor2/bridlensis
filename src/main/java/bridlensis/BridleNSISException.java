@@ -12,7 +12,7 @@ public class BridleNSISException extends Exception {
 	}
 
 	public BridleNSISException(int errorCode, Exception e) {
-		super(e);
+		super(e.getMessage(), e);
 		this.errorCode = errorCode;
 	}
 
