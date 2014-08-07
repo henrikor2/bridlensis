@@ -84,14 +84,16 @@ public class MakeBridleNSIS {
 				outputFile, arguments.getEncoding(),
 				arguments.getExcludeFiles());
 		String nsisHome = findNSISHome(arguments.getNsisHome());
-		return makeNSIS(outputFile.getAbsolutePath(), nsisHome,
-				arguments.getNSISOptions());
+		return makeNSIS(arguments.getDir(), outputFile.getAbsolutePath(),
+				nsisHome, arguments.getNSISOptions());
 	}
 
 	private static BridleNSISArguments parseArguments(String[] args) {
 		BridleNSISArguments arguments = new BridleNSISArguments();
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-n")) {
+			if (args[i].equals("-d")) {
+				arguments.setDir(new File(args[++i]));
+			} else if (args[i].equals("-n")) {
 				arguments.setNsisHome(args[++i]);
 			} else if (args[i].equals("-o")) {
 				arguments.setOutDir(new File(args[++i]));
@@ -229,7 +231,7 @@ public class MakeBridleNSIS {
 				time, parser.getInputLines(), parser.getFileCount()));
 	}
 
-	private static int makeNSIS(String filename, String nsisHome,
+	private static int makeNSIS(File dir, String filename, String nsisHome,
 			Collection<String> nsisOptions) throws BridleNSISException {
 		ArrayList<String> cmd = new ArrayList<String>();
 
@@ -246,12 +248,17 @@ public class MakeBridleNSIS {
 		cmd.add(filename);
 
 		stdout.println("\"" + filename + "\"");
-		stdout.println("\nMakeNSIS ---->\n");
 
 		ProcessBuilder builder = new ProcessBuilder(cmd);
+		if (dir == null) {
+			dir = new File(System.getProperty("user.dir"));
+		}
+		stdout.println("Work directory: \"" + dir.getAbsolutePath() + "\" ");
+		builder.directory(dir);
 		builder.redirectErrorStream(true);
 		Process process;
 		try {
+			stdout.println("\nMakeNSIS ---->\n");
 			process = builder.start();
 		} catch (IOException e) {
 			throw new BridleNSISException(EXIT_MAKENSISERROR, e);

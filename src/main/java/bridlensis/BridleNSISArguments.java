@@ -8,6 +8,7 @@ import java.util.List;
 public class BridleNSISArguments {
 
 	private File inputFile;
+	private File dir;
 	private String encoding;
 	private String nsisHome;
 	private File outDir;
@@ -19,6 +20,7 @@ public class BridleNSISArguments {
 		encoding = System.getProperty("file.encoding");
 		nsisHome = null;
 		outDir = null;
+		dir = null;
 		nsisOptions = new ArrayList<String>();
 		excludeFiles = new ArrayList<String>();
 	}
@@ -29,6 +31,14 @@ public class BridleNSISArguments {
 
 	public void setInputFile(File inputFile) {
 		this.inputFile = inputFile;
+	}
+
+	public File getDir() {
+		return dir;
+	}
+
+	public void setDir(File dir) {
+		this.dir = dir;
 	}
 
 	public String getEncoding() {
