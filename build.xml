@@ -94,11 +94,15 @@
                  classname="bridlensis.ApacheAntTask"
                  classpathref="main.classpath" />
         <bridle file="build/inst/Example/Installer.nsi"
+                dir="."
                 nsishome="${bridle.nsis.home}"
-                encoding="Cp1252">
+                encoding="Cp1252"
+                failOnError="true"
+                resultProperty="makebridle.result">
             <nsisoption value="/DBRIDLE_HOME=${basedir}\build\inst" />
             <nsisoption value="/DBRIDLE_VERSION=${bridle.version}" />
         </bridle>
+        <echo message="makebridle.result=${makebridle.result}" />
     </target>
 
     <target name="clean">
@@ -123,5 +127,5 @@
             </javac>
         </sequential>
     </macrodef>
-    
+
 </project>

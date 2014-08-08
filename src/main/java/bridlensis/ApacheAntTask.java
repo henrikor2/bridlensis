@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Scanner;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 public class ApacheAntTask extends Task {
@@ -29,6 +30,8 @@ public class ApacheAntTask extends Task {
 	}
 
 	private BridleNSISArguments args = new BridleNSISArguments();
+	private boolean failOnError = true;
+	private String resultProperty = null;
 
 	public void setNsisHome(String nsisHome) {
 		args.setNsisHome(nsisHome);
@@ -63,18 +66,42 @@ public class ApacheAntTask extends Task {
 		args.addNSISOption(option.value);
 	}
 
+	public void setDir(File dir) {
+		args.setDir(dir);
+	}
+
+	public void setFailOnError(boolean failOnError) {
+		this.failOnError = failOnError;
+	}
+
+	public void setResultProperty(String resultProperty) {
+		this.resultProperty = resultProperty;
+	}
+
 	@Override
 	public void execute() throws BuildException {
-		if (args.getInputFile() == null) {
-			throw new BuildException("Parameter 'file' not defined.");
-		}
+		validateArguments();
 		try {
 			int exitCode = MakeBridleNSIS.execute(args);
-			if (exitCode != 0) {
+			if (exitCode != 0 && failOnError) {
 				throw new BuildException("NSIS returned error code " + exitCode);
 			}
+			if (resultProperty != null) {
+				getProject().setProperty(resultProperty,
+						Integer.toString(exitCode));
+			}
 		} catch (BridleNSISException e) {
-			throw new BuildException(e);
+			if (failOnError) {
+				throw new BuildException(e);
+			} else {
+				log(e, Project.MSG_ERR);
+			}
+		}
+	}
+
+	private void validateArguments() {
+		if (args.getInputFile() == null) {
+			throw new BuildException("Parameter 'file' not defined.");
 		}
 	}
 

@@ -43,11 +43,14 @@ Use the following task definition to compile BridleNSIS scripts from Apache Ant:
 
 Parameters:
 
-*   `file`: BridleNSIS script file to compile (__required__)
-*   `nsishome`: NSIS home directory
-*   `output`: Output directory for converted script files
-*   `encoding`: Input/output file encoding
-*   `excludes`: Colon-separated list of files to exclude
+*   `file`: BridleNSIS script file to compile (__required__).
+*   `dir`: MakenNSIS process work directory.
+*   `nsishome`: NSIS home directory.
+*   `output`: Output directory for converted script files.
+*   `encoding`: Input/output file encoding.
+*   `excludes`: Colon-separated list of files to exclude.
+*   `failonerror`: Stop the buildprocess if the compile exits with a return code signaling failure. Defaults to false.
+*   `resultproperty`: The name of a property in which the compile return code should be stored.
 
 Optional nested elements:
 
