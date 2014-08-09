@@ -67,29 +67,23 @@ class FunctionMsgBox extends CustomFunction {
 			throws InvalidSyntaxException {
 		switch (buttons) {
 		case OK:
-			return Arrays.asList(new ReturnOption("OK", nameGenerator
-					.generate()));
+			return Arrays.asList();
 		case OKCANCEL:
-			return Arrays.asList(
-					new ReturnOption("OK", nameGenerator.generate()),
-					new ReturnOption("CANCEL", nameGenerator.generate()));
+			return Arrays.asList(new ReturnOption("CANCEL", nameGenerator
+					.generate()));
 		case YESNO:
-			return Arrays.asList(
-					new ReturnOption("YES", nameGenerator.generate()),
-					new ReturnOption("NO", nameGenerator.generate()));
+			return Arrays.asList(new ReturnOption("NO", nameGenerator
+					.generate()));
 		case YESNOCANCEL:
 			return Arrays.asList(
-					new ReturnOption("YES", nameGenerator.generate()),
 					new ReturnOption("NO", nameGenerator.generate()),
 					new ReturnOption("CANCEL", nameGenerator.generate()));
 		case RETRYCANCEL:
-			return Arrays.asList(
-					new ReturnOption("RETRY", nameGenerator.generate()),
-					new ReturnOption("CANCEL", nameGenerator.generate()));
+			return Arrays.asList(new ReturnOption("CANCEL", nameGenerator
+					.generate()));
 		case ABORTRETRYIGNORE:
 			return Arrays.asList(
 					new ReturnOption("ABORT", nameGenerator.generate()),
-					new ReturnOption("RETRY", nameGenerator.generate()),
 					new ReturnOption("IGNORE", nameGenerator.generate()));
 		}
 		throw new InvalidSyntaxException(String.format(
@@ -162,6 +156,33 @@ class FunctionMsgBox extends CustomFunction {
 				sbRet.append(NSISStatements.goTo(NSISStatements.DEFAULT_INDENT,
 						exit_jump));
 			}
+
+			sb.append(NSISStatements.NEWLINE_MARKER);
+			switch (buttonGroup) {
+			case OK:
+			case OKCANCEL:
+				sb.append(strcpy
+						.statementFor(NSISStatements.DEFAULT_INDENT,
+								Arrays.asList(SimpleTypeObject.string("OK")),
+								returnVar));
+				break;
+			case RETRYCANCEL:
+			case ABORTRETRYIGNORE:
+				sb.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
+						Arrays.asList(SimpleTypeObject.string("RETRY")),
+						returnVar));
+				break;
+			case YESNO:
+			case YESNOCANCEL:
+				sb.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
+						Arrays.asList(SimpleTypeObject.string("YES")),
+						returnVar));
+				break;
+			}
+
+			sb.append(NSISStatements.NEWLINE_MARKER);
+			sb.append(NSISStatements.goTo(NSISStatements.DEFAULT_INDENT,
+					exit_jump));
 			sb.append(sbRet);
 			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.label(indent, exit_jump));

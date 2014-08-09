@@ -53,13 +53,15 @@ public class FunctionMsgBoxTest {
 		Iterator<ReturnOption> iterator;
 
 		iterator = mb.returnOptions(ButtonGroup.OK).iterator();
-		assertReturnOption("IDOK", "msgbox_s01", iterator.next());
+		assertFalse(iterator.hasNext());
+
+		iterator = mb.returnOptions(ButtonGroup.OKCANCEL).iterator();
+		assertReturnOption("IDCANCEL", "msgbox_s01", iterator.next());
 		assertFalse(iterator.hasNext());
 
 		iterator = mb.returnOptions(ButtonGroup.ABORTRETRYIGNORE).iterator();
 		assertReturnOption("IDABORT", "msgbox_s02", iterator.next());
-		assertReturnOption("IDRETRY", "msgbox_s03", iterator.next());
-		assertReturnOption("IDIGNORE", "msgbox_s04", iterator.next());
+		assertReturnOption("IDIGNORE", "msgbox_s03", iterator.next());
 		assertFalse(iterator.hasNext());
 	}
 
