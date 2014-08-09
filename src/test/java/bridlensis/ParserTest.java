@@ -431,14 +431,6 @@ public class ParserTest {
 		}
 
 		try {
-			parser.parseStatement(readerFor("bar()"));
-			fail();
-		} catch (EnvironmentException e) {
-			// it's ok baby
-			System.err.println(e.getMessage());
-		}
-
-		try {
 			parser.parseStatement(readerFor("Function foo(foo)"));
 			fail();
 		} catch (EnvironmentException e) {
@@ -1149,13 +1141,8 @@ public class ParserTest {
 			System.out.println(e.getMessage());
 		}
 
-		// Function myfunc is defined inside macro and cannot be seen
-		try {
-			parser.parseStatement(readerFor("myfunc()"));
-			fail();
-		} catch (EnvironmentException e) {
-			// OK
-			System.out.println(e.getMessage());
-		}
+		// Function myfunc is defined inside macro but can be accessed ad hoc
+		assertEquals("Call myfunc",
+				parser.parseStatement(readerFor("myfunc()")));
 	}
 }

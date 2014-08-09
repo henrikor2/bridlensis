@@ -78,12 +78,8 @@ public class EnvironmentTest {
 	@Test
 	public void testGetCallable() throws EnvironmentException {
 		Environment env = EnvironmentFactory.build(null);
-		try {
-			env.getCallable("a");
-			fail();
-		} catch (EnvironmentException e) {
-			System.err.println(e.getMessage());
-		}
+		Callable adhoc = env.getCallable("a");
+		assertEquals(AdHocFunction.class, adhoc.getClass());
 		UserFunction a = env.registerUserFunction("a");
 		assertEquals(a, env.getCallable("a"));
 	}

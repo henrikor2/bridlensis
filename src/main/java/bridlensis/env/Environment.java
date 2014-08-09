@@ -101,8 +101,7 @@ public class Environment {
 	public Callable getCallable(String name) throws EnvironmentException {
 		String key = name.toLowerCase();
 		if (!callables.containsKey(key)) {
-			throw new EnvironmentException(String.format(
-					"Function '%s' not found", name));
+			return new AdHocFunction(name);
 		}
 		return callables.get(key);
 	}

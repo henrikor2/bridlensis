@@ -110,3 +110,20 @@ StrCmp $r0 "a string" same different
 ; IntCmp
 IntCmp $r0 5 is5 lessthan5
 IntCmp $r0 5 is5 lessthan5 morethan5
+
+;AdHoc function call
+Push 2
+Push 1
+Call adhoc
+Var /GLOBAL adhoc.a
+Var /GLOBAL adhoc.b
+Function adhoc
+    Pop $adhoc.a
+    Pop $adhoc.b
+    Push 3
+    Return
+FunctionEnd
+Push 2
+Push 1
+Call adhoc
+Pop $b

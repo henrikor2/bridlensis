@@ -86,3 +86,10 @@ StrCmp(r0, "a string", "same", "different")
 ; IntCmp
 IntCmp(r0, 5, "is5", "lessthan5")
 IntCmp(r0, 5, "is5", "lessthan5", "morethan5")
+
+;AdHoc function call
+AdHoc(1, 2)
+Function AdHoc(a, b)
+    Return 3
+FunctionEnd
+b = AdHoc(1, 2)

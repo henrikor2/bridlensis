@@ -12,6 +12,8 @@ public abstract class Callable {
 		VOID, OPTIONAL, REQUIRED, ERRORFLAG
 	}
 
+	public static final int UNLIMITED_ARGS = -1;
+
 	private final List<String> aliases;
 	private final List<Variable> arguments;
 
@@ -41,11 +43,11 @@ public abstract class Callable {
 		arguments.add(arg);
 	}
 
-	public final int getArgsCount() {
+	public int getArgsCount() {
 		return arguments.size();
 	}
 
-	public final Variable getArgument(int index) {
+	public Variable getArgument(int index) {
 		return arguments.get(index);
 	}
 

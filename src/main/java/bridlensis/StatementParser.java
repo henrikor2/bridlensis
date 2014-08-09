@@ -212,7 +212,7 @@ class StatementParser {
 			}
 		}
 
-		if (function.getArgsCount() > -1
+		if (function.getArgsCount() != Callable.UNLIMITED_ARGS
 				&& args.size() > function.getArgsCount()) {
 			throw new InvalidSyntaxException(
 					String.format(
