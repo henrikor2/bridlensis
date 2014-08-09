@@ -183,6 +183,27 @@ Variables introduced inside function can be accessed only within that function s
     DetailPrint(Foo()) ; <-- "hello world"
 
 
+### Ad Hoc Function Call
+
+BridleNSIS allows to call functions before or without them being introduced. This enables for example calling functions that are defined inside macros (See section Macros for details). 
+
+The function call is optimistic meaning BridleNSIS compiler is not able to verify existence of the function, or validity of arguments and return value. Best practise is to have functions introduced before they are called further in the script whenever possible. 
+
+Example calling a function ad hoc defined inside macro:
+
+    !macro f.foo UN
+        Function ${UN}foo
+            Pop $0 ; first argument
+            Pop $1 ; second argument
+            Push "$0 and $1" ; Return value
+        FunctionEnd
+    !macroend
+    !insertmacro f.foo ""
+    !insertmacro f.foo "un."
+    ...
+    value = un.foo("A", "B") ; --> "A and B"
+
+
 ### If Statement
 
 BridleNSIS relies on NSIS Logic Lib to add support for flow control and logic, therefore `LogicLib.nsh` must be imported before using If statements.
@@ -244,7 +265,7 @@ BridleNSIS syntax is not allowed inside macros and anything defined inside macro
     !insertmacro myfunc ""
     !insertmacro myfunc "un."
 
-In this case functions myfunc and un.myfunc cannot be called using Bridle syntax `myfunc()` or `un.myfun()`, neither you can use Bridle syntax inside myfunc body.
+See section Ad Hoc Function Call about accessing the functions inside macros when using BridleNSIS syntax.
 
 
 ## Function Reference
