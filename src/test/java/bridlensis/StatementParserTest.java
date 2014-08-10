@@ -234,4 +234,16 @@ public class StatementParserTest {
 				"s03", null)));
 	}
 
+	@Test
+	public void testParseIf() throws InvalidSyntaxException,
+			EnvironmentException {
+		StatementParser parser = createStatementParser();
+		InputReader reader = readerFor("If ${Exists} 'file.1' Or ${Exists} 'file.2'");
+		StringBuilder expected = new StringBuilder();
+		expected.append("${If} ${Exists} 'file.1'\r\n");
+		expected.append("${OrIf} ${Exists} 'file.2'");
+		assertEquals(expected.toString(),
+				parser.parseIf(reader.nextWord(), reader));
+	}
+
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import bridlensis.env.TypeObject.Type;
-
 public class ComparisonStatement {
 
 	private String key;
@@ -56,10 +54,6 @@ public class ComparisonStatement {
 
 	public void addRight(TypeObject expr) {
 		right.add(expr);
-	}
-
-	public Type getLastLeftType() {
-		return left.get(left.size() - 1).getType();
 	}
 
 	@Override

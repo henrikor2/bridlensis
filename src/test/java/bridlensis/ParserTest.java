@@ -1002,15 +1002,6 @@ public class ParserTest {
 		expected.append("${EndIf}");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
-
-		try {
-			inputStatement = new StringBuilder();
-			inputStatement.append("If 1 2");
-			parser.parseStatement(readerFor(inputStatement.toString()));
-			fail();
-		} catch (InvalidSyntaxException e) {
-			// all good
-		}
 	}
 
 	@Test
@@ -1086,15 +1077,6 @@ public class ParserTest {
 		expected.append("${LoopUntil} $a > $s02");
 		assertEquals(expected.toString(),
 				parser.parseStatement(readerFor(inputStatement.toString())));
-
-		try {
-			inputStatement = new StringBuilder();
-			inputStatement.append("Loop Until 1 2");
-			parser.parseStatement(readerFor(inputStatement.toString()));
-			fail();
-		} catch (InvalidSyntaxException e) {
-			// all good
-		}
 	}
 
 	@Test
