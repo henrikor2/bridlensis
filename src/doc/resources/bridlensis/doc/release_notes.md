@@ -1,5 +1,21 @@
 ﻿# BridleNSIS Release Notes
 
+## Version 0.4.0
+
+Release date: TBD
+
+### What's New
+
+*   Possibility to call functions ad hoc, without them being introduced. This allows to use BridleNSIS syntax to call functions defined inside macros for example.
+*   Added command-line option -d <directory> to define NSIS compiler (makensis.exe) work directory.
+*   Added new Ant task attributes dir, failonerror and resultproperty.
+
+### Fixes
+
+*   Fixed overprotective comparison statement parser that caused syntax errors in some cases. Now BridleNSIS won't even try to detect syntax errors in comparison statements but falls back to LogicLib and NSIS compiler.
+*   Fixed function MsgBox causing NSIS compile to fail when using three-buttons dialog (YESNOCANCEL or ABORTRETRYIGNOR).
+
+
 ## Version 0.3.1
 
 Release date: 2014-08-04
