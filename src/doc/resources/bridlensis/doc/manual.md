@@ -51,6 +51,7 @@ Parameters:
 *   `excludes`: Colon-separated list of files to exclude.
 *   `failonerror`: Stop the buildprocess if the compile exits with a return code signaling failure. Defaults to false.
 *   `resultproperty`: The name of a property in which the compile return code should be stored.
+*   `outFile`: The file name where to write the compile process output (uses stdout if omitted).
 
 Optional nested elements:
 

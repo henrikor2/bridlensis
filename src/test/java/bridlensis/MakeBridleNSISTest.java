@@ -48,7 +48,7 @@ public class MakeBridleNSISTest {
 		outputFile.deleteOnExit();
 
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
-				outputFile, DEFAULT_ENCODING, null);
+				outputFile, DEFAULT_ENCODING, null, System.out);
 		assertFiles(expectedFile, outputFile, DEFAULT_ENCODING);
 	}
 
@@ -61,7 +61,7 @@ public class MakeBridleNSISTest {
 		outputFile.deleteOnExit();
 
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
-				outputFile, DEFAULT_ENCODING, null);
+				outputFile, DEFAULT_ENCODING, null, System.out);
 		assertFiles(expectedFile, outputFile, DEFAULT_ENCODING);
 	}
 
@@ -80,7 +80,7 @@ public class MakeBridleNSISTest {
 			// Excluding Include2.nsh will fail the Makebridle process
 			MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
 					outputFile1, DEFAULT_ENCODING,
-					Arrays.asList("Include2.nsh"));
+					Arrays.asList("Include2.nsh"), System.out);
 			fail();
 		} catch (BridleNSISException e) {
 			// All good
@@ -88,7 +88,7 @@ public class MakeBridleNSISTest {
 		}
 
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
-				outputFile1, DEFAULT_ENCODING, null);
+				outputFile1, DEFAULT_ENCODING, null, System.out);
 		assertFiles(expectedFile1, outputFile1, DEFAULT_ENCODING);
 		assertFiles(expectedFile2, outputFile2, DEFAULT_ENCODING);
 	}
@@ -106,7 +106,7 @@ public class MakeBridleNSISTest {
 
 		// Parser fails to read any input if using wrong encoding
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
-				outputFile, "UTF-16LE", null);
+				outputFile, "UTF-16LE", null, System.out);
 		assertFiles(expectedFile, outputFile, "UTF-16LE");
 		assertTrue(outputFile.delete());
 		assertEquals(2, outputFile_ja.length()); // Output file contains BOM
@@ -114,13 +114,14 @@ public class MakeBridleNSISTest {
 
 		// Must use SJIS for parsing the Japanese file
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile_ja,
-				outputFile_ja, "SJIS", null);
+				outputFile_ja, "SJIS", null, System.out);
 		assertFiles(expectedFile_ja1, outputFile_ja, "SJIS");
 		assertTrue(outputFile_ja.delete());
 
 		// Use exclude to skip language files
 		MakeBridleNSIS.makeBridleNSIS(new SimpleNameGenerator(), inputFile,
-				outputFile, "UTF-16LE", Arrays.asList("I18N_ja.nsh"));
+				outputFile, "UTF-16LE", Arrays.asList("I18N_ja.nsh"),
+				System.out);
 		assertFiles(expectedFile, outputFile, "UTF-16LE");
 		assertTrue(outputFile.delete());
 		assertFiles(expectedFile_ja2, outputFile_ja, "SJIS");

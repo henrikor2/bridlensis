@@ -2,13 +2,13 @@
 
 ## Version 0.4.0
 
-Release date: TBD
+Release date: 2014-08-11
 
 ### What's New
 
 *   Possibility to call functions ad hoc, without them being introduced. This allows to use BridleNSIS syntax to call functions defined inside macros for example.
 *   Added command-line option -d <directory> to define NSIS compiler (makensis.exe) work directory.
-*   Added new Ant task attributes dir, failonerror and resultproperty.
+*   Added new Ant task attributes dir, failonerror, resultproperty, and outfile.
 
 ### Fixes
 

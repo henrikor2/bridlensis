@@ -1,6 +1,9 @@
 package bridlensis;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Scanner;
 
 import org.apache.tools.ant.BuildException;
@@ -32,6 +35,7 @@ public class ApacheAntTask extends Task {
 	private BridleNSISArguments args = new BridleNSISArguments();
 	private boolean failOnError = true;
 	private String resultProperty = null;
+	private File outFile = null;
 
 	public void setNsisHome(String nsisHome) {
 		args.setNsisHome(nsisHome);
@@ -78,11 +82,15 @@ public class ApacheAntTask extends Task {
 		this.resultProperty = resultProperty;
 	}
 
+	public void setOutFile(File outFile) {
+		this.outFile = outFile;
+	}
+
 	@Override
 	public void execute() throws BuildException {
 		validateArguments();
 		try {
-			int exitCode = MakeBridleNSIS.execute(args);
+			int exitCode = MakeBridleNSIS.execute(args, getPrintStream());
 			if (exitCode != 0 && failOnError) {
 				throw new BuildException("NSIS returned error code " + exitCode);
 			}
@@ -102,6 +110,28 @@ public class ApacheAntTask extends Task {
 	private void validateArguments() {
 		if (args.getInputFile() == null) {
 			throw new BuildException("Parameter 'file' not defined.");
+		}
+	}
+
+	private PrintStream getPrintStream() throws BuildException {
+		if (outFile == null) {
+			return System.out;
+		}
+		if (!outFile.exists()) {
+			try {
+				if (!outFile.getParentFile().mkdirs()
+						|| outFile.createNewFile()) {
+					throw new BuildException("Unable to create file "
+							+ outFile.getAbsolutePath());
+				}
+			} catch (IOException e) {
+				throw new BuildException(e);
+			}
+		}
+		try {
+			return new PrintStream(outFile);
+		} catch (FileNotFoundException e) {
+			throw new BuildException(e);
 		}
 	}
 
