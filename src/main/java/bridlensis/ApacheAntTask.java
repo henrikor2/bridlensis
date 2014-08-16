@@ -3,11 +3,11 @@ package bridlensis;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.util.FileUtils;
 
@@ -90,8 +90,9 @@ public class ApacheAntTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		validateArguments();
+		PrintStream printStream = getPrintStream();
 		try {
-			int exitCode = MakeBridleNSIS.execute(args, getPrintStream());
+			int exitCode = MakeBridleNSIS.execute(args, printStream);
 			if (exitCode != 0 && failOnError) {
 				throw new BuildException("NSIS returned error code " + exitCode);
 			}
@@ -103,7 +104,7 @@ public class ApacheAntTask extends Task {
 			if (failOnError) {
 				throw new BuildException(e);
 			} else {
-				log(e, Project.MSG_ERR);
+				printStream.println(e.getMessage());
 			}
 		}
 	}
@@ -116,7 +117,20 @@ public class ApacheAntTask extends Task {
 
 	private PrintStream getPrintStream() throws BuildException {
 		if (outFile == null) {
-			return System.out;
+			return new PrintStream(new OutputStream() {
+
+				private StringBuilder buffer = new StringBuilder(512);
+
+				@Override
+				public void write(int b) throws IOException {
+					if (b == '\n') {
+						log(buffer.toString());
+						buffer = new StringBuilder(512);
+					} else if (b != '\r') {
+						buffer.append((char) b);
+					}
+				}
+			});
 		}
 		if (!outFile.exists()) {
 			try {
