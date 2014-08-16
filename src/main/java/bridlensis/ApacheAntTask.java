@@ -9,6 +9,7 @@ import java.util.Scanner;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.util.FileUtils;
 
 public class ApacheAntTask extends Task {
 
@@ -119,8 +120,7 @@ public class ApacheAntTask extends Task {
 		}
 		if (!outFile.exists()) {
 			try {
-				if (!outFile.getParentFile().mkdirs()
-						|| outFile.createNewFile()) {
+				if (!FileUtils.getFileUtils().createNewFile(outFile, true)) {
 					throw new BuildException("Unable to create file "
 							+ outFile.getAbsolutePath());
 				}
