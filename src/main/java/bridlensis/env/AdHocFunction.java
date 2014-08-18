@@ -5,9 +5,9 @@ import java.util.List;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
 
-class AdHocFunction extends Callable {
+public class AdHocFunction extends Callable {
 
-	public AdHocFunction(String name) {
+	protected AdHocFunction(String name) {
 		super(name);
 	}
 

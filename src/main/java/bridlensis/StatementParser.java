@@ -7,6 +7,7 @@ import java.util.List;
 
 import bridlensis.InputReader.Word;
 import bridlensis.InputReader.WordTail;
+import bridlensis.env.AdHocFunction;
 import bridlensis.env.Callable;
 import bridlensis.env.Callable.ReturnType;
 import bridlensis.env.ComparisonStatement;
@@ -187,6 +188,10 @@ class StatementParser {
 			throws InvalidSyntaxException, EnvironmentException {
 		StringBuilder sb = new StringBuilder();
 		Callable callable = environment.getCallable(name.asName());
+		if (callable instanceof AdHocFunction) {
+			warn(reader, "Calling unintroduced function '" + callable.getName()
+					+ "'");
+		}
 		List<TypeObject> args = parseAndValidateFunctionArguments(callable,
 				returnVar, reader, sb);
 		sb.append(call(reader.getIndent(), callable, args, returnVar));
