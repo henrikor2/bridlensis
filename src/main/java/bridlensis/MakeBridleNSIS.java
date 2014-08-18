@@ -218,9 +218,10 @@ public class MakeBridleNSIS {
 		output.println("Encoding: " + encoding);
 		output.println();
 
-		Parser parser = new Parser(new StatementParser(
-				EnvironmentFactory.build(nameGenerator), nameGenerator),
-				baseDir, outDir, encoding, excludeFiles, output);
+		StatementParser statementParser = new StatementParser(
+				EnvironmentFactory.build(nameGenerator), nameGenerator, output);
+		Parser parser = new Parser(statementParser, baseDir, outDir, encoding,
+				excludeFiles, output);
 
 		long time = System.currentTimeMillis();
 		try {

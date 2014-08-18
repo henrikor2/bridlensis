@@ -12,7 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Scanner;
 
 import bridlensis.InputReader.Word;
 import bridlensis.InputReader.WordTail;
@@ -90,8 +89,7 @@ public class Parser {
 
 	private void parseFile(File inputFile, BufferedWriter writer)
 			throws IOException, ParserException {
-		Scanner source = new Scanner(inputFile, encoding);
-		InputReader reader = new InputReader(source);
+		InputReader reader = new InputReader(inputFile, encoding);
 		fileCount++;
 		try {
 			while (reader.goToNextStatement()) {
@@ -105,7 +103,7 @@ public class Parser {
 			throw new ParserException(inputFile.getAbsolutePath(),
 					reader.getLinesRead(), e);
 		} finally {
-			source.close();
+			reader.close();
 		}
 	}
 

@@ -1,5 +1,6 @@
 package bridlensis;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,10 +27,13 @@ class StatementParser {
 	private NameGenerator nameGenerator;
 	private UserFunction enclosingFunction = null;
 	private Variable functionNullReturn = null;
+	private PrintStream outStream;
 
-	public StatementParser(Environment environment, NameGenerator nameGenerator) {
+	public StatementParser(Environment environment,
+			NameGenerator nameGenerator, PrintStream outStream) {
 		this.environment = environment;
 		this.nameGenerator = nameGenerator;
+		this.outStream = outStream;
 	}
 
 	public Environment getEnvironment() {
@@ -44,7 +48,15 @@ class StatementParser {
 			name = reader.nextWord();
 		}
 		do {
-			Variable variable = environment.registerVariable(name.asName(),
+			String baseName = name.asName();
+			if (enclosingFunction != null
+					&& environment.containsVariable(baseName, null)) {
+				warn(reader,
+						String.format(
+								"Declaring variable '%s' in function '%s' that overshadows a global variable with the same name.",
+								baseName, enclosingFunction.getName()));
+			}
+			Variable variable = environment.registerVariable(baseName,
 					enclosingFunction);
 			sb.append(NSISStatements.variableDeclare(reader.getIndent(),
 					variable));
@@ -421,6 +433,11 @@ class StatementParser {
 		buffer.append(NSISStatements.variableDeclare(indent, variable));
 		buffer.append(NSISStatements.NEWLINE_MARKER);
 		return variable;
+	}
+
+	private void warn(InputReader reader, String message) {
+		outStream.println(String.format("%s, line %d, WARN: %s",
+				reader.getFile(), reader.getLinesRead(), message));
 	}
 
 }

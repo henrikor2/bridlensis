@@ -22,7 +22,8 @@ public class StatementParserTest {
 	private StatementParser createStatementParser() {
 		SimpleNameGenerator nameGenerator = new SimpleNameGenerator();
 		StatementParser parser = new StatementParser(
-				EnvironmentFactory.build(nameGenerator), nameGenerator);
+				EnvironmentFactory.build(nameGenerator), nameGenerator,
+				System.out);
 		return parser;
 	}
 

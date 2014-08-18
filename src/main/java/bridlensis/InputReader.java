@@ -1,5 +1,7 @@
 package bridlensis;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import bridlensis.env.TypeObject;
@@ -151,14 +153,20 @@ public class InputReader {
 
 	}
 
+	private File file;
 	private Scanner input;
 	private InputText text;
 	private String indent;
 	private WordTail tail;
 	private int linesRead;
 
-	public InputReader(Scanner input) {
-		this.input = input;
+	public InputReader(File file, String encoding) throws FileNotFoundException {
+		this(new Scanner(file, encoding));
+		this.file = file;
+	}
+
+	protected InputReader(Scanner scanner) {
+		this.input = scanner;
 		this.linesRead = 0;
 		this.text = new InputText();
 	}
@@ -168,12 +176,20 @@ public class InputReader {
 		return "InputReader[" + text.get() + "]";
 	}
 
+	public File getFile() {
+		return file;
+	}
+
 	public int getLinesRead() {
 		return linesRead;
 	}
 
 	public String getIndent() {
 		return indent;
+	}
+
+	public void close() {
+		input.close();
 	}
 
 	public boolean goToNextStatement() throws InvalidSyntaxException {
