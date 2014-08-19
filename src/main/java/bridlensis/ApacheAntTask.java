@@ -37,6 +37,7 @@ public class ApacheAntTask extends Task {
 	private boolean failOnError = true;
 	private String resultProperty = null;
 	private File outFile = null;
+	private int logLevel = Logger.INFO;
 
 	public void setNsisHome(String nsisHome) {
 		args.setNsisHome(nsisHome);
@@ -87,11 +88,16 @@ public class ApacheAntTask extends Task {
 		this.outFile = outFile;
 	}
 
+	public void setLogLevel(int level) {
+		this.logLevel = level;
+	}
+
 	@Override
 	public void execute() throws BuildException {
+		validateArguments();
 		Logger logger = Logger.getInstance();
 		logger.setPrintStream(getPrintStream());
-		validateArguments();
+		logger.setLogLevel(logLevel);
 		try {
 			int exitCode = MakeBridleNSIS.execute(args);
 			if (exitCode != 0 && failOnError) {
