@@ -58,6 +58,8 @@ class StatementParser {
 			}
 			Variable variable = environment.registerVariable(baseName,
 					enclosingFunction);
+			logger.debug(reader, "Register new varibale '" + variable.getName()
+					+ "'");
 			sb.append(NSISStatements.variableDeclare(reader.getIndent(),
 					variable));
 			if (reader.hasNextWord()) {
@@ -81,6 +83,8 @@ class StatementParser {
 		} else {
 			variable = registerAndDeclareVariable(varName.asName(),
 					reader.getIndent(), sb);
+			logger.debug(reader, "Register new varibale '" + variable.getName()
+					+ "'");
 		}
 
 		Word word = reader.nextWord();
@@ -120,6 +124,8 @@ class StatementParser {
 		}
 		enclosingFunction = environment.registerUserFunction(reader.nextWord()
 				.asName());
+		logger.debug(reader,
+				"Register new function '" + enclosingFunction.getName() + "'");
 
 		StringBuilder sb = new StringBuilder();
 
@@ -129,6 +135,9 @@ class StatementParser {
 				String argName = reader.nextWord().asName();
 				Variable argVariable = registerAndDeclareVariable(argName,
 						reader.getIndent(), sb);
+				logger.debug(reader,
+						"Register new function argument varibale '"
+								+ argVariable.getName() + "'");
 				enclosingFunction.registerArgument(argVariable);
 			} while (reader.getWordTail().isFunctionArgSeparator());
 			if (!reader.getWordTail().containsFunctionArgsClose()) {
@@ -424,6 +433,8 @@ class StatementParser {
 			throws InvalidSyntaxException, EnvironmentException {
 		Variable fReturn = registerAndDeclareVariable(nameGenerator.generate(),
 				reader.getIndent(), buffer);
+		logger.debug(reader, "Register new function return varibale '"
+				+ fReturn.getName() + "'");
 		buffer.append(parseCall(new Word(callableName.getValue()), fReturn,
 				reader));
 		buffer.append(NSISStatements.NEWLINE_MARKER);
