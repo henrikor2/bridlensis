@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -22,19 +21,19 @@ public class Parser {
 	public static final char UTF16BE_BOM = '\uFFFE';
 	public static final char UTF16LE_BOM = '\uFEFF';
 
+	private static final Logger logger = Logger.getInstance();
+
 	private File baseDir;
 	private File outDir;
 	private String encoding;
 	private Collection<String> excludeFiles;
-	private PrintStream outStream;
 	private int fileCount = 0;
 	private int inputLines = 0;
 	private StatementParser statementParser;
 	private boolean insideMacro;
 
 	public Parser(StatementParser statementParser, File baseDir, File outDir,
-			String encoding, Collection<String> excludeFiles,
-			PrintStream outStream) {
+			String encoding, Collection<String> excludeFiles) {
 		this.baseDir = baseDir;
 		this.outDir = outDir;
 		this.encoding = encoding;
@@ -43,7 +42,6 @@ public class Parser {
 		if (excludeFiles != null) {
 			this.excludeFiles.addAll(excludeFiles);
 		}
-		this.outStream = outStream;
 	}
 
 	public int getInputLines() {
@@ -58,7 +56,7 @@ public class Parser {
 			throws IOException, ParserException {
 		insideMacro = false;
 		File inputFile = new File(baseDir, inputFileName);
-		outStream.println("Begin parse file: " + inputFile.getAbsolutePath());
+		logger.debug("Begin parse file: " + inputFile.getAbsolutePath());
 		try (BufferedWriter writer = getOutputWriter(outputFileName)) {
 			writer.write(NSISStatements.nullDefine());
 			parseFile(inputFile, writer);
@@ -76,7 +74,7 @@ public class Parser {
 						+ outDirPath.getAbsolutePath());
 			}
 		}
-		outStream.println("Output file: " + outputFile.getAbsolutePath());
+		logger.debug("Output file: " + outputFile.getAbsolutePath());
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 				new FileOutputStream(outputFile), encoding));
 		if (encoding.equalsIgnoreCase("UTF-16LE")) {
@@ -96,7 +94,7 @@ public class Parser {
 				writer.write(parseStatement(reader));
 				writer.write(NSISStatements.NEWLINE_MARKER);
 			}
-			outStream.println(String.format("End parsing %d lines in file %s.",
+			logger.debug(String.format("End parsing %d lines in file %s.",
 					reader.getLinesRead(), inputFile.getAbsolutePath()));
 			inputLines += reader.getLinesRead();
 		} catch (InvalidSyntaxException | EnvironmentException e) {
@@ -173,7 +171,7 @@ public class Parser {
 		if (excludeFiles.contains(inputFileName)
 				|| excludeFiles.contains(inputFile.getAbsolutePath())) {
 			// Handle excluded file
-			outStream.println("Include file '" + inputFileName
+			logger.info(reader, "Include file '" + inputFileName
 					+ "' omitted being marked as excluded.");
 			String outputFileName = MakeBridleNSIS
 					.convertToBridleFilename(inputFileName);
@@ -183,12 +181,12 @@ public class Parser {
 					outputFileName);
 		} else if (!inputFile.exists()) {
 			// Include file not found
-			outStream.println("Include file '" + inputFileName
+			logger.debug(reader, "Include file '" + inputFileName
 					+ "' not found, assuming it's found by NSIS.");
 			statement = reader.getCurrentStatement();
 		} else {
 			// Parse include file
-			outStream.println("Follow include: " + inputFile.getAbsolutePath());
+			logger.debug(reader, "Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
 					.convertToBridleFilename(inputFileName);
 			try (BufferedWriter writer = getOutputWriter(outputFileName)) {
@@ -204,7 +202,7 @@ public class Parser {
 
 	private void copyFile(File sourceFile, File destFile, int lineNumber)
 			throws ParserException {
-		outStream.println(String.format("Copy file '%s' to directory '%s'",
+		logger.debug(String.format("Copy file '%s' to directory '%s'",
 				sourceFile.getAbsolutePath(), outDir.getAbsolutePath()));
 		try (FileInputStream input = new FileInputStream(sourceFile);
 				FileOutputStream output = new FileOutputStream(destFile)) {

@@ -1,6 +1,5 @@
 package bridlensis;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,17 +23,16 @@ class StatementParser {
 
 	private static final String NULLVAR = "bridlensis_nullvar";
 
+	private static final Logger logger = Logger.getInstance();
+
 	private Environment environment;
 	private NameGenerator nameGenerator;
 	private UserFunction enclosingFunction = null;
 	private Variable functionNullReturn = null;
-	private PrintStream outStream;
 
-	public StatementParser(Environment environment,
-			NameGenerator nameGenerator, PrintStream outStream) {
+	public StatementParser(Environment environment, NameGenerator nameGenerator) {
 		this.environment = environment;
 		this.nameGenerator = nameGenerator;
-		this.outStream = outStream;
 	}
 
 	public Environment getEnvironment() {
@@ -52,7 +50,8 @@ class StatementParser {
 			String baseName = name.asName();
 			if (enclosingFunction != null
 					&& environment.containsVariable(baseName, null)) {
-				warn(reader,
+				logger.warn(
+						reader,
 						String.format(
 								"Declaring variable '%s' in function '%s' that overshadows a global variable with the same name.",
 								baseName, enclosingFunction.getName()));
@@ -189,8 +188,9 @@ class StatementParser {
 		StringBuilder sb = new StringBuilder();
 		Callable callable = environment.getCallable(name.asName());
 		if (callable instanceof AdHocFunction) {
-			warn(reader, "Calling unintroduced function '" + callable.getName()
-					+ "'");
+			logger.warn(reader,
+					"Calling unintroduced function '" + callable.getName()
+							+ "'");
 		}
 		List<TypeObject> args = parseAndValidateFunctionArguments(callable,
 				returnVar, reader, sb);
@@ -438,11 +438,6 @@ class StatementParser {
 		buffer.append(NSISStatements.variableDeclare(indent, variable));
 		buffer.append(NSISStatements.NEWLINE_MARKER);
 		return variable;
-	}
-
-	private void warn(InputReader reader, String message) {
-		outStream.println(String.format("%s, line %d, WARN: %s",
-				reader.getFile(), reader.getLinesRead(), message));
 	}
 
 }

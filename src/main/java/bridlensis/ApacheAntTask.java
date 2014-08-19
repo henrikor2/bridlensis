@@ -89,10 +89,11 @@ public class ApacheAntTask extends Task {
 
 	@Override
 	public void execute() throws BuildException {
+		Logger logger = Logger.getInstance();
+		logger.setPrintStream(getPrintStream());
 		validateArguments();
-		PrintStream printStream = getPrintStream();
 		try {
-			int exitCode = MakeBridleNSIS.execute(args, printStream);
+			int exitCode = MakeBridleNSIS.execute(args);
 			if (exitCode != 0 && failOnError) {
 				throw new BuildException("NSIS returned error code " + exitCode);
 			}
@@ -104,7 +105,7 @@ public class ApacheAntTask extends Task {
 			if (failOnError) {
 				throw new BuildException(e);
 			} else {
-				printStream.println(e.getMessage());
+				logger.error(e);
 			}
 		}
 	}

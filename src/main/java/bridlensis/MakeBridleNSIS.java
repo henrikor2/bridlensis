@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +24,8 @@ public class MakeBridleNSIS {
 	public static final int EXIT_MAKENSISERROR = 13;
 
 	private static final String MAKENSIS_EXE = "makensis.exe";
+
+	private static final Logger logger = Logger.getInstance();
 
 	static {
 		try (Scanner versionFileScanner = new Scanner(MakeBridleNSIS.class
@@ -71,7 +72,7 @@ public class MakeBridleNSIS {
 
 		int exitCode;
 		try {
-			exitCode = execute(arguments, System.out);
+			exitCode = execute(arguments);
 		} catch (BridleNSISException e) {
 			System.out.println(e.getMessage());
 			exitCode = e.getErrorCode();
@@ -80,16 +81,16 @@ public class MakeBridleNSIS {
 		System.exit(exitCode);
 	}
 
-	public static int execute(BridleNSISArguments arguments, PrintStream output)
+	public static int execute(BridleNSISArguments arguments)
 			throws BridleNSISException {
 		File outputFile = getOutFile(arguments.getOutDir(),
 				arguments.getInputFile());
 		makeBridleNSIS(new DefaultNameGenerator(), arguments.getInputFile(),
 				outputFile, arguments.getEncoding(),
-				arguments.getExcludeFiles(), output);
-		String nsisHome = findNSISHome(arguments.getNsisHome(), output);
+				arguments.getExcludeFiles());
+		String nsisHome = findNSISHome(arguments.getNsisHome());
 		return makeNSIS(arguments.getDir(), outputFile.getAbsolutePath(),
-				nsisHome, arguments.getNSISOptions(), output);
+				nsisHome, arguments.getNSISOptions());
 	}
 
 	private static BridleNSISArguments parseArguments(String[] args) {
@@ -133,26 +134,26 @@ public class MakeBridleNSIS {
 		return new File(outDir, convertToBridleFilename(inputFile.getName()));
 	}
 
-	private static String findNSISHome(String startDir, PrintStream output)
+	private static String findNSISHome(String startDir)
 			throws BridleNSISException {
 		if (startDir != null && !startDir.trim().isEmpty()
-				&& isNSISHome(startDir, output)) {
+				&& isNSISHome(startDir)) {
 			return startDir;
 		}
 
-		if (isNSISHome("", output)) {
+		if (isNSISHome("")) {
 			return "";
 		}
 
 		String homeX86 = System.getenv("ProgramFiles(x86)")
 				+ System.getProperty("file.separator") + "NSIS";
-		if (isNSISHome(homeX86, output)) {
+		if (isNSISHome(homeX86)) {
 			return homeX86;
 		}
 
 		String homeX64 = System.getenv("ProgramFiles")
 				+ System.getProperty("file.separator") + "NSIS";
-		if (isNSISHome(homeX64, output)) {
+		if (isNSISHome(homeX64)) {
 			return homeX64;
 		}
 
@@ -160,7 +161,7 @@ public class MakeBridleNSIS {
 				"NSIS home not found.");
 	}
 
-	private static boolean isNSISHome(String dir, PrintStream output) {
+	private static boolean isNSISHome(String dir) {
 		String exec;
 		if (dir == null || dir.trim().isEmpty()) {
 			exec = MAKENSIS_EXE;
@@ -168,22 +169,24 @@ public class MakeBridleNSIS {
 			exec = new File(dir, MAKENSIS_EXE).getPath();
 		}
 		try {
+			StringBuilder logMsg = new StringBuilder();
 			ProcessBuilder builder = new ProcessBuilder(exec, "/VERSION");
 			Process process = builder.start();
 			try (BufferedReader reader = new BufferedReader(
 					new InputStreamReader(process.getInputStream(),
 							System.getProperty("file.encoding")))) {
 				String version = reader.readLine();
-				output.print("Detected NSIS version " + version);
+				logMsg.append("Detected NSIS version " + version);
 			} catch (IOException e) {
-				output.print("Unable to detected NSIS version");
+				logMsg.append("Unable to detected NSIS version");
 			}
 			if (!exec.contains(System.getProperty("file.separator"))) {
-				output.print(" in system %PATH%");
+				logMsg.append(" in system %PATH%");
 			} else {
-				output.print(" in folder " + dir);
+				logMsg.append(" in folder " + dir);
 			}
-			output.println(".");
+			logMsg.append(".");
+			logger.info(logMsg.toString());
 			return (process.waitFor() == 0);
 		} catch (IOException | InterruptedException e) {
 			return false;
@@ -204,8 +207,7 @@ public class MakeBridleNSIS {
 
 	protected static void makeBridleNSIS(NameGenerator nameGenerator,
 			File inputFile, File outputFile, String encoding,
-			Collection<String> excludeFiles, PrintStream output)
-			throws BridleNSISException {
+			Collection<String> excludeFiles) throws BridleNSISException {
 		if (outputFile.equals(inputFile)) {
 			throw new BridleNSISException(EXIT_MAKEBRIDLENSISERROR,
 					"Cannot override input file");
@@ -214,14 +216,14 @@ public class MakeBridleNSIS {
 		File baseDir = inputFile.getParentFile();
 		File outDir = outputFile.getParentFile();
 
-		output.println("Output: " + outDir.getAbsolutePath());
-		output.println("Encoding: " + encoding);
-		output.println();
+		logger.info("Output: " + outDir.getAbsolutePath());
+		logger.info("Encoding: " + encoding);
+		logger.info("");
 
 		StatementParser statementParser = new StatementParser(
-				EnvironmentFactory.build(nameGenerator), nameGenerator, output);
+				EnvironmentFactory.build(nameGenerator), nameGenerator);
 		Parser parser = new Parser(statementParser, baseDir, outDir, encoding,
-				excludeFiles, output);
+				excludeFiles);
 
 		long time = System.currentTimeMillis();
 		try {
@@ -232,40 +234,42 @@ public class MakeBridleNSIS {
 		time = System.currentTimeMillis() - time;
 		time = time < 1000 ? 1 : time / 1000;
 
-		output.println(String.format(
+		logger.info(String.format(
 				"%nParsed in %d seconds total of %d lines in %d file(s).%n",
 				time, parser.getInputLines(), parser.getFileCount()));
 	}
 
 	private static int makeNSIS(File dir, String filename, String nsisHome,
-			Collection<String> nsisOptions, PrintStream output)
-			throws BridleNSISException {
+			Collection<String> nsisOptions) throws BridleNSISException {
 		ArrayList<String> cmd = new ArrayList<String>();
 
 		String exec = new File(nsisHome, MAKENSIS_EXE).getAbsolutePath();
 		cmd.add(exec);
-		output.print("Execute: ");
-		output.print("\"" + exec + "\" ");
+
+		StringBuilder logMsg = new StringBuilder();
+		logMsg.append("Execute: ");
+		logMsg.append("\"" + exec + "\" ");
 
 		for (String option : nsisOptions) {
 			cmd.add(option);
-			output.print("\"" + option + "\" ");
+			logMsg.append("\"" + option + "\" ");
 		}
 
 		cmd.add(filename);
 
-		output.println("\"" + filename + "\"");
+		logMsg.append("\"" + filename + "\"");
+		logger.info(logMsg.toString());
 
 		ProcessBuilder builder = new ProcessBuilder(cmd);
 		if (dir == null) {
 			dir = new File(System.getProperty("user.dir"));
 		}
-		output.println("Work directory: \"" + dir.getAbsolutePath() + "\" ");
+		logger.info("Work directory: \"" + dir.getAbsolutePath() + "\" ");
 		builder.directory(dir);
 		builder.redirectErrorStream(true);
 		Process process;
 		try {
-			output.println("\nMakeNSIS ---->\n");
+			logger.info("\nMakeNSIS ---->\n");
 			process = builder.start();
 		} catch (IOException e) {
 			throw new BridleNSISException(EXIT_MAKENSISERROR, e);
@@ -276,11 +280,10 @@ public class MakeBridleNSIS {
 				processInput, "Cp1252"))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				output.println(line);
+				logger.info(line);
 			}
 		} catch (IOException e) {
-			output.println("Unable to read makensis.exe output: "
-					+ e.getMessage());
+			logger.warn("Unable to read makensis.exe output: " + e.getMessage());
 		}
 
 		try {
