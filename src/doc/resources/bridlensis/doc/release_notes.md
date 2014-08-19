@@ -1,5 +1,19 @@
 ﻿# BridleNSIS Release Notes
 
+## Version 0.4.1
+
+Release date: 2014-08-19
+
+### What's New
+
+*   New command-line arguments `-q` and `-v` to control output logging.
+*   New Apache Ant task argument `loglevel=[0-3]` to control output logging.
+*   Redirect Apache Ant task printout to task logger instead of stdout.
+
+### Fixes
+
+*   Fixed Apache Ant task failure when the argument `output="path-to-file"` file doesn't exist.
+
 ## Version 0.4.0
 
 Release date: 2014-08-13
