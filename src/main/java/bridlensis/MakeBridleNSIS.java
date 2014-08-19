@@ -48,13 +48,12 @@ public class MakeBridleNSIS {
 		return sb.toString();
 	}
 
-	private static String header() {
+	public static String header() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("BridleNSIS v");
 		sb.append(VERSION);
 		sb.append(" - Copyright (c) 2014 Contributors\r\n");
 		sb.append("See the User Manual for license details and credits.\r\n");
-		sb.append("\r\n");
 		return sb.toString();
 	}
 

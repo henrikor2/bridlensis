@@ -98,6 +98,7 @@ public class ApacheAntTask extends Task {
 		Logger logger = Logger.getInstance();
 		logger.setPrintStream(getPrintStream());
 		logger.setLogLevel(logLevel);
+		logger.warn(MakeBridleNSIS.header());
 		try {
 			int exitCode = MakeBridleNSIS.execute(args);
 			if (exitCode != 0 && failOnError) {
