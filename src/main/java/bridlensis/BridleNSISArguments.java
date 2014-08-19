@@ -14,6 +14,7 @@ public class BridleNSISArguments {
 	private File outDir;
 	private ArrayList<String> nsisOptions;
 	private ArrayList<String> excludeFiles;
+	private int logLevel;
 
 	public BridleNSISArguments() {
 		inputFile = null;
@@ -23,6 +24,7 @@ public class BridleNSISArguments {
 		dir = null;
 		nsisOptions = new ArrayList<String>();
 		excludeFiles = new ArrayList<String>();
+		logLevel = Logger.INFO;
 	}
 
 	public File getInputFile() {
@@ -84,4 +86,13 @@ public class BridleNSISArguments {
 	public void addAllExcludes(List<String> filespecs) {
 		excludeFiles.addAll(excludeFiles);
 	}
+
+	public int getLogLevel() {
+		return logLevel;
+	}
+
+	public void setLogLevel(int logLevel) {
+		this.logLevel = logLevel;
+	}
+
 }

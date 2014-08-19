@@ -59,22 +59,24 @@ public class MakeBridleNSIS {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(header());
+		logger.warn(header());
 
 		BridleNSISArguments arguments = parseArguments(args);
 
 		if (arguments.getInputFile() == null) {
-			System.out.println("Usage: ");
-			System.out.println("  " + usage());
+			logger.warn("Usage: ");
+			logger.warn("  " + usage());
 			System.exit(0);
 			return;
 		}
+
+		logger.setLogLevel(arguments.getLogLevel());
 
 		int exitCode;
 		try {
 			exitCode = execute(arguments);
 		} catch (BridleNSISException e) {
-			System.out.println(e.getMessage());
+			logger.error(e);
 			exitCode = e.getErrorCode();
 		}
 
@@ -107,6 +109,10 @@ public class MakeBridleNSIS {
 			} else if (args[i].equals("-x")) {
 				arguments.addAllExcludes(Arrays.asList(args[++i].split(System
 						.getProperty("path.separator"))));
+			} else if (args[i].equals("-q")) {
+				arguments.setLogLevel(Logger.WARN);
+			} else if (args[i].equals("-v")) {
+				arguments.setLogLevel(Logger.DEBUG);
 			} else if (args[i].startsWith("/")) {
 				arguments.addNSISOption(args[i]);
 			} else {
@@ -234,7 +240,7 @@ public class MakeBridleNSIS {
 		time = System.currentTimeMillis() - time;
 		time = time < 1000 ? 1 : time / 1000;
 
-		logger.info(String.format(
+		logger.warn(String.format(
 				"%nParsed in %d seconds total of %d lines in %d file(s).%n",
 				time, parser.getInputLines(), parser.getFileCount()));
 	}
@@ -269,7 +275,7 @@ public class MakeBridleNSIS {
 		builder.redirectErrorStream(true);
 		Process process;
 		try {
-			logger.info("\nMakeNSIS ---->\n");
+			logger.warn("\nMakeNSIS ---->\n");
 			process = builder.start();
 		} catch (IOException e) {
 			throw new BridleNSISException(EXIT_MAKENSISERROR, e);
@@ -280,7 +286,7 @@ public class MakeBridleNSIS {
 				processInput, "Cp1252"))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				logger.info(line);
+				logger.warn(line);
 			}
 		} catch (IOException e) {
 			logger.warn("Unable to read makensis.exe output: " + e.getMessage());

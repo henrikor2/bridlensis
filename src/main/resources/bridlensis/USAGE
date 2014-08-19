@@ -1,4 +1,4 @@
-java -jar bridlensis-%VERSION%.jar [-d <directory>] [-n <NSIS home>] [-o <outdir>] [-e <encoding>] [-x <file1:file2:..>] <script file> [<NSIS options>]
+java -jar bridlensis-%VERSION%.jar [-d <directory>] [-n <NSIS home>] [-o <outdir>] [-e <encoding>] [-x <file1:file2:..>] [-q|v] <script file> [<NSIS options>]
 
 Arguments:
   -d <directory>: MakenNSIS process work directory
@@ -6,6 +6,8 @@ Arguments:
   -o <output>: Output directory for converted script files (.snsi or .snsh)
   -e <encoding>: File encoding (defaults to Windows system encoding)
   -x <files>: Colon-separated list of files to exclude (or not to follow when found in !include)
+  -q: Suppress output logging to warnings and errors only
+  -v: Set the most verbose output logging
   <script file>: BridleNSIS script file to compile
   <NSIS options>: Options passed to NSIS compiler, e.g. /Dname=value
 
