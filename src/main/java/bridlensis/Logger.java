@@ -4,10 +4,10 @@ import java.io.PrintStream;
 
 public class Logger {
 
-	private static final int ERROR = 4;
-	private static final int WARN = 3;
-	private static final int INFO = 2;
-	private static final int DEBUG = 1;
+	public static final int ERROR = 0;
+	public static final int WARN = 1;
+	public static final int INFO = 2;
+	public static final int DEBUG = 3;
 
 	private static Logger instance = null;
 
@@ -30,8 +30,12 @@ public class Logger {
 		output = printStream;
 	}
 
+	public void setLogLevel(int level) {
+		this.level = level;
+	}
+
 	private void log(int level, String msg) {
-		if (level >= this.level) {
+		if (level <= this.level) {
 			output.println(msg);
 		}
 	}
