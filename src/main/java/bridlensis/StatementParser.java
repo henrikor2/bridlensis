@@ -50,7 +50,7 @@ class StatementParser {
 			String baseName = name.asName();
 			if (enclosingFunction != null
 					&& environment.containsVariable(baseName, null)) {
-				logger.warn(
+				logger.info(
 						reader,
 						String.format(
 								"Declaring variable '%s' in function '%s' that overshadows a global variable with the same name.",
@@ -197,7 +197,7 @@ class StatementParser {
 		StringBuilder sb = new StringBuilder();
 		Callable callable = environment.getCallable(name.asName());
 		if (callable instanceof AdHocFunction) {
-			logger.warn(reader,
+			logger.debug(reader,
 					"Calling unintroduced function '" + callable.getName()
 							+ "'");
 		}
