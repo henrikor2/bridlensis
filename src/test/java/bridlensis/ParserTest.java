@@ -1127,4 +1127,42 @@ public class ParserTest {
 		assertEquals("Call myfunc",
 				parser.parseStatement(readerFor("myfunc()")));
 	}
+
+	@Test
+	public void testStrings() throws InvalidSyntaxException,
+			EnvironmentException, ParserException {
+		Parser parser = createParser();
+
+		InputReader reader = readerFor("a = '\"' + '\"'");
+		StringBuilder expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("StrCpy $a '\"\"'");
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+
+		reader = readerFor("a = \"'\" + \"'\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"''\"");
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+	}
+
+	@Test
+	public void testNestedFunctions() throws InvalidSyntaxException,
+			EnvironmentException, ParserException {
+		Parser parser = createParser();
+
+		InputReader reader = readerFor("a = 'hello'");
+		StringBuilder expected = new StringBuilder();
+		expected.append("Var /GLOBAL a\r\n");
+		expected.append("StrCpy $a 'hello'");
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+
+		reader = readerFor("b = IntOp(StrLen(a), '-', 1)");
+		expected = new StringBuilder();
+		expected.append("Var /GLOBAL b\r\n");
+		expected.append("Var /GLOBAL s01\r\n");
+		expected.append("StrLen $s01 $a \r\n");
+		expected.append("IntOp $b $s01 '-' 1");
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+	}
+
 }
