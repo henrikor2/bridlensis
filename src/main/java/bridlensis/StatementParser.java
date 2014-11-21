@@ -21,7 +21,13 @@ import bridlensis.env.Variable;
 
 class StatementParser {
 
-	private static final String NULLVAR = "bridlensis_nullvar";
+	private static final String NULLVAR_NAME = "bridlensis_nullvar";
+
+	private static final List<TypeObject> ERRORFLAG_RETURN_0 = new ArrayList<TypeObject>(
+			Arrays.asList(new SimpleTypeObject(Type.INTEGER, 0)));
+
+	private static final List<TypeObject> ERRORFLAG_RETURN_1 = new ArrayList<TypeObject>(
+			Arrays.asList(new SimpleTypeObject(Type.INTEGER, 1)));
 
 	private static final Logger logger = Logger.getInstance();
 
@@ -266,8 +272,8 @@ class StatementParser {
 		if (returnVar == null
 				&& callable.getReturnType() == ReturnType.REQUIRED) {
 			if (functionNullReturn == null) {
-				functionNullReturn = environment
-						.registerVariable(NULLVAR, null);
+				functionNullReturn = environment.registerVariable(NULLVAR_NAME,
+						null);
 				sb.append(NSISStatements.variableDeclare(indent,
 						functionNullReturn));
 				sb.append(NSISStatements.NEWLINE_MARKER);
@@ -276,7 +282,7 @@ class StatementParser {
 		} else if (returnVar != null
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append(environment.getCallable("strcpy").statementFor(indent,
-					Arrays.asList(SimpleTypeObject.integer(1)), returnVar));
+					ERRORFLAG_RETURN_1, returnVar));
 			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.clearErrors(indent));
 			sb.append(NSISStatements.NEWLINE_MARKER);
@@ -286,8 +292,8 @@ class StatementParser {
 				&& callable.getReturnType() == ReturnType.ERRORFLAG) {
 			sb.append(NSISStatements.NEWLINE_MARKER);
 			sb.append(NSISStatements.callOnError(indent,
-					environment.getCallable("strcpy"),
-					Arrays.asList(SimpleTypeObject.integer(0)), returnVar));
+					environment.getCallable("strcpy"), ERRORFLAG_RETURN_0,
+					returnVar));
 		}
 		return sb.toString();
 	}
@@ -425,7 +431,7 @@ class StatementParser {
 		String rightValue = SimpleTypeObject.stripString(parseExpression(
 				reader.nextWord(), buffer, reader));
 
-		return SimpleTypeObject.string(leftValue + rightValue);
+		return new SimpleTypeObject(Type.STRING, leftValue + rightValue);
 	}
 
 	private Variable parseInExpressionCall(TypeObject callableName,

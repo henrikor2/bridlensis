@@ -6,13 +6,15 @@ import bridlensis.env.Callable;
 import bridlensis.env.ComparisonStatement;
 import bridlensis.env.SimpleTypeObject;
 import bridlensis.env.TypeObject;
+import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 import bridlensis.env.Variable;
 
 public class NSISStatements {
 
-	public static final TypeObject NULL = SimpleTypeObject
-			.special("${BRIDLE_NULL}");
+	public static final TypeObject NULL = new SimpleTypeObject(Type.SPECIAL,
+			"${BRIDLE_NULL}");
+
 	public static final String DEFAULT_INDENT = "    ";
 	public static final String NEWLINE_MARKER = "\r\n";
 

@@ -4,10 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import bridlensis.env.EnvironmentFactory;
 import bridlensis.env.Environment;
 import bridlensis.env.EnvironmentException;
+import bridlensis.env.EnvironmentFactory;
 import bridlensis.env.SimpleTypeObject;
+import bridlensis.env.TypeObject.Type;
 import bridlensis.env.UserFunction;
 
 public class NSISStatementsTest {
@@ -34,16 +35,12 @@ public class NSISStatementsTest {
 	@Test
 	public void testVariableAssign() throws InvalidSyntaxException,
 			EnvironmentException {
-		assertEquals(
-				"  StrCpy $a 1",
-				NSISStatements.variableAssign("  ",
-						env.registerVariable("a", null),
-						SimpleTypeObject.integer(1)));
-		assertEquals(
-				"StrCpy $foo $a",
-				NSISStatements.variableAssign("",
-						env.registerVariable("foo", null),
-						SimpleTypeObject.special("$a")));
+		assertEquals("  StrCpy $a 1", NSISStatements.variableAssign("  ", env
+				.registerVariable("a", null), new SimpleTypeObject(
+				Type.INTEGER, 1)));
+		assertEquals("StrCpy $foo $a", NSISStatements.variableAssign("", env
+				.registerVariable("foo", null), new SimpleTypeObject(
+				Type.SPECIAL, "$a")));
 	}
 
 	@Test
@@ -72,9 +69,8 @@ public class NSISStatementsTest {
 
 		UserFunction bar = env.registerUserFunction("bar");
 		bar.setHasReturn(true);
-		assertEquals(
-				"Push \"hello world!\"\r\nReturn",
-				NSISStatements.functionReturn("", bar,
-						SimpleTypeObject.string("hello world!")));
+		assertEquals("Push \"hello world!\"\r\nReturn",
+				NSISStatements.functionReturn("", bar, new SimpleTypeObject(
+						Type.STRING, "hello world!")));
 	}
 }

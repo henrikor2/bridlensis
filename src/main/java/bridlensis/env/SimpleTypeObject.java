@@ -5,9 +5,9 @@ public class SimpleTypeObject implements TypeObject {
 	private static final char STRING_MARKER = '"';
 
 	private final Type type;
-	private final String value;
+	private final Object value;
 
-	private SimpleTypeObject(Type type, String value) {
+	public SimpleTypeObject(Type type, Object value) {
 		this.type = type;
 		this.value = value;
 	}
@@ -21,26 +21,14 @@ public class SimpleTypeObject implements TypeObject {
 	public String getValue() {
 		if (type == Type.STRING) {
 			return String.format("%1$c%2$s%1$c", STRING_MARKER,
-					strEncode(value, STRING_MARKER));
+					strEncode(value.toString(), STRING_MARKER));
 		}
-		return value;
+		return value.toString();
 	}
 
 	@Override
 	public String toString() {
 		return type + "[" + value + "]";
-	}
-
-	public static TypeObject string(String value) {
-		return new SimpleTypeObject(Type.STRING, value);
-	}
-
-	public static TypeObject special(String value) {
-		return new SimpleTypeObject(Type.SPECIAL, value);
-	}
-
-	public static TypeObject integer(int value) {
-		return new SimpleTypeObject(Type.INTEGER, Integer.toString(value));
 	}
 
 	public static String stripString(TypeObject obj) {

@@ -1,11 +1,13 @@
 package bridlensis.env;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import bridlensis.InvalidSyntaxException;
 import bridlensis.NSISStatements;
+import bridlensis.env.TypeObject.Type;
 
 class FunctionMsgBox extends CustomFunction {
 
@@ -22,6 +24,13 @@ class FunctionMsgBox extends CustomFunction {
 	protected static enum ButtonGroup {
 		OK, OKCANCEL, ABORTRETRYIGNORE, RETRYCANCEL, YESNO, YESNOCANCEL
 	};
+
+	private static final List<TypeObject> RETURN_ARG_YES = new ArrayList<TypeObject>(
+			Arrays.asList(new SimpleTypeObject(Type.STRING, "YES")));
+	private static final List<TypeObject> RETURN_ARG_RETRY = new ArrayList<TypeObject>(
+			Arrays.asList(new SimpleTypeObject(Type.STRING, "RETRY")));
+	private static final List<TypeObject> RETURN_ARG_OK = new ArrayList<TypeObject>(
+			Arrays.asList(new SimpleTypeObject(Type.STRING, "OK")));
 
 	protected static class ReturnOption implements TypeObject {
 
@@ -161,22 +170,18 @@ class FunctionMsgBox extends CustomFunction {
 			switch (buttonGroup) {
 			case OK:
 			case OKCANCEL:
-				sb.append(strcpy
-						.statementFor(NSISStatements.DEFAULT_INDENT,
-								Arrays.asList(SimpleTypeObject.string("OK")),
-								returnVar));
+				sb.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
+						RETURN_ARG_OK, returnVar));
 				break;
 			case RETRYCANCEL:
 			case ABORTRETRYIGNORE:
 				sb.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
-						Arrays.asList(SimpleTypeObject.string("RETRY")),
-						returnVar));
+						RETURN_ARG_RETRY, returnVar));
 				break;
 			case YESNO:
 			case YESNOCANCEL:
 				sb.append(strcpy.statementFor(NSISStatements.DEFAULT_INDENT,
-						Arrays.asList(SimpleTypeObject.string("YES")),
-						returnVar));
+						RETURN_ARG_YES, returnVar));
 				break;
 			}
 
