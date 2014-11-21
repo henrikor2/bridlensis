@@ -1132,17 +1132,32 @@ public class ParserTest {
 	public void testStrings() throws InvalidSyntaxException,
 			EnvironmentException, ParserException {
 		Parser parser = createParser();
+		InputReader reader;
+		StringBuilder expected;
 
-		InputReader reader = readerFor("a = '\"' + '\"'");
-		StringBuilder expected = new StringBuilder();
-		expected.append("Var /GLOBAL a\r\n");
-		expected.append("StrCpy $a '\"\"'");
+		parser.parseStatement(readerFor("Var a")); // Init test variable
+
+		reader = readerFor("a = \"''\"");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"''\"");
 		assertEquals(expected.toString(), parser.parseStatement(reader));
 
 		reader = readerFor("a = \"'\" + \"'\"");
 		expected = new StringBuilder();
 		expected.append("StrCpy $a \"''\"");
 		assertEquals(expected.toString(), parser.parseStatement(reader));
+
+		reader = readerFor("a = '\"\"'");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a '\"\"'");
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+
+		reader = readerFor("a = '\"' + '$\\\"'");
+		expected = new StringBuilder();
+		expected.append("StrCpy $a \"$\\\"$\\\"\""); // in-line strings markers
+														// must be escaped
+		assertEquals(expected.toString(), parser.parseStatement(reader));
+
 	}
 
 	@Test

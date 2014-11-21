@@ -2,6 +2,8 @@ package bridlensis.env;
 
 public class SimpleTypeObject implements TypeObject {
 
+	private static final char STRING_MARKER = '"';
+
 	private final Type type;
 	private final String value;
 
@@ -18,7 +20,8 @@ public class SimpleTypeObject implements TypeObject {
 	@Override
 	public String getValue() {
 		if (type == Type.STRING) {
-			return "\"" + value + "\"";
+			return String.format("%1$c%2$s%1$c", STRING_MARKER,
+					strEncode(value, STRING_MARKER));
 		}
 		return value;
 	}
@@ -45,6 +48,11 @@ public class SimpleTypeObject implements TypeObject {
 			return obj.getValue().substring(1, obj.getValue().length() - 1);
 		}
 		return obj.getValue();
+	}
+
+	private static String strEncode(String text, char cencodedCharacter) {
+		return text.replaceAll("(?<!\\$\\\\)\\" + cencodedCharacter,
+				"\\$\\\\\\" + cencodedCharacter);
 	}
 
 }
