@@ -2,10 +2,10 @@ package bridlensis;
 
 class WordTail {
 
-	private String pattern = "";
+	private String pattern;
 
-	void add(char c) {
-		pattern += c;
+	WordTail(String pattern) {
+		this.pattern = pattern;
 	}
 
 	protected String getPattern() {

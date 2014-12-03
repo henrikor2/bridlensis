@@ -32,7 +32,7 @@ public class InputReader {
 	private static final String LANGSTRING_START = "$(";
 	private static final String LANGSTRING_END = ")";
 
-	private static final WordTail EMPTY_TAIL = new WordTail();
+	private static final WordTail EMPTY_TAIL = new WordTail("");
 
 	private File file;
 	private Scanner input;
@@ -121,7 +121,7 @@ public class InputReader {
 		String word = text.get().substring(start, text.cursorPos());
 
 		// Move cursor to start of next word and collect tail chars
-		findNextWordStart();
+		tail = collectWordTail();
 
 		return new Word(word);
 	}
@@ -136,18 +136,19 @@ public class InputReader {
 		return line;
 	}
 
-	private void findNextWordStart() throws InvalidSyntaxException {
-		tail = new WordTail();
+	private WordTail collectWordTail() throws InvalidSyntaxException {
+		StringBuilder tailPattern = new StringBuilder();
 		while (!text.isAtEnd()) {
 			skipCommentsAtCursor();
 			if (text.charAtCursorIn(TAIL_MARKERS)) {
 				// Collect tail characters
-				tail.add(text.charAtCursor());
+				tailPattern.append(text.charAtCursor());
 			} else if (!text.charAtCursorIn(WORD_START_MARKERS)) {
 				break;
 			}
 			text.cursorForward(1);
 		}
+		return new WordTail(tailPattern.toString());
 	}
 
 	private void findCurrentWordEnd() throws InvalidSyntaxException {
