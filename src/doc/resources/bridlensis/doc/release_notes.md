@@ -1,5 +1,14 @@
 ﻿# BridleNSIS Release Notes
 
+## Version 0.4.2
+
+Release date: TBD
+
+### Fixes
+
+*   Fixed not encoding concatenated strings when using single-quote (`'`) markers in source code
+*   Fixed parsing nested function arguments in some cases
+
 ## Version 0.4.1
 
 Release date: 2014-08-19
