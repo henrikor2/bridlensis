@@ -136,7 +136,7 @@ class StatementParser {
 		StringBuilder sb = new StringBuilder();
 
 		if (!reader.getWordTail().isEmpty()
-				&& !reader.getWordTail().containsFunctionArgsClose()) {
+				&& !reader.getWordTail().isFunctionArgsClose()) {
 			do {
 				String argName = reader.nextWord().asName();
 				Variable argVariable = registerAndDeclareVariable(argName,
@@ -146,7 +146,7 @@ class StatementParser {
 								+ argVariable.getName() + "'");
 				enclosingFunction.registerArgument(argVariable);
 			} while (reader.getWordTail().isFunctionArgSeparator());
-			if (!reader.getWordTail().containsFunctionArgsClose()) {
+			if (!reader.getWordTail().isFunctionArgsClose()) {
 				throw new InvalidSyntaxException(
 						"Unterminated function definition");
 			}
@@ -222,12 +222,12 @@ class StatementParser {
 		}
 		ArrayList<TypeObject> args = new ArrayList<>();
 
-		if (!reader.getWordTail().containsFunctionArgsClose()) {
+		if (!reader.getWordTail().isFunctionArgsClose()) {
 			do {
 				TypeObject arg;
 				Word word = reader.nextWord();
 				WordTail tail = reader.getWordTail();
-				if (!tail.containsFunctionArgsClose()
+				if (!tail.isFunctionArgsClose()
 						&& (tail.isFunctionArgsOpen() || tail.isConcatenation())) {
 					arg = parseExpression(word, buffer, reader);
 				} else if (word.getType() == Type.NAME) {
@@ -238,8 +238,9 @@ class StatementParser {
 					arg = word;
 				}
 				args.add(arg);
-			} while (reader.getWordTail().isFunctionArgSeparator());
-			if (!reader.getWordTail().containsFunctionArgsClose()) {
+			} while (reader.getWordTail().isFunctionArgSeparator()
+					&& !reader.getWordTail().isFunctionArgsClose());
+			if (!reader.getWordTail().isFunctionArgsClose()) {
 				throw new InvalidSyntaxException("Unterminated function call");
 			}
 		}

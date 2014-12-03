@@ -120,7 +120,7 @@ public class InputReader {
 		}
 
 		public boolean isAssignment() {
-			return pattern.startsWith("=");
+			return pattern.equals("=");
 		}
 
 		public boolean isFunctionArgsOpen() {
@@ -128,11 +128,11 @@ public class InputReader {
 		}
 
 		public boolean isFunctionArgSeparator() {
-			return pattern.equals(",");
+			return pattern.contains(",");
 		}
 
-		public boolean containsFunctionArgsClose() {
-			return pattern.matches(".*\\).*");
+		public boolean isFunctionArgsClose() {
+			return pattern.contains(")");
 		}
 
 		public boolean isConcatenation() {
