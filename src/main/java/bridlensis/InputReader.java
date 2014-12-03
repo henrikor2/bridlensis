@@ -151,6 +151,10 @@ public class InputReader {
 			return pattern.isEmpty();
 		}
 
+		public void removeFunctionArgsClose() {
+			pattern = pattern.replaceFirst("\\)", "");
+		}
+
 	}
 
 	private File file;

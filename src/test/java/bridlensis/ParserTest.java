@@ -1176,7 +1176,7 @@ public class ParserTest {
 		expected.append("Var /GLOBAL b\r\n");
 		expected.append("Var /GLOBAL s01\r\n");
 		expected.append("StrLen $s01 $a \r\n");
-		expected.append("IntOp $b $s01 '-' 1");
+		expected.append("IntOp $b $s01 '-' 1 ");
 		assertEquals(expected.toString(), parser.parseStatement(reader));
 	}
 

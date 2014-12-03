@@ -244,6 +244,10 @@ class StatementParser {
 			}
 		}
 
+		// Make sure nested function call as an argument won't prevent parsing
+		// rest of the argument of the parent function call.
+		reader.getWordTail().removeFunctionArgsClose();
+
 		if (function.getArgsCount() != Callable.UNLIMITED_ARGS
 				&& args.size() > function.getArgsCount()) {
 			throw new InvalidSyntaxException(
