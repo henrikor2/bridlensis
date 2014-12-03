@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import bridlensis.env.TypeObject;
-
 public class InputReader {
 
 	private static final char LINE_CONTINUE = '\\';
@@ -13,7 +11,7 @@ public class InputReader {
 	private static final String COMMENT_MARKERS = ";#";
 	private static final String COMMENTBLOCK_START = "/*";
 	private static final String COMMENTBLOCK_END = "*/";
-	private static final String STRING_MARKERS = "\"'";
+	static final String STRING_MARKERS = "\"'";
 	private static final String STRING_CHARMASK = "$\\";
 
 	// Ignored characters
@@ -35,127 +33,6 @@ public class InputReader {
 	private static final String LANGSTRING_END = ")";
 
 	private static final WordTail EMPTY_TAIL = new WordTail();
-
-	static class Word implements TypeObject {
-
-		private final String value;
-		private final Type type;
-
-		public Word(String value) {
-			this.value = value;
-			if (value.isEmpty()) {
-				type = Type.SPECIAL;
-			} else if (isString()) {
-				type = Type.STRING;
-			} else if (value.charAt(0) == '$' || value.charAt(0) == '{'
-					|| value.charAt(0) == '/') {
-				type = Type.SPECIAL;
-			} else if (isNumeric()) {
-				type = Type.INTEGER;
-			} else {
-				type = Type.NAME;
-			}
-		}
-
-		private boolean isString() {
-			return STRING_MARKERS.indexOf(value.charAt(0)) != -1;
-		}
-
-		private boolean isNumeric() {
-			char[] charArray = value.toCharArray();
-			for (int i = charArray[0] == '-' ? 1 : 0; i < charArray.length; i++) {
-				if (!Character.isDigit(charArray[i]))
-					return false;
-			}
-			return true;
-		}
-
-		public String asName() {
-			return value.toLowerCase();
-		}
-
-		public String asBareString() {
-			if (isString()) {
-				return value.substring(1, value.length() - 1);
-			}
-			return value;
-		}
-
-		@Override
-		public Type getType() {
-			return type;
-		}
-
-		@Override
-		public String getValue() {
-			return value;
-		}
-
-		@Override
-		public String toString() {
-			return "Word[" + value + "]";
-		}
-
-	}
-
-	static class WordTail {
-
-		private String pattern = "";
-
-		private void add(char c) {
-			pattern += c;
-		}
-
-		protected String getPattern() {
-			return pattern;
-		}
-
-		@Override
-		public String toString() {
-			return "Tail[" + pattern + "]";
-		}
-
-		public boolean isCompilerCommand() {
-			return pattern.equals("!");
-		}
-
-		public boolean isAssignment() {
-			return pattern.equals("=");
-		}
-
-		public boolean isFunctionArgsOpen() {
-			return pattern.startsWith("(");
-		}
-
-		public boolean isFunctionArgSeparator() {
-			return pattern.contains(",");
-		}
-
-		public boolean isFunctionArgsClose() {
-			return pattern.contains(")");
-		}
-
-		public boolean isConcatenation() {
-			return pattern.endsWith("+");
-		}
-
-		public boolean isComparison() {
-			return pattern.matches(".*(==|!=|[<>]).*");
-		}
-
-		public String getComparison() {
-			return pattern.replaceAll("[^=!\\<\\>]", "");
-		}
-
-		public boolean isEmpty() {
-			return pattern.isEmpty();
-		}
-
-		public void removeFunctionArgsClose() {
-			pattern = pattern.replaceFirst("\\)", "");
-		}
-
-	}
 
 	private File file;
 	private Scanner input;

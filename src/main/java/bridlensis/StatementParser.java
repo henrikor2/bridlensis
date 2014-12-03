@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import bridlensis.InputReader.Word;
-import bridlensis.InputReader.WordTail;
 import bridlensis.env.AdHocFunction;
 import bridlensis.env.Callable;
 import bridlensis.env.Callable.ReturnType;

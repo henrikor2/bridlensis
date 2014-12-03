@@ -7,7 +7,6 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import bridlensis.InputReader;
-import bridlensis.InputReader.Word;
 import bridlensis.InvalidSyntaxException;
 import bridlensis.env.TypeObject;
 

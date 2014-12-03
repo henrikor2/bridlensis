@@ -12,8 +12,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import bridlensis.InputReader.Word;
-import bridlensis.InputReader.WordTail;
 import bridlensis.env.EnvironmentException;
 
 public class Parser {
@@ -186,7 +184,8 @@ public class Parser {
 			statement = reader.getCurrentStatement();
 		} else {
 			// Parse include file
-			logger.debug(reader, "Follow include: " + inputFile.getAbsolutePath());
+			logger.debug(reader,
+					"Follow include: " + inputFile.getAbsolutePath());
 			String outputFileName = MakeBridleNSIS
 					.convertToBridleFilename(inputFileName);
 			try (BufferedWriter writer = getOutputWriter(outputFileName)) {
