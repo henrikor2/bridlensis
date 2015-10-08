@@ -101,6 +101,8 @@ Example:
 
 *   **[BridleNSIS Sublime Text](https://github.com/idleberg/BridleNSIS-Sublime-Text)**
     BridleNSIS syntax definitions and completions for Sublime Text. The former work for TextMate as well.
+*   **[BridleNSIS Atom](https://atom.io/packages/language-bridlensis)**
+    Atom language support for BridleNSIS, consisting of grammar and snippets.
 
 
 ## Language Reference
